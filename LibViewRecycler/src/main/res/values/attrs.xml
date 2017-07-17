@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ProgressBar -->
+    <declare-styleable name="ViewRecyclerCircleProgressBar">
+        <attr name="bar_text_size" format="dimension"/>
+        <attr name="bar_text_color" format="color"/>
+        <attr name="bar_text_progress" format="dimension"/>
+        <attr name="bar_text_visibility" format="enum">
+            <enum name="visible" value="0"/>
+            <enum name="invisible" value="1"/>
+        </attr>
+    </declare-styleable>
+</resources>

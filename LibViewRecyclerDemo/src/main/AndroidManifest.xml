@@ -1,0 +1,30 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.yline.view.recycler.demo">
+
+    <application
+        android:name="com.yline.application.BaseApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"></action>
+                <category android:name="android.intent.category.LAUNCHER"></category>
+            </intent-filter>
+        </activity>
+        <!-- Simple -->
+        <activity android:name=".simple.SimpleGridDecorationActivity"/>
+        <activity android:name=".simple.SimpleHeadFootRecyclerActivity"/>
+        <activity android:name=".simple.SimpleLinearDecorationActivity"/>
+        <activity android:name=".simple.SimpleListActivity"/>
+        <activity android:name=".simple.SimpleRecyclerActivity"/>
+        <!-- z -->
+        <activity android:name=".z.SecondMenuActivity"/>
+        <activity android:name=".z.SuperSwipeCustomActivity"/>
+        <activity android:name=".z.ProgressCircleActivity"/>
+        <activity android:name=".z.SuperSwipeSimpleActivity"/>
+    </application>
+
+</manifest>
