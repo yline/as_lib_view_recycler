@@ -40,8 +40,8 @@ ext {
 
     libraryDescription = '提供使用较多的公共View类'
 
-    siteUrl = 'https://github.com/yline/as_lib_place '
-    gitUrl = 'https://github.com/yline/as_lib_place.git'
+    siteUrl = 'https://github.com/yline/as_lib_view_recycler'
+    gitUrl = 'https://github.com/yline/as_lib_view_recycler.git'
 
     libraryVersion = '1.0.1'
 
