@@ -71,18 +71,18 @@ public class SimpleRecyclerActivity extends BaseAppCompatActivity
 						homeAdapter.remove(0);
 						break;
 					case 5:
-						if (homeAdapter.dataSize() > 1)
+						if (homeAdapter.getDataSize() > 1)
 						{
-							String object = homeAdapter.getItem(homeAdapter.dataSize() - 1);
+							String object = homeAdapter.getItem(homeAdapter.getDataSize() - 1);
 							homeAdapter.remove(object);
 						}
 						break;
 					case 6:
-						if (homeAdapter.dataSize() > 3)
+						if (homeAdapter.getDataSize() > 3)
 						{
-							String objectA = homeAdapter.getItem(homeAdapter.dataSize() - 1);
-							String objectB = homeAdapter.getItem(homeAdapter.dataSize() - 2);
-							String objectC = homeAdapter.getItem(homeAdapter.dataSize() - 3);
+							String objectA = homeAdapter.getItem(homeAdapter.getDataSize() - 1);
+							String objectB = homeAdapter.getItem(homeAdapter.getDataSize() - 2);
+							String objectC = homeAdapter.getItem(homeAdapter.getDataSize() - 3);
 							homeAdapter.removeAll(Arrays.asList(objectA, objectB, objectC));
 						}
 						break;

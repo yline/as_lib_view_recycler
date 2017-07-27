@@ -31,21 +31,11 @@ public abstract class CommonListAdapter<T> extends BaseAdapter implements IDataA
 		this.sContext = context;
 		this.sList = new ArrayList<>();
 	}
-
+	
 	@Override
 	public int getCount()
 	{
 		return sList.size();
-	}
-
-	@Override
-	public T getItem(int position)
-	{
-		if (position >= sList.size())
-		{
-			throw new IllegalArgumentException("invalid position");
-		}
-		return sList.get(position);
 	}
 
 	@Override
@@ -106,13 +96,44 @@ public abstract class CommonListAdapter<T> extends BaseAdapter implements IDataA
 	}
 
 	@Override
+	public T getItem(int position)
+	{
+		if (position >= sList.size())
+		{
+			throw new IllegalArgumentException("invalid position");
+		}
+		return sList.get(position);
+	}
+
+	@Override
+	public boolean contains(Object object)
+	{
+		boolean result = sList.contains(object);
+		return result;
+	}
+
+	@Override
+	public boolean containsAll(Collection collection)
+	{
+		boolean result = sList.containsAll(collection);
+		return result;
+	}
+
+	@Override
+	public boolean isEmpty()
+	{
+		return super.isEmpty();
+	}
+
+	@Override
+	public boolean isEmptyViewShow()
+	{
+		return true;
+	}
+
+	@Override
 	public boolean add(T object)
 	{
-		if (sList.size() == 0)
-		{
-			return false;
-		}
-
 		boolean result = sList.add(object);
 		this.notifyDataSetChanged();
 		return result;
@@ -121,25 +142,14 @@ public abstract class CommonListAdapter<T> extends BaseAdapter implements IDataA
 	@Override
 	public boolean add(int index, T element)
 	{
-		if (sList.size() == 0)
-		{
-			return false;
-		}
-
 		sList.add(index, element);
 		this.notifyDataSetChanged();
-
 		return true;
 	}
 
 	@Override
 	public boolean addAll(Collection collection)
 	{
-		if (sList.size() == 0)
-		{
-			return false;
-		}
-
 		boolean result = sList.addAll(collection);
 		this.notifyDataSetChanged();
 		return result;
@@ -153,17 +163,14 @@ public abstract class CommonListAdapter<T> extends BaseAdapter implements IDataA
 		return result;
 	}
 
-
-	@Override
-	public boolean contains(Object object)
-	{
-		boolean result = sList.contains(object);
-		return result;
-	}
-
 	@Override
 	public T remove(int index)
 	{
+		if (index >= sList.size())
+		{
+			return null;
+		}
+
 		T t = sList.remove(index);
 		this.notifyDataSetChanged();
 		return t;
@@ -178,7 +185,7 @@ public abstract class CommonListAdapter<T> extends BaseAdapter implements IDataA
 	}
 
 	@Override
-	public int dataSize()
+	public int getDataSize()
 	{
 		int size = sList.size();
 		return size;
@@ -193,13 +200,6 @@ public abstract class CommonListAdapter<T> extends BaseAdapter implements IDataA
 	}
 
 	@Override
-	public boolean containsAll(Collection collection)
-	{
-		boolean result = sList.containsAll(collection);
-		return result;
-	}
-
-	@Override
 	public void clear()
 	{
 		sList.clear();
@@ -209,7 +209,7 @@ public abstract class CommonListAdapter<T> extends BaseAdapter implements IDataA
 	@Override
 	public boolean update(int index, T t)
 	{
-		if (1 > sList.size())
+		if (index >= sList.size())
 		{
 			return false;
 		}
@@ -224,9 +224,19 @@ public abstract class CommonListAdapter<T> extends BaseAdapter implements IDataA
 	@Override
 	public boolean update(int[] index, T[] arrays)
 	{
+		// 入参处理
 		if (index.length != arrays.length)
 		{
 			return false;
+		}
+
+		// 越界处理
+		for (int i = 0; i < index.length; i++)
+		{
+			if (index[i] >= sList.size())
+			{
+				return false;
+			}
 		}
 
 		for (int i = 0; i < index.length; i++)

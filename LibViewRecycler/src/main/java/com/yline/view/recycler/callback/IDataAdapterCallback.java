@@ -27,6 +27,13 @@ public interface IDataAdapterCallback<E>
 	E getItem(int position);
 
 	/**
+	 * 获取数据量大小
+	 *
+	 * @return
+	 */
+	int getDataSize();
+
+	/**
 	 * 判断是否包含某一项数据
 	 *
 	 * @param object
@@ -50,11 +57,10 @@ public interface IDataAdapterCallback<E>
 	boolean isEmpty();
 
 	/**
-	 * 获取数据量大小
-	 *
+	 * 判断 数据列表为空时，是否显示其它的View
 	 * @return
 	 */
-	int dataSize();
+	boolean isEmptyViewShow();
 
 	/**
 	 * 放置，全部的数据

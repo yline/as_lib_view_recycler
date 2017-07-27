@@ -21,10 +21,6 @@
         <activity android:name=".simple.SimpleListActivity"/>
         <activity android:name=".simple.SimpleRecyclerActivity"/>
         <!-- z -->
-        <activity android:name=".z.SecondMenuActivity"/>
-        <activity android:name=".z.SuperSwipeCustomActivity"/>
-        <activity android:name=".z.ProgressCircleActivity"/>
-        <activity android:name=".z.SuperSwipeSimpleActivity"/>
     </application>
 
 </manifest>

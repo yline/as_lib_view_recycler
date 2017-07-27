@@ -114,7 +114,13 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<Recy
 		}
 		return sList.get(position);
 	}
-	
+
+	@Override
+	public boolean isEmptyViewShow()
+	{
+		return true;
+	}
+
 	@Override
 	public List<T> getDataList()
 	{
@@ -199,7 +205,7 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<Recy
 	}
 	
 	@Override
-	public int dataSize()
+	public int getDataSize()
 	{
 		int size = sList.size();
 		return size;

@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.yline.base.BaseAppCompatActivity;
+import com.yline.test.TestConstant;
 import com.yline.utils.UIScreenUtil;
 import com.yline.view.recycler.demo.R;
 import com.yline.view.recycler.holder.RecyclerViewHolder;
@@ -29,6 +30,11 @@ public class SimpleHeadFootRecyclerActivity extends BaseAppCompatActivity
 	private GridLayoutManager gridLayoutManager;
 
 	private Random random = new Random();
+
+	public static void actionStart(Context context)
+	{
+		context.startActivity(new Intent(context, SimpleHeadFootRecyclerActivity.class));
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -60,6 +66,12 @@ public class SimpleHeadFootRecyclerActivity extends BaseAppCompatActivity
 			{
 				return 2;
 			}
+
+			@Override
+			protected int getDivideResourceId()
+			{
+				return R.drawable.recycler_divider_black_normal;
+			}
 		});
 		recyclerView.setAdapter(simpleAdapter);
 
@@ -82,6 +94,8 @@ public class SimpleHeadFootRecyclerActivity extends BaseAppCompatActivity
 		footViewB.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, UIScreenUtil.dp2px(this, 20)));
 		footViewB.setBackgroundColor(ContextCompat.getColor(this, android.R.color.holo_blue_bright));
 		simpleAdapter.addFootView(footViewB);
+
+		simpleAdapter.setDataList(TestConstant.getListFive(10));
 
 		TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_recycler);
 		tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener()
@@ -107,18 +121,18 @@ public class SimpleHeadFootRecyclerActivity extends BaseAppCompatActivity
 						simpleAdapter.remove(0);
 						break;
 					case 5:
-						if (simpleAdapter.dataSize() > 1)
+						if (simpleAdapter.getDataSize() > 1)
 						{
-							String object = simpleAdapter.getItem(simpleAdapter.dataSize() - 1);
+							String object = simpleAdapter.getItem(simpleAdapter.getDataSize() - 1);
 							simpleAdapter.remove(object);
 						}
 						break;
 					case 6:
-						if (simpleAdapter.dataSize() > 3)
+						if (simpleAdapter.getDataSize() > 3)
 						{
-							String objectA = simpleAdapter.getItem(simpleAdapter.dataSize() - 1);
-							String objectB = simpleAdapter.getItem(simpleAdapter.dataSize() - 2);
-							String objectC = simpleAdapter.getItem(simpleAdapter.dataSize() - 3);
+							String objectA = simpleAdapter.getItem(simpleAdapter.getDataSize() - 1);
+							String objectB = simpleAdapter.getItem(simpleAdapter.getDataSize() - 2);
+							String objectC = simpleAdapter.getItem(simpleAdapter.getDataSize() - 3);
 							simpleAdapter.removeAll(Arrays.asList(objectA, objectB, objectC));
 						}
 						break;
@@ -178,11 +192,6 @@ public class SimpleHeadFootRecyclerActivity extends BaseAppCompatActivity
 		}
 
 		simpleAdapter.setDataList(data);
-	}
-
-	public static void actionStart(Context context)
-	{
-		context.startActivity(new Intent(context, SimpleHeadFootRecyclerActivity.class));
 	}
 
 	private class SimpleHeadFootAdapter extends SimpleHeadFootRecyclerAdapter

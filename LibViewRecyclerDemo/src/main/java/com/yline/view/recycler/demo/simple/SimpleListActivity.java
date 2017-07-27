@@ -3,11 +3,12 @@ package com.yline.view.recycler.demo.simple;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.widget.ListView;
 
 import com.yline.base.BaseActivity;
-import com.yline.view.recycler.demo.InnerConstant;
 import com.yline.view.recycler.demo.R;
+import com.yline.view.recycler.demo.TestDataAdapter;
 import com.yline.view.recycler.simple.SimpleListAdapter;
 
 public class SimpleListActivity extends BaseActivity
@@ -27,7 +28,9 @@ public class SimpleListActivity extends BaseActivity
 		listAdapter = new SimpleListAdapter(this);
 		lvDemo.setAdapter(listAdapter);
 
-		listAdapter.setDataList(InnerConstant.getMvList());
+		// 数据操作
+		TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout_list);
+		new TestDataAdapter(tabLayout, listAdapter);
 	}
 
 	/**
