@@ -31,7 +31,7 @@ public abstract class CommonListAdapter<T> extends BaseAdapter implements IDataA
 		this.sContext = context;
 		this.sList = new ArrayList<>();
 	}
-	
+
 	@Override
 	public int getCount()
 	{
@@ -123,12 +123,6 @@ public abstract class CommonListAdapter<T> extends BaseAdapter implements IDataA
 	public boolean isEmpty()
 	{
 		return super.isEmpty();
-	}
-
-	@Override
-	public boolean isEmptyViewShow()
-	{
-		return true;
 	}
 
 	@Override
@@ -242,7 +236,7 @@ public abstract class CommonListAdapter<T> extends BaseAdapter implements IDataA
 		for (int i = 0; i < index.length; i++)
 		{
 			sList.remove(index[i]);
-			sList.add(arrays[i]);
+			sList.add(index[i], arrays[i]);
 		}
 		this.notifyDataSetChanged();
 

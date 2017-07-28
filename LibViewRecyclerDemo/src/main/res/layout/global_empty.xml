@@ -19,6 +19,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/iv_empty_recycler"
         android:layout_centerHorizontal="true"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
         android:text="数据为空"/>
 
     <Button
@@ -28,5 +30,4 @@
         android:layout_below="@id/tv_empty_recycler"
         android:layout_centerHorizontal="true"
         android:text="Button"/>
-
 </RelativeLayout>

@@ -1,4 +1,4 @@
-package com.yline.view.recycler.demo.simple;
+package com.yline.view.recycler.demo.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,8 +7,8 @@ import android.support.design.widget.TabLayout;
 import android.widget.ListView;
 
 import com.yline.base.BaseActivity;
+import com.yline.view.recycler.demo.DataAdapterTest;
 import com.yline.view.recycler.demo.R;
-import com.yline.view.recycler.demo.TestDataAdapter;
 import com.yline.view.recycler.simple.SimpleListAdapter;
 
 public class SimpleListActivity extends BaseActivity
@@ -16,6 +16,11 @@ public class SimpleListActivity extends BaseActivity
 	private ListView lvDemo;
 
 	private SimpleListAdapter listAdapter;
+
+	public static void actionStart(Context context)
+	{
+		context.startActivity(new Intent(context, SimpleListActivity.class));
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -30,16 +35,6 @@ public class SimpleListActivity extends BaseActivity
 
 		// 数据操作
 		TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout_list);
-		new TestDataAdapter(tabLayout, listAdapter);
-	}
-
-	/**
-	 * 开启该CommonListActivity
-	 *
-	 * @param context
-	 */
-	public static void actionStart(Context context)
-	{
-		context.startActivity(new Intent(context, SimpleListActivity.class));
+		new DataAdapterTest(tabLayout, listAdapter);
 	}
 }

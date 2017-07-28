@@ -19,6 +19,13 @@ public interface IDataAdapterCallback<E>
 	List<E> getDataList();
 
 	/**
+	 * 放置，全部的数据
+	 *
+	 * @param list
+	 */
+	void setDataList(List<E> list);
+
+	/**
 	 * 依据位置，获取相应的数据
 	 *
 	 * @param position
@@ -55,19 +62,6 @@ public interface IDataAdapterCallback<E>
 	 * @return
 	 */
 	boolean isEmpty();
-
-	/**
-	 * 判断 数据列表为空时，是否显示其它的View
-	 * @return
-	 */
-	boolean isEmptyViewShow();
-
-	/**
-	 * 放置，全部的数据
-	 *
-	 * @param list
-	 */
-	void setDataList(List<E> list);
 
 	/**
 	 * 在数据末尾，添加一条数据

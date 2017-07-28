@@ -20,7 +20,7 @@ import java.util.List;
  * @author yline 2017/5/23 -- 10:31
  * @version 1.0.0
  */
-public abstract class HeadFootRecyclerAdapter<T> extends CommonRecyclerAdapter<T>
+public abstract class HeadFootRecyclerAdapter<T> extends CommonEmptyRecyclerAdapter<T>
 {
 	// 头部的开始标签
 	private static final int BASE_ITEM_TYPE_HEADER = 1024;

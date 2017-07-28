@@ -21,8 +21,6 @@ import java.util.List;
  */
 public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<RecyclerViewHolder> implements IDataAdapterCallback<T>
 {
-	private static final int EmptyType = -11111;
-	
 	protected List<T> sList;
 	
 	public CommonRecyclerAdapter()
@@ -33,92 +31,18 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<Recy
 	@Override
 	public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
 	{
-		if (viewType == EmptyType)
-		{
-			return new RecyclerViewHolder(LayoutInflater.from(parent.getContext()).inflate(getEmptyItemRes(), parent, false));
-		}
 		return new RecyclerViewHolder(LayoutInflater.from(parent.getContext()).inflate(getItemRes(), parent, false));
 	}
-	
-	@Override
-	public void onBindViewHolder(RecyclerViewHolder holder, int position, List<Object> payloads)
-	{
-		if (holder.getItemViewType() == EmptyType)
-		{
-			onBindEmptyViewHolder(holder, position);
-		}
-		else
-		{
-			super.onBindViewHolder(holder, position, payloads);
-		}
-	}
-	
-	/**
-	 * 数据为空时，显示内容
-	 *
-	 * @param viewHolder
-	 * @param position
-	 */
-	public void onBindEmptyViewHolder(RecyclerViewHolder viewHolder, int position)
-	{
-		// TODO: 2017/5/23  
-	}
-	
-	@Override
-	public int getItemViewType(int position)
-	{
-		if (sList.size() == 0)
-		{
-			return EmptyType;
-		}
-		return super.getItemViewType(position);
-	}
-	
+
 	/**
 	 * @return item 资源文件
 	 */
 	public abstract int getItemRes();
 	
-	/**
-	 * 数据为空时，显示内容
-	 *
-	 * @return
-	 */
-	public int getEmptyItemRes()
-	{
-		return android.R.layout.simple_list_item_1;
-	}
-	
 	@Override
 	public int getItemCount()
 	{
-		if (sList.size() == 0)
-		{
-			return 1;
-		}
 		return sList.size();
-	}
-	
-	/**
-	 * 返回某项数据
-	 *
-	 * @param position 位置
-	 * @return 某项数据
-	 */
-	@Override
-	public T getItem(int position)
-	{
-		if (position >= sList.size())
-		{
-			throw new IllegalArgumentException("invalid position");
-		}
-		return sList.get(position);
-	}
-
-	@Override
-	public boolean isEmptyViewShow()
-	{
-		return true;
 	}
 
 	@Override
@@ -136,15 +60,53 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<Recy
 			this.notifyDataSetChanged();
 		}
 	}
-	
+
+	/**
+	 * 返回某项数据
+	 *
+	 * @param position 位置
+	 * @return 某项数据
+	 */
+	@Override
+	public T getItem(int position)
+	{
+		if (position >= sList.size())
+		{
+			throw new IllegalArgumentException("invalid position");
+		}
+		return sList.get(position);
+	}
+
+	@Override
+	public int getDataSize()
+	{
+		int size = sList.size();
+		return size;
+	}
+
+	@Override
+	public boolean contains(Object object)
+	{
+		boolean result = sList.contains(object);
+		return result;
+	}
+
+	@Override
+	public boolean containsAll(Collection collection)
+	{
+		boolean result = sList.containsAll(collection);
+		return result;
+	}
+
+	@Override
+	public boolean isEmpty()
+	{
+		return sList.isEmpty();
+	}
+
 	@Override
 	public boolean add(T object)
 	{
-		if (sList.size() == 0)
-		{
-			return false;
-		}
-		
 		boolean result = sList.add(object);
 		this.notifyItemInserted(sList.size() - 1);
 		return result;
@@ -153,11 +115,6 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<Recy
 	@Override
 	public boolean add(int index, T element)
 	{
-		if (sList.size() == 0)
-		{
-			return false;
-		}
-		
 		sList.add(index, element);
 		this.notifyItemInserted(index);
 		
@@ -165,13 +122,8 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<Recy
 	}
 	
 	@Override
-	public boolean addAll(Collection collection)
+	public boolean addAll(Collection<? extends T> collection)
 	{
-		if (sList.size() == 0)
-		{
-			return false;
-		}
-		
 		boolean result = sList.addAll(collection);
 		this.notifyItemRangeInserted(sList.size() - 1, collection.size());
 		return result;
@@ -180,43 +132,11 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<Recy
 	@Override
 	public boolean addAll(int index, Collection<? extends T> collection)
 	{
-		if (sList.size() == 0)
-		{
-			return false;
-		}
-		
 		boolean result = sList.addAll(index, collection);
 		this.notifyItemRangeInserted(index, collection.size());
 		return result;
 	}
-	
-	@Override
-	public boolean contains(Object object)
-	{
-		boolean result = sList.contains(object);
-		return result;
-	}
-	
-	@Override
-	public boolean containsAll(Collection collection)
-	{
-		boolean result = sList.containsAll(collection);
-		return result;
-	}
-	
-	@Override
-	public int getDataSize()
-	{
-		int size = sList.size();
-		return size;
-	}
-	
-	@Override
-	public boolean isEmpty()
-	{
-		return sList.isEmpty();
-	}
-	
+
 	@Override
 	public T remove(int index)
 	{
@@ -294,7 +214,7 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<Recy
 	@Override
 	public boolean update(int index, T t)
 	{
-		if (1 > sList.size())
+		if (index >= sList.size())
 		{
 			return false;
 		}
@@ -312,6 +232,14 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<Recy
 		if (index.length != arrays.length || index.length > sList.size())
 		{
 			return false;
+		}
+
+		for (int i = 0; i < index.length; i++)
+		{
+			if (index[i] >= sList.size())
+			{
+				return false;
+			}
 		}
 		
 		for (int i = 0; i < arrays.length; i++)

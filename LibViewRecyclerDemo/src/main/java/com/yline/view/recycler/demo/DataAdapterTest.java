@@ -9,9 +9,9 @@ import com.yline.view.recycler.callback.IDataAdapterCallback;
 
 import java.util.List;
 
-public class TestDataAdapter
+public class DataAdapterTest
 {
-	public TestDataAdapter(TabLayout tabLayout, final IDataAdapterCallback<String> adapter)
+	public DataAdapterTest(TabLayout tabLayout, final IDataAdapterCallback<String> adapter)
 	{
 		tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
 		tabLayout.addTab(tabLayout.newTab().setText("getDataList"));
@@ -20,7 +20,6 @@ public class TestDataAdapter
 		tabLayout.addTab(tabLayout.newTab().setText("contains"));
 		tabLayout.addTab(tabLayout.newTab().setText("containsAll"));
 		tabLayout.addTab(tabLayout.newTab().setText("isEmpty"));
-		tabLayout.addTab(tabLayout.newTab().setText("isEmptyViewShow"));
 		tabLayout.addTab(tabLayout.newTab().setText("setDataList"));
 		tabLayout.addTab(tabLayout.newTab().setText("add"));
 		tabLayout.addTab(tabLayout.newTab().setText("add(0)"));
@@ -74,60 +73,56 @@ public class TestDataAdapter
 						LogFileUtil.v("isEmpty = " + adapter.isEmpty());
 						break;
 					case 6:
-						SDKManager.toast("isEmptyViewShow = " + adapter.isEmptyViewShow());
-						LogFileUtil.v("isEmptyViewShow = " + adapter.isEmptyViewShow());
-						break;
-					case 7:
 						adapter.setDataList(TestConstant.getListThree(5));
 						SDKManager.toast("setDataList ok");
 						LogFileUtil.v("setDataList ok");
 						break;
-					case 8:
+					case 7:
 						boolean addResult = adapter.add(TestConstant.getListSix(2).get(0));
 						SDKManager.toast("add = " + addResult);
 						LogFileUtil.v("add = " + addResult);
 						break;
-					case 9:
+					case 8:
 						boolean addResult0 = adapter.add(0, TestConstant.getListFour(3).get(0));
 						SDKManager.toast("add(0) = " + addResult0);
 						LogFileUtil.v("add(0) = " + addResult0);
 						break;
-					case 10:
+					case 9:
 						boolean addAll = adapter.addAll(TestConstant.getListSix(2));
 						SDKManager.toast("addAll = " + addAll);
 						LogFileUtil.v("addAll = " + addAll);
 						break;
-					case 11:
+					case 10:
 						boolean addAll0 = adapter.addAll(0, TestConstant.getListFour(3));
 						SDKManager.toast("addAll0 = " + addAll0);
 						LogFileUtil.v("addAll0 = " + addAll0);
 						break;
-					case 12:
+					case 11:
 						boolean remove = adapter.remove(TestConstant.getListFour(3).get(0));
 						SDKManager.toast("remove = " + remove);
 						LogFileUtil.v("remove = " + remove);
 						break;
-					case 13:
+					case 12:
 						String remove0 = adapter.remove(0);
 						SDKManager.toast("remove0 = " + remove0);
 						LogFileUtil.v("remove0 = " + remove0);
 						break;
-					case 14:
+					case 13:
 						boolean removeAll = adapter.removeAll(TestConstant.getListFour(3));
 						SDKManager.toast("removeAll = " + removeAll);
 						LogFileUtil.v("removeAll = " + removeAll);
 						break;
-					case 15:
+					case 14:
 						adapter.clear();
 						SDKManager.toast("adapter ok");
 						LogFileUtil.v("adapter ok");
 						break;
-					case 16:
+					case 15:
 						boolean update0 = adapter.update(0, TestConstant.getListEnglish(2).get(0));
 						SDKManager.toast("update0 = " + update0);
 						LogFileUtil.v("update0 = " + update0);
 						break;
-					case 17:
+					case 16:
 						boolean update01 = adapter.update(new int[]{0, 1}, TestConstant.getListEnglish(2).toArray(new String[]{"", ""}));
 						SDKManager.toast("update01 = " + update01);
 						LogFileUtil.v("update01 = " + update01);

@@ -1,4 +1,4 @@
-package com.yline.view.recycler.demo.simple;
+package com.yline.view.recycler.demo.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -199,7 +199,7 @@ public class SimpleHeadFootRecyclerActivity extends BaseAppCompatActivity
 		@Override
 		public int getEmptyItemRes()
 		{
-			return R.layout.global_recycler_empty;
+			return R.layout.global_empty;
 		}
 
 		@Override

@@ -6,18 +6,18 @@ import android.view.View;
 import com.yline.application.BaseApplication;
 import com.yline.log.LogFileUtil;
 import com.yline.test.BaseTestActivity;
+import com.yline.view.recycler.demo.adapter.SimpleEmptyRecyclerActivity;
+import com.yline.view.recycler.demo.adapter.SimpleHeadFootRecyclerActivity;
+import com.yline.view.recycler.demo.adapter.SimpleListActivity;
+import com.yline.view.recycler.demo.adapter.SimpleRecyclerActivity;
 import com.yline.view.recycler.demo.simple.SimpleGridDecorationActivity;
-import com.yline.view.recycler.demo.simple.SimpleHeadFootRecyclerActivity;
 import com.yline.view.recycler.demo.simple.SimpleLinearDecorationActivity;
-import com.yline.view.recycler.demo.simple.SimpleListActivity;
-import com.yline.view.recycler.demo.simple.SimpleRecyclerActivity;
 
 public class MainActivity extends BaseTestActivity
 {
 	@Override
 	public void testStart(View view, Bundle savedInstanceState)
 	{
-		// SimpleListActivity
 		addButton("SimpleListAdapter", new View.OnClickListener()
 		{
 			@Override
@@ -27,14 +27,24 @@ public class MainActivity extends BaseTestActivity
 				SimpleListActivity.actionStart(MainActivity.this);
 			}
 		});
-
-		addButton("SimpleRecycleAdapter", new View.OnClickListener()
+		
+		addButton("SimpleRecyclerAdapter", new View.OnClickListener()
 		{
 			@Override
 			public void onClick(View v)
 			{
 				LogFileUtil.v(BaseApplication.TAG, "CommonRecyclerAdapter");
 				SimpleRecyclerActivity.actionStart(MainActivity.this);
+			}
+		});
+
+		addButton("SimpleEmptyRecyclerAdapter", new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				LogFileUtil.v(BaseApplication.TAG, "SimpleEmptyRecyclerAdapter");
+				SimpleEmptyRecyclerActivity.actionStart(MainActivity.this);
 			}
 		});
 

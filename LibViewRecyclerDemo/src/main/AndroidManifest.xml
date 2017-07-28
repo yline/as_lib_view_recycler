@@ -14,13 +14,11 @@
                 <category android:name="android.intent.category.LAUNCHER"></category>
             </intent-filter>
         </activity>
-        <!-- Simple -->
-        <activity android:name=".simple.SimpleGridDecorationActivity"/>
-        <activity android:name=".simple.SimpleHeadFootRecyclerActivity"/>
-        <activity android:name=".simple.SimpleLinearDecorationActivity"/>
-        <activity android:name=".simple.SimpleListActivity"/>
-        <activity android:name=".simple.SimpleRecyclerActivity"/>
-        <!-- z -->
+        <!-- adapter -->
+        <activity android:name=".adapter.SimpleListActivity"></activity>
+        <activity android:name=".adapter.SimpleRecyclerActivity"></activity>
+        <activity android:name=".adapter.SimpleEmptyRecyclerActivity"></activity>
+        <activity android:name=".adapter.SimpleHeadFootRecyclerActivity"></activity>
     </application>
 
 </manifest>
