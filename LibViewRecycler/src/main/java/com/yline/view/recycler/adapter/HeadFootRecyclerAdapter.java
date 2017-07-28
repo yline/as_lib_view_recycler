@@ -5,6 +5,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.yline.view.recycler.callback.IHeadFootCallback;
 import com.yline.view.recycler.holder.RecyclerViewHolder;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.List;
  * @author yline 2017/5/23 -- 10:31
  * @version 1.0.0
  */
-public abstract class HeadFootRecyclerAdapter<T> extends CommonEmptyRecyclerAdapter<T>
+public abstract class HeadFootRecyclerAdapter<T> extends CommonEmptyRecyclerAdapter<T> implements IHeadFootCallback
 {
 	// 头部的开始标签 1024
 	private static final int BASE_ITEM_TYPE_HEADER = 1024;
@@ -103,11 +104,13 @@ public abstract class HeadFootRecyclerAdapter<T> extends CommonEmptyRecyclerAdap
 		footViewArray.put(footViewArray.size() + BASE_ITEM_TYPE_FOOTER, view);
 	}
 
+	@Override
 	public int getHeadersCount()
 	{
 		return headViewArray.size();
 	}
-
+	
+	@Override
 	public int getFootersCount()
 	{
 		return footViewArray.size();

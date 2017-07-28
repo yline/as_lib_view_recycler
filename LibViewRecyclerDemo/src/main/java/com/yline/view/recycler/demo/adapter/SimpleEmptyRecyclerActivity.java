@@ -21,8 +21,6 @@ public class SimpleEmptyRecyclerActivity extends BaseAppCompatActivity
 
 	private SimpleEmptyRecyclerAdapter homeAdapter;
 	
-	private GridLayoutManager gridLayoutManager;
-	
 	public static void actionStart(Context context)
 	{
 		context.startActivity(new Intent(context, SimpleEmptyRecyclerActivity.class));
@@ -35,10 +33,7 @@ public class SimpleEmptyRecyclerActivity extends BaseAppCompatActivity
 		setContentView(R.layout.global_recycler);
 
 		recyclerView = (RecyclerView) findViewById(R.id.recycler);
-
-		gridLayoutManager = new GridLayoutManager(this, 3);
-		gridLayoutManager.setSpanCount(3);
-		recyclerView.setLayoutManager(gridLayoutManager);
+		initRecyclerView(recyclerView);
 
 		homeAdapter = new DefineRecyclerAdapter();
 		recyclerView.setAdapter(homeAdapter);
@@ -46,6 +41,13 @@ public class SimpleEmptyRecyclerActivity extends BaseAppCompatActivity
 		LogFileUtil.v("adapter isEmptyViewShow = " + homeAdapter.isEmptyViewShow());
 		TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_recycler);
 		new DataAdapterTest(tabLayout, homeAdapter);
+	}
+
+	protected void initRecyclerView(RecyclerView recyclerView)
+	{
+		GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
+		gridLayoutManager.setSpanCount(3);
+		recyclerView.setLayoutManager(gridLayoutManager);
 	}
 
 	private class DefineRecyclerAdapter extends SimpleEmptyRecyclerAdapter

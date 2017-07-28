@@ -22,9 +22,9 @@ import java.util.List;
  */
 public abstract class CommonEmptyRecyclerAdapter<T> extends CommonRecyclerAdapter<T>
 {
-	protected static final int EmptyTypePosition = -1;
+	public static final int EmptyType = -11111;
 
-	protected static final int EmptyType = -11111;
+	protected static final int EmptyTypePosition = -1;
 
 	@Override
 	public int getItemCount()

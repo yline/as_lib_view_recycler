@@ -14,11 +14,7 @@ import com.yline.view.recycler.simple.SimpleRecyclerAdapter;
 
 public class SimpleRecyclerActivity extends BaseAppCompatActivity
 {
-	private RecyclerView recyclerView;
-
-	private SimpleRecyclerAdapter homeAdapter;
-
-	private GridLayoutManager gridLayoutManager;
+	protected SimpleRecyclerAdapter homeAdapter;
 
 	public static void actionStart(Context context)
 	{
@@ -31,16 +27,20 @@ public class SimpleRecyclerActivity extends BaseAppCompatActivity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.global_recycler);
 
-		recyclerView = (RecyclerView) findViewById(R.id.recycler);
+		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler);
+		initRecyclerView(recyclerView);
 
-		gridLayoutManager = new GridLayoutManager(this, 3);
-		gridLayoutManager.setSpanCount(3);
-		recyclerView.setLayoutManager(gridLayoutManager);
-		
 		homeAdapter = new SimpleRecyclerAdapter();
 		recyclerView.setAdapter(homeAdapter);
 
 		TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_recycler);
 		new DataAdapterTest(tabLayout, homeAdapter);
+	}
+
+	protected void initRecyclerView(RecyclerView recyclerView)
+	{
+		GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
+		gridLayoutManager.setSpanCount(3);
+		recyclerView.setLayoutManager(gridLayoutManager);
 	}
 }

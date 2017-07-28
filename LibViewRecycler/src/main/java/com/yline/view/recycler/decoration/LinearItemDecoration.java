@@ -10,8 +10,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.yline.view.recycler.adapter.CommonEmptyRecyclerAdapter;
+import com.yline.view.recycler.callback.IHeadFootCallback;
+
 /**
  * 公共的 LinearItemDecoration
+ * 处理了空数据、头部和底部三种情况
  *
  * @author yline 2017/5/23 -- 10:31
  * @version 1.0.0
@@ -41,13 +45,17 @@ public abstract class LinearItemDecoration extends RecyclerView.ItemDecoration
 	{
 		super.onDraw(c, parent, state);
 
-		if (getOrientation() == LinearLayoutManager.VERTICAL)
+		RecyclerView.LayoutManager layoutManager = parent.getLayoutManager();
+		if (layoutManager instanceof LinearLayoutManager)
 		{
-			drawVertical(c, parent);
-		}
-		else if (getOrientation() == LinearLayoutManager.HORIZONTAL)
-		{
-			drawHorizontal(c, parent);
+			if (((LinearLayoutManager) layoutManager).getOrientation() == LinearLayoutManager.VERTICAL)
+			{
+				drawVertical(c, parent);
+			}
+			else
+			{
+				drawHorizontal(c, parent);
+			}
 		}
 	}
 
@@ -64,13 +72,13 @@ public abstract class LinearItemDecoration extends RecyclerView.ItemDecoration
 			final View child = parent.getChildAt(i);
 			currentPosition = parent.getChildAdapterPosition(child);
 
-			if (isDrawDivide(childTotalCount, currentPosition))
+			if (isDrawDivide(parent.getAdapter(), childTotalCount, currentPosition))
 			{
 				final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
 				final int childTop = child.getTop() - params.topMargin;
 				final int childBottom = child.getBottom() + params.bottomMargin;
 
-				drawVerticalDivider(c, sDivider, currentPosition, childLeft, childTop, childRight, childBottom);
+				drawVerticalDivider(c, currentPosition, childLeft, childTop, childRight, childBottom);
 			}
 		}
 	}
@@ -88,33 +96,13 @@ public abstract class LinearItemDecoration extends RecyclerView.ItemDecoration
 			final View child = parent.getChildAt(i);
 			currentPosition = parent.getChildAdapterPosition(child);
 
-			if (isDrawDivide(childTotalCount, currentPosition))
+			if (isDrawDivide(parent.getAdapter(), childTotalCount, currentPosition))
 			{
 				final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
 				final int childLeft = child.getLeft() - params.leftMargin;
 				final int childRight = child.getRight() + params.rightMargin;
 
-				drawHorizontalDivider(c, sDivider, currentPosition, childLeft, childTop, childRight, childBottom);
-			}
-		}
-	}
-
-	@Override
-	public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state)
-	{
-		super.getItemOffsets(outRect, view, parent, state);
-
-		final int currentPosition = parent.getChildAdapterPosition(view);
-		final int totalCount = parent.getAdapter().getItemCount();
-		if (isDrawDivide(totalCount, currentPosition))
-		{
-			if (getOrientation() == LinearLayoutManager.VERTICAL)
-			{
-				setVerticalOffsets(outRect, sDivider, currentPosition);
-			}
-			else if (getOrientation() == LinearLayoutManager.HORIZONTAL)
-			{
-				setHorizontalOffsets(outRect, sDivider, currentPosition);
+				drawHorizontalDivider(c, currentPosition, childLeft, childTop, childRight, childBottom);
 			}
 		}
 	}
@@ -126,53 +114,112 @@ public abstract class LinearItemDecoration extends RecyclerView.ItemDecoration
 	 * @param currentPosition 当前的位置
 	 * @return
 	 */
-	public abstract boolean isDrawDivide(int totalCount, int currentPosition);
+	protected boolean isDrawDivide(RecyclerView.Adapter adapter, int totalCount, int currentPosition)
+	{
+		if (adapter instanceof CommonEmptyRecyclerAdapter)
+		{
+			if (adapter.getItemViewType(currentPosition) == CommonEmptyRecyclerAdapter.EmptyType)
+			{
+				return false;
+			}
+		}
+
+		if (adapter instanceof IHeadFootCallback)
+		{
+			// 头部
+			if (((IHeadFootCallback) adapter).getHeadersCount() > currentPosition)
+			{
+				return false;
+			}
+
+			// 底部
+			if (currentPosition > totalCount - 1 - ((IHeadFootCallback) adapter).getFootersCount())
+			{
+				return false;
+			}
+		}
+		return true;
+	}
 
 	/**
-	 * 设置 垂直 偏移量
+	 * RecyclerView.Vertical 时，绘制 底部 分割线
+	 *
+	 * @param c               画布
+	 * @param currentPosition item 当前位置
+	 * @param childLeft       item left
+	 * @param childTop        item top
+	 * @param childRight      item right
+	 * @param childBottom     item bottom
+	 */
+	protected void drawVerticalDivider(Canvas c, int currentPosition, int childLeft, int childTop, int childRight, int childBottom)
+	{
+		sDivider.setBounds(childLeft, childBottom, childRight, childBottom + sDivider.getIntrinsicHeight());
+		sDivider.draw(c);
+	}
+
+	/**
+	 * RecyclerView.Horizontal 时，绘制 右侧 分割线
+	 *
+	 * @param c               画布
+	 * @param currentPosition item 当前位置
+	 * @param childLeft       item left
+	 * @param childTop        item top
+	 * @param childRight      item right
+	 * @param childBottom     item bottom
+	 */
+	protected void drawHorizontalDivider(Canvas c, int currentPosition, int childLeft, int childTop, int childRight, int childBottom)
+	{
+		sDivider.setBounds(childRight, childTop, childRight + sDivider.getIntrinsicWidth(), childBottom);
+		sDivider.draw(c);
+	}
+
+	@Override
+	public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state)
+	{
+		super.getItemOffsets(outRect, view, parent, state);
+
+		RecyclerView.LayoutManager layoutManager = parent.getLayoutManager();
+		if (layoutManager instanceof LinearLayoutManager)
+		{
+			final int currentPosition = parent.getChildAdapterPosition(view);
+			final int totalCount = parent.getAdapter().getItemCount();
+			if (isDrawDivide(parent.getAdapter(), totalCount, currentPosition))
+			{
+				if (((LinearLayoutManager) layoutManager).getOrientation() == LinearLayoutManager.VERTICAL)
+				{
+					setVerticalOffsets(outRect, currentPosition);
+				}
+				else
+				{
+					setHorizontalOffsets(outRect, currentPosition);
+				}
+			}
+		}
+	}
+
+	/**
+	 * RecyclerView.Vertical 时，设置 底部 偏移量
 	 *
 	 * @param outRect
-	 * @param divider
 	 * @param currentPosition
 	 */
-	public abstract void setVerticalOffsets(Rect outRect, Drawable divider, int currentPosition);
+	protected void setVerticalOffsets(Rect outRect, int currentPosition)
+	{
+		outRect.set(0, 0, 0, sDivider.getIntrinsicHeight());
+	}
 
 	/**
-	 * 设置 水平 偏移量
+	 * RecyclerView.Horizontal 时，设置 右边 偏移量
 	 *
 	 * @param outRect
-	 * @param divider
 	 * @param currentPosition
 	 */
-	public abstract void setHorizontalOffsets(Rect outRect, Drawable divider, int currentPosition);
+	protected void setHorizontalOffsets(Rect outRect, int currentPosition)
+	{
+		outRect.set(0, 0, sDivider.getIntrinsicWidth(), 0);
+	}
 
-	/**
-	 * 绘制 分割线
-	 *
-	 * @param c
-	 * @param divide
-	 * @param currentPosition
-	 * @param childLeft
-	 * @param childTop
-	 * @param childRight
-	 * @param childBottom
-	 */
-	public abstract void drawVerticalDivider(Canvas c, Drawable divide, int currentPosition, int childLeft, int childTop, int childRight, int childBottom);
-
-	/**
-	 * 绘制 分割线
-	 *
-	 * @param c
-	 * @param divide
-	 * @param currentPosition
-	 * @param childLeft
-	 * @param childTop
-	 * @param childRight
-	 * @param childBottom
-	 */
-	public abstract void drawHorizontalDivider(Canvas c, Drawable divide, int currentPosition, int childLeft, int childTop, int childRight, int childBottom);
-
-	/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 提供重写的参数 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
+	/* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& 参数重写 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& */
 
 	/**
 	 * 分割线资源
@@ -182,15 +229,5 @@ public abstract class LinearItemDecoration extends RecyclerView.ItemDecoration
 	protected int getDivideResourceId()
 	{
 		return -1;
-	}
-
-	/**
-	 * 方向
-	 *
-	 * @return
-	 */
-	protected int getOrientation()
-	{
-		return LinearLayoutManager.VERTICAL;
 	}
 }

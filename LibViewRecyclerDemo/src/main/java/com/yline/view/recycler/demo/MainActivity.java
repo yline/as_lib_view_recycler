@@ -8,14 +8,19 @@ import com.yline.view.recycler.demo.adapter.SimpleEmptyRecyclerActivity;
 import com.yline.view.recycler.demo.adapter.SimpleHeadFootRecyclerActivity;
 import com.yline.view.recycler.demo.adapter.SimpleListActivity;
 import com.yline.view.recycler.demo.adapter.SimpleRecyclerActivity;
-import com.yline.view.recycler.demo.simple.SimpleGridDecorationActivity;
-import com.yline.view.recycler.demo.simple.SimpleLinearDecorationActivity;
+import com.yline.view.recycler.demo.grid.GridEmptyRecyclerActivity;
+import com.yline.view.recycler.demo.grid.GridHeadFootRecyclerActivity;
+import com.yline.view.recycler.demo.grid.GridRecyclerActivity;
+import com.yline.view.recycler.demo.linear.LinearEmptyRecyclerActivity;
+import com.yline.view.recycler.demo.linear.LinearHeadFootRecyclerActivity;
+import com.yline.view.recycler.demo.linear.LinearRecyclerActivity;
 
 public class MainActivity extends BaseTestActivity
 {
 	@Override
 	public void testStart(View view, Bundle savedInstanceState)
 	{
+		addTextView("Simple 系列");
 		addButton("SimpleListAdapter", new View.OnClickListener()
 		{
 			@Override
@@ -52,21 +57,59 @@ public class MainActivity extends BaseTestActivity
 			}
 		});
 
-		addButton("SimpleGridItemDecoration", new View.OnClickListener()
+		addTextView("Linear 系列");
+		addButton("LinearRecyclerActivity", new View.OnClickListener()
 		{
 			@Override
 			public void onClick(View v)
 			{
-				SimpleGridDecorationActivity.actionStart(MainActivity.this);
+				LinearRecyclerActivity.actionStart(MainActivity.this);
 			}
 		});
 
-		addButton("SimpleLinearItemDecoration", new View.OnClickListener()
+		addButton("LinearEmptyRecyclerActivity", new View.OnClickListener()
 		{
 			@Override
 			public void onClick(View v)
 			{
-				SimpleLinearDecorationActivity.actionStart(MainActivity.this);
+				LinearEmptyRecyclerActivity.actionStart(MainActivity.this);
+			}
+		});
+
+		addButton("LinearHeadFootRecyclerActivity", new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				LinearHeadFootRecyclerActivity.actionStart(MainActivity.this);
+			}
+		});
+
+		addTextView("Grid 系列");
+		addButton("GridRecyclerActivity", new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				GridRecyclerActivity.actionStart(MainActivity.this);
+			}
+		});
+		
+		addButton("GridEmptyRecyclerActivity", new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				GridEmptyRecyclerActivity.actionStart(MainActivity.this);
+			}
+		});
+
+		addButton("GridHeadFootRecyclerActivity", new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				GridHeadFootRecyclerActivity.actionStart(MainActivity.this);
 			}
 		});
 	}

@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.yline.base.BaseAppCompatActivity;
+import com.yline.log.LogFileUtil;
 import com.yline.utils.UIScreenUtil;
 import com.yline.view.recycler.demo.DataAdapterTest;
 import com.yline.view.recycler.demo.R;
@@ -20,8 +21,6 @@ import com.yline.view.recycler.simple.SimpleHeadFootRecyclerAdapter;
 public class SimpleHeadFootRecyclerActivity extends BaseAppCompatActivity
 {
 	private SimpleHeadFootAdapter simpleAdapter;
-
-	private StaggeredGridLayoutManager gridLayoutManager;
 
 	public static void actionStart(Context context)
 	{
@@ -40,30 +39,10 @@ public class SimpleHeadFootRecyclerActivity extends BaseAppCompatActivity
 	private void initView()
 	{
 		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler);
-		gridLayoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
 		simpleAdapter = new SimpleHeadFootAdapter();
 
-		recyclerView.setLayoutManager(gridLayoutManager);
-		/*recyclerView.addItemDecoration(new SimpleGridItemDecoration(this)
-		{
-			@Override
-			protected int getHeadNumber()
-			{
-				return 2;
-			}
-
-			@Override
-			protected int getFootNumber()
-			{
-				return 2;
-			}
-
-			@Override
-			protected int getDivideResourceId()
-			{
-				return R.drawable.recycler_divider_black_normal;
-			}
-		});*/
+		LogFileUtil.v("adapter isEmptyViewShow = " + simpleAdapter.isEmptyViewShow());
+		initRecyclerView(recyclerView);
 		recyclerView.setAdapter(simpleAdapter);
 
 		View headViewA = new View(this);
@@ -88,6 +67,12 @@ public class SimpleHeadFootRecyclerActivity extends BaseAppCompatActivity
 
 		TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_recycler);
 		new DataAdapterTest(tabLayout, simpleAdapter);
+	}
+
+	protected void initRecyclerView(RecyclerView recyclerView)
+	{
+		StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
+		recyclerView.setLayoutManager(gridLayoutManager);
 	}
 
 	private class SimpleHeadFootAdapter extends SimpleHeadFootRecyclerAdapter

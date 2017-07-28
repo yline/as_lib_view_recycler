@@ -19,6 +19,14 @@
         <activity android:name=".adapter.SimpleRecyclerActivity"></activity>
         <activity android:name=".adapter.SimpleEmptyRecyclerActivity"></activity>
         <activity android:name=".adapter.SimpleHeadFootRecyclerActivity"></activity>
+        <!-- linear -->
+        <activity android:name=".linear.LinearRecyclerActivity"></activity>
+        <activity android:name=".linear.LinearEmptyRecyclerActivity"></activity>
+        <activity android:name=".linear.LinearHeadFootRecyclerActivity"></activity>
+        <!-- grid -->
+        <activity android:name=".grid.GridRecyclerActivity"></activity>
+        <activity android:name=".grid.GridEmptyRecyclerActivity"></activity>
+        <activity android:name=".grid.GridHeadFootRecyclerActivity"></activity>
     </application>
 
 </manifest>

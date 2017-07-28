@@ -1,10 +1,8 @@
-package com.yline.view.recycler.simple;
+package com.yline.view.recycler.decoration;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
-
-import com.yline.view.recycler.decoration.GridItemDecoration;
 
 /**
  * 简单的绘制 表格 分割线封装
@@ -12,9 +10,9 @@ import com.yline.view.recycler.decoration.GridItemDecoration;
  * @author yline 2017/5/10 -- 9:32
  * @version 1.0.0
  */
-public class SimpleGridItemDecoration extends GridItemDecoration
+public class CommonGridDecoration extends GridItemDecoration
 {
-	public SimpleGridItemDecoration(Context context)
+	public CommonGridDecoration(Context context)
 	{
 		super(context);
 	}
