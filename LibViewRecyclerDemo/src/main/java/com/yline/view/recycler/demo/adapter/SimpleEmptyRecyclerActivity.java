@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.yline.base.BaseAppCompatActivity;
+import com.yline.log.LogFileUtil;
 import com.yline.view.recycler.demo.DataAdapterTest;
 import com.yline.view.recycler.demo.R;
 import com.yline.view.recycler.holder.RecyclerViewHolder;
@@ -42,6 +43,7 @@ public class SimpleEmptyRecyclerActivity extends BaseAppCompatActivity
 		homeAdapter = new DefineRecyclerAdapter();
 		recyclerView.setAdapter(homeAdapter);
 
+		LogFileUtil.v("adapter isEmptyViewShow = " + homeAdapter.isEmptyViewShow());
 		TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_recycler);
 		new DataAdapterTest(tabLayout, homeAdapter);
 	}

@@ -22,7 +22,9 @@ import java.util.List;
  */
 public abstract class CommonEmptyRecyclerAdapter<T> extends CommonRecyclerAdapter<T>
 {
-	private static final int EmptyType = -11111;
+	protected static final int EmptyTypePosition = -1;
+
+	protected static final int EmptyType = -11111;
 
 	@Override
 	public int getItemCount()
@@ -186,7 +188,7 @@ public abstract class CommonEmptyRecyclerAdapter<T> extends CommonRecyclerAdapte
 	@Override
 	public boolean add(T object)
 	{
-		if (getItemViewType(0) == EmptyType)
+		if (getItemViewType(EmptyTypePosition) == EmptyType)
 		{
 			setDataList(Arrays.asList(object));
 			return true;
@@ -200,7 +202,7 @@ public abstract class CommonEmptyRecyclerAdapter<T> extends CommonRecyclerAdapte
 	@Override
 	public boolean add(int index, T element)
 	{
-		if (getItemViewType(0) == EmptyType)
+		if (getItemViewType(EmptyTypePosition) == EmptyType)
 		{
 			setDataList(Arrays.asList(element));
 			return true;
@@ -214,7 +216,7 @@ public abstract class CommonEmptyRecyclerAdapter<T> extends CommonRecyclerAdapte
 	@Override
 	public boolean addAll(Collection<? extends T> collection)
 	{
-		if (getItemViewType(0) == EmptyType)
+		if (getItemViewType(EmptyTypePosition) == EmptyType)
 		{
 			setDataList(new ArrayList<T>(collection));
 			return true;
@@ -228,7 +230,7 @@ public abstract class CommonEmptyRecyclerAdapter<T> extends CommonRecyclerAdapte
 	@Override
 	public boolean addAll(int index, Collection<? extends T> collection)
 	{
-		if (getItemViewType(0) == EmptyType)
+		if (getItemViewType(EmptyTypePosition) == EmptyType)
 		{
 			setDataList(new ArrayList<T>(collection));
 			return true;

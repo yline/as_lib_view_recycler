@@ -2,8 +2,6 @@ package com.yline.view.recycler.adapter;
 
 import android.support.v4.util.SparseArrayCompat;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -22,10 +20,10 @@ import java.util.List;
  */
 public abstract class HeadFootRecyclerAdapter<T> extends CommonEmptyRecyclerAdapter<T>
 {
-	// 头部的开始标签
+	// 头部的开始标签 1024
 	private static final int BASE_ITEM_TYPE_HEADER = 1024;
 
-	// 底部最大个数：100
+	// 底部最大个数：1024
 	private static final int BASE_ITEM_TYPE_FOOTER = Integer.MAX_VALUE - 1024;
 
 	// 头布局
@@ -34,13 +32,6 @@ public abstract class HeadFootRecyclerAdapter<T> extends CommonEmptyRecyclerAdap
 	// 底部布局
 	private SparseArrayCompat<View> footViewArray = new SparseArrayCompat<>();
 
-	/**
-	 * 创建时会调用多次,依据viewType类型,创建ViewHolder
-	 *
-	 * @param parent
-	 * @param viewType
-	 * @return
-	 */
 	@Override
 	public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
 	{
@@ -92,71 +83,9 @@ public abstract class HeadFootRecyclerAdapter<T> extends CommonEmptyRecyclerAdap
 		return getHeadersCount() + getFootersCount() + super.getItemCount();
 	}
 
-	/**
-	 * 适配 GridLayoutManager
-	 */
-	@Override
-	public void onAttachedToRecyclerView(RecyclerView recyclerView)
-	{
-		super.onAttachedToRecyclerView(recyclerView);
-
-		RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
-
-		if (layoutManager instanceof GridLayoutManager)
-		{
-			final GridLayoutManager gridLayoutManager = (GridLayoutManager) layoutManager;
-			final GridLayoutManager.SpanSizeLookup spanSizeLookup = gridLayoutManager.getSpanSizeLookup();
-
-			gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup()
-			{
-				@Override
-				public int getSpanSize(int position)
-				{
-					int viewType = getItemViewType(position);
-
-					if (headViewArray.get(viewType) != null)
-					{
-						return gridLayoutManager.getSpanCount();
-					}
-					else if (footViewArray.get(viewType) != null)
-					{
-						return gridLayoutManager.getSpanCount();
-					}
-
-					if (spanSizeLookup != null)
-					{
-						return spanSizeLookup.getSpanSize(position);
-					}
-
-					return 0;
-				}
-			});
-
-			gridLayoutManager.setSpanCount(gridLayoutManager.getSpanCount());
-		}
-	}
-
-	// 适配 StaggeredGridLayoutManager
-	@Override
-	public void onViewAttachedToWindow(RecyclerViewHolder holder)
-	{
-		super.onViewAttachedToWindow(holder);
-		int position = holder.getLayoutPosition();
-		if (isHeaderViewPos(position) || isFooterViewPos(position))
-		{
-			ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
-			if (lp != null && lp instanceof StaggeredGridLayoutManager.LayoutParams)
-			{
-				StaggeredGridLayoutManager.LayoutParams params = (StaggeredGridLayoutManager.LayoutParams) lp;
-
-				params.setFullSpan(true);
-			}
-		}
-	}
-
 	private boolean isHeaderViewPos(int position)
 	{
-		return position < getHeadersCount();
+		return (position >= 0) && (position < getHeadersCount());
 	}
 
 	private boolean isFooterViewPos(int position)
@@ -184,59 +113,96 @@ public abstract class HeadFootRecyclerAdapter<T> extends CommonEmptyRecyclerAdap
 		return footViewArray.size();
 	}
 
-	/* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& 数据更新，会因为head、foot的原因导致不能使用 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& */
+	/* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& 适配情形 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& */
+	@Override
+	protected int onConfigGridLayoutManager(GridLayoutManager gridLayoutManager, GridLayoutManager.SpanSizeLookup spanSizeLookup, int position)
+	{
+		int viewType = getItemViewType(position);
+		if (headViewArray.get(viewType) != null)
+		{
+			return gridLayoutManager.getSpanCount();
+		}
+		else if (footViewArray.get(viewType) != null)
+		{
+			return gridLayoutManager.getSpanCount();
+		}
+		return super.onConfigGridLayoutManager(gridLayoutManager, spanSizeLookup, position);
+	}
+
+	@Override
+	protected boolean onConfigStaggeredGridLayoutManager(int position)
+	{
+		if (isHeaderViewPos(position) || isFooterViewPos(position))
+		{
+			return true;
+		}
+		return super.onConfigStaggeredGridLayoutManager(position);
+	}
+
+	/* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& 兼容数据操作 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& */
 
 	@Override
 	public boolean add(T object)
 	{
-		if (sList.size() == 0)
+		if (getItemViewType(EmptyTypePosition) == EmptyType)
 		{
-			return false;
+			setDataList(Arrays.asList(object));
+			return true;
 		}
-
-		boolean result = sList.add(object);
-		this.notifyItemInserted(getHeadersCount() + sList.size() - 1);
-		return result;
+		else
+		{
+			boolean result = sList.add(object);
+			this.notifyItemInserted(getHeadersCount() + sList.size() - 1);
+			return result;
+		}
 	}
 
 	@Override
 	public boolean add(int index, T element)
 	{
-		if (sList.size() == 0)
+		if (getItemViewType(EmptyTypePosition) == EmptyType)
 		{
-			return false;
+			setDataList(Arrays.asList(element));
+			return true;
 		}
-
-		sList.add(index, element);
-		this.notifyItemInserted(getHeadersCount() + index);
-
-		return true;
+		else
+		{
+			sList.add(index, element);
+			this.notifyItemInserted(getHeadersCount() + index);
+			return true;
+		}
 	}
 
 	@Override
-	public boolean addAll(Collection collection)
+	public boolean addAll(Collection<? extends T> collection)
 	{
-		if (sList.size() == 0)
+		if (getItemViewType(EmptyTypePosition) == EmptyType)
 		{
-			return false;
+			setDataList(new ArrayList<T>(collection));
+			return true;
 		}
-
-		boolean result = sList.addAll(collection);
-		this.notifyItemRangeInserted(getHeadersCount() + sList.size() - 1, collection.size());
-		return result;
+		else
+		{
+			boolean result = sList.addAll(collection);
+			this.notifyItemRangeInserted(getHeadersCount() + sList.size() - 1, collection.size());
+			return result;
+		}
 	}
 
 	@Override
 	public boolean addAll(int index, Collection<? extends T> collection)
 	{
-		if (sList.size() == 0)
+		if (getItemViewType(EmptyTypePosition) == EmptyType)
 		{
-			return false;
+			setDataList(new ArrayList<T>(collection));
+			return true;
 		}
-
-		boolean result = sList.addAll(index, collection);
-		this.notifyItemRangeInserted(getHeadersCount() + index, collection.size());
-		return result;
+		else
+		{
+			boolean result = sList.addAll(index, collection);
+			this.notifyItemRangeInserted(getHeadersCount() + index, collection.size());
+			return result;
+		}
 	}
 
 	@Override
@@ -309,7 +275,7 @@ public abstract class HeadFootRecyclerAdapter<T> extends CommonEmptyRecyclerAdap
 	@Override
 	public boolean update(int index, T t)
 	{
-		if (1 > sList.size())
+		if (index >= sList.size())
 		{
 			return false;
 		}

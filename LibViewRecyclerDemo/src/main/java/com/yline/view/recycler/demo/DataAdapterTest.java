@@ -88,12 +88,12 @@ public class DataAdapterTest
 						LogFileUtil.v("add(0) = " + addResult0);
 						break;
 					case 9:
-						boolean addAll = adapter.addAll(TestConstant.getListSix(2));
+						boolean addAll = adapter.addAll(TestConstant.getListOne(2));
 						SDKManager.toast("addAll = " + addAll);
 						LogFileUtil.v("addAll = " + addAll);
 						break;
 					case 10:
-						boolean addAll0 = adapter.addAll(0, TestConstant.getListFour(3));
+						boolean addAll0 = adapter.addAll(0, TestConstant.getListOne(3));
 						SDKManager.toast("addAll0 = " + addAll0);
 						LogFileUtil.v("addAll0 = " + addAll0);
 						break;

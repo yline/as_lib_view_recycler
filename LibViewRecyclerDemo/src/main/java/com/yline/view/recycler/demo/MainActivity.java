@@ -3,8 +3,6 @@ package com.yline.view.recycler.demo;
 import android.os.Bundle;
 import android.view.View;
 
-import com.yline.application.BaseApplication;
-import com.yline.log.LogFileUtil;
 import com.yline.test.BaseTestActivity;
 import com.yline.view.recycler.demo.adapter.SimpleEmptyRecyclerActivity;
 import com.yline.view.recycler.demo.adapter.SimpleHeadFootRecyclerActivity;
@@ -23,7 +21,6 @@ public class MainActivity extends BaseTestActivity
 			@Override
 			public void onClick(View v)
 			{
-				LogFileUtil.v(BaseApplication.TAG, "CommonListAdapter");
 				SimpleListActivity.actionStart(MainActivity.this);
 			}
 		});
@@ -33,7 +30,6 @@ public class MainActivity extends BaseTestActivity
 			@Override
 			public void onClick(View v)
 			{
-				LogFileUtil.v(BaseApplication.TAG, "CommonRecyclerAdapter");
 				SimpleRecyclerActivity.actionStart(MainActivity.this);
 			}
 		});
@@ -43,8 +39,16 @@ public class MainActivity extends BaseTestActivity
 			@Override
 			public void onClick(View v)
 			{
-				LogFileUtil.v(BaseApplication.TAG, "SimpleEmptyRecyclerAdapter");
 				SimpleEmptyRecyclerActivity.actionStart(MainActivity.this);
+			}
+		});
+
+		addButton("SimpleHeadFootRecyclerActivity", new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View v)
+			{
+				SimpleHeadFootRecyclerActivity.actionStart(MainActivity.this);
 			}
 		});
 
@@ -63,15 +67,6 @@ public class MainActivity extends BaseTestActivity
 			public void onClick(View v)
 			{
 				SimpleLinearDecorationActivity.actionStart(MainActivity.this);
-			}
-		});
-
-		addButton("SimpleHeadFootRecyclerActivity", new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				SimpleHeadFootRecyclerActivity.actionStart(MainActivity.this);
 			}
 		});
 	}
