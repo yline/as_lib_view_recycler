@@ -109,7 +109,7 @@ public abstract class HeadFootRecyclerAdapter<T> extends CommonEmptyRecyclerAdap
 	{
 		return headViewArray.size();
 	}
-	
+
 	@Override
 	public int getFootersCount()
 	{

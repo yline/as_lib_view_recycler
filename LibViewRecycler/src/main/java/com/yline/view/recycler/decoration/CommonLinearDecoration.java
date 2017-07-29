@@ -1,6 +1,8 @@
 package com.yline.view.recycler.decoration;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 
 import com.yline.view.recycler.callback.IHeadFootCallback;
@@ -31,6 +33,30 @@ public class CommonLinearDecoration extends LinearItemDecoration
 			}
 		}
 		return super.isDrawDivide(adapter, totalCount, currentPosition);
+	}
+
+	@Override
+	protected void drawVerticalDivider(Canvas c, int currentPosition, int childLeft, int childTop, int childRight, int childBottom)
+	{
+		super.drawVerticalDivider(c, currentPosition, childLeft, childTop, childRight, childBottom);
+	}
+
+	@Override
+	protected void drawHorizontalDivider(Canvas c, int currentPosition, int childLeft, int childTop, int childRight, int childBottom)
+	{
+		super.drawHorizontalDivider(c, currentPosition, childLeft, childTop, childRight, childBottom);
+	}
+
+	@Override
+	protected void setVerticalOffsets(Rect outRect, int currentPosition)
+	{
+		super.setVerticalOffsets(outRect, currentPosition);
+	}
+	
+	@Override
+	protected void setHorizontalOffsets(Rect outRect, int currentPosition)
+	{
+		super.setHorizontalOffsets(outRect, currentPosition);
 	}
 
 	/**

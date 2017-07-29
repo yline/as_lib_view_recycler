@@ -22,24 +22,11 @@ public class LinearHeadFootRecyclerActivity extends SimpleHeadFootRecyclerActivi
 		recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 		recyclerView.addItemDecoration(new CommonLinearDecoration(this)
 		{
-			/*@Override
-			protected int getHeadNumber()
-			{
-				return 2;
-			}
-
-			@Override
-			protected int getFootNumber()
-			{
-				return 2;
-			}
-			*/
 			@Override
 			protected int getDivideResourceId()
 			{
 				return R.drawable.recycler_divider_black_normal;
 			}
 		});
-		// super.initRecyclerView(recyclerView);
 	}
 }

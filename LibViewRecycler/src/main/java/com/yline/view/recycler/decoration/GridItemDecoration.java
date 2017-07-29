@@ -12,6 +12,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 
+import com.yline.view.recycler.adapter.CommonEmptyRecyclerAdapter;
+import com.yline.view.recycler.callback.IHeadFootCallback;
+
 /**
  * 公众的 GridItemDecoration
  *
@@ -41,60 +44,132 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 	@Override
 	public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state)
 	{
-		final int childCount = parent.getChildCount();
-		final int totalCount = parent.getAdapter().getItemCount();
+		final int childCount = parent.getChildCount(); // 界面上 child 个数
+		final int totalCount = parent.getAdapter().getItemCount(); // adapter child 总数
 		int spanCount = getSpanCount(parent);
 
 		int currentPosition;
 		for (int i = 0; i < childCount; i++)
 		{
 			final View child = parent.getChildAt(i);
-
 			currentPosition = parent.getChildAdapterPosition(child);
-			if (isDrawDivide(totalCount, currentPosition))
+			
+			// 处理 头部、底部、头部 特殊情况
+			if (!isDrawDivide(parent.getAdapter(), totalCount, currentPosition))
 			{
-				if (isLastLine(totalCount, currentPosition, spanCount))
-				{
-					int orientation = getOrientation(parent);
-					if (orientation == LinearLayoutManager.VERTICAL)
-					{
-						drawVertical(c, child, currentPosition);
-					}
-					else
-					{
-						drawHorizontal(c, child, currentPosition);
-					}
-				}
-				else
-				{
-					drawHorizontal(c, child, currentPosition);
-					drawVertical(c, child, currentPosition);
-				}
+				continue;
+			}
+			
+			int[] drawParam = initDrawParam(child);
+			boolean[] spanParam = initSpanParam(parent.getAdapter(), totalCount, spanCount, currentPosition);
+			if (getOrientation(parent.getLayoutManager()))
+			{
+				drawVerticalDivider(c, drawParam, spanParam);
+			}
+			else
+			{
+				drawHorizontalDivider(c, drawParam, spanParam);
 			}
 		}
 	}
 
-	protected void drawHorizontal(Canvas c, View child, int currentPosition)
+	/**
+	 * @param child
+	 * @return {left, top, right, bottom}
+	 */
+	protected int[] initDrawParam(View child)
 	{
-		final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
-
-		final int childTop = child.getTop() - params.topMargin;
-		final int childBottom = child.getBottom() + params.bottomMargin;
-		final int childLeft = child.getLeft() - params.leftMargin;
-		final int childRight = child.getRight() + params.rightMargin;
-
-		drawHorizontalDivider(c, sDivider, currentPosition, childLeft, childTop, childRight, childBottom);
+		RecyclerView.LayoutParams childParams = (RecyclerView.LayoutParams) child.getLayoutParams();
+		
+		int childLeft = child.getLeft();
+		int childTop = child.getTop();
+		int childRight = child.getRight();
+		int childBottom = child.getBottom();
+		return new int[]{childLeft, childTop, childRight, childBottom};
 	}
 
-	protected void drawVertical(Canvas c, View child, int currentPosition)
+	/**
+	 * 初始化，四方位判断
+	 * 不需要考虑currentPos 为 头部和底部 的情况
+	 *
+	 * @param adapter
+	 * @param totalCount 总数
+	 * @param spanCount  行列数
+	 * @param currentPos 当前位置
+	 * @return {left, top, right, bottom}
+	 */
+	protected boolean[] initSpanParam(RecyclerView.Adapter adapter, int totalCount, int spanCount, int currentPos)
 	{
-		final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
-		final int childTop = child.getTop() - params.topMargin;
-		final int childBottom = child.getBottom() + params.bottomMargin;
-		final int childLeft = child.getLeft() - params.leftMargin;
-		final int childRight = child.getRight() + params.rightMargin;
+		int headCount = 0, footCount = 0;
+		if (adapter instanceof IHeadFootCallback)
+		{
+			headCount = ((IHeadFootCallback) adapter).getHeadersCount();
+			footCount = ((IHeadFootCallback) adapter).getFootersCount();
+		}
 
-		drawVerticalDivider(c, sDivider, currentPosition, childLeft, childTop, childRight, childBottom);
+		boolean isSpanFirst = ((currentPos - headCount) % spanCount == 0);
+		boolean isFirst = (currentPos - headCount >= 0 && currentPos - headCount < spanCount);
+		boolean isSpanLast = ((currentPos - headCount) % spanCount == (spanCount - 1));
+
+		int minPos = headCount + spanCount * ((totalCount - 1 - headCount - footCount) / spanCount);
+		boolean isLast = (currentPos - minPos >= 0 && currentPos - minPos < spanCount);
+
+		return new boolean[]{isSpanFirst, isFirst, isSpanLast, isLast};
+	}
+
+	/**
+	 * 初始化设置，是否绘制
+	 *
+	 * @return {left, top, right, bottom}
+	 */
+	protected boolean[] isSpanDraw()
+	{
+		return new boolean[]{true, true, true, true};
+	}
+	
+	protected void drawVerticalDivider(Canvas c, int[] drawParam, boolean[] spanParam)
+	{
+		// 参数排除
+		if (drawParam.length != 4 || spanParam.length != 4)
+		{
+			return;
+		}
+
+		// 计算开始
+		int outLeft = 0, outTop = 0, outRight = 0, outBottom = 0; // 每一个方向上，对应的宽度
+		boolean isSpanFirst = spanParam[0], isFirst = spanParam[1], isSpanLast = spanParam[2], isLast = spanParam[3];
+		boolean isDrawSpanFirst = isSpanDraw()[0], isDrawFirst = isSpanDraw()[1], isDrawSpanLast = isSpanDraw()[2], isDrawLast = isSpanDraw()[3];
+
+		outLeft = isSpanFirst ? (isDrawSpanFirst ? sDivider.getIntrinsicWidth() : 0) : sDivider.getIntrinsicWidth() / 2;
+		outTop = isFirst ? (isDrawFirst ? sDivider.getIntrinsicHeight() : 0) : sDivider.getIntrinsicHeight() / 2;
+		outRight = isSpanLast ? (isDrawSpanLast ? sDivider.getIntrinsicHeight() : 0) : sDivider.getIntrinsicWidth() / 2;
+		outBottom = isLast ? (isDrawLast ? sDivider.getIntrinsicHeight() : 0) : sDivider.getIntrinsicHeight() / 2;
+
+		// 绘制开始
+		int childLeft = drawParam[0], childTop = drawParam[1], childRight = drawParam[2], childBottom = drawParam[3];
+		// 绘制左边
+		sDivider.setBounds(childLeft - outLeft, childTop - outTop, childLeft, childBottom + outBottom);
+		sDivider.draw(c);
+
+		// 绘制顶部
+		sDivider.setBounds(childLeft - outLeft, childTop - outTop, childRight + outRight, childTop);
+		sDivider.draw(c);
+
+		// 绘制右边
+		sDivider.setBounds(childRight, childTop - outTop, childRight + outRight, childBottom + outBottom);
+		sDivider.draw(c);
+
+		// 绘制底部
+		sDivider.setBounds(childLeft - outLeft, childBottom, childRight + outRight, childBottom + outBottom);
+		sDivider.draw(c);
+	}
+	
+	protected void drawHorizontalDivider(Canvas c, int[] drawParam, boolean[] spanParam)
+	{
+		if (drawParam.length != 4 || spanParam.length != 4)
+		{
+			return;
+		}
 	}
 
 	@Override
@@ -105,35 +180,66 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 		int totalCount = parent.getAdapter().getItemCount();
 
 		int currentPosition = parent.getChildAdapterPosition(view);
-		if (isDrawDivide(totalCount, currentPosition))
+		if (!isDrawDivide(parent.getAdapter(), totalCount, currentPosition))
 		{
-			int orientation = getOrientation(parent);
-			boolean isLastLine = isLastLine(totalCount, currentPosition, spanCount);
-			boolean isLastSpan = isLastSpan(currentPosition, spanCount);
-
-			setItemOffsets(outRect, sDivider, orientation, isLastLine, isLastSpan);
+			return;
 		}
+
+		boolean[] spanParam = initSpanParam(parent.getAdapter(), totalCount, spanCount, currentPosition);
+		if (getOrientation(parent.getLayoutManager()))
+		{
+			setVerticalItemOffsets(outRect, spanParam);
+		}
+		else
+		{
+			setHorizontalItemOffsets(outRect, spanParam);
+		}
+	}
+
+	protected void setVerticalItemOffsets(Rect outRect, boolean[] spanParam)
+	{
+		// 计算开始
+		int outLeft = 0, outTop = 0, outRight = 0, outBottom = 0; // 每一个方向上，对应的宽度
+		boolean isSpanFirst = spanParam[0], isFirst = spanParam[1], isSpanLast = spanParam[2], isLast = spanParam[3];
+		boolean isDrawSpanFirst = isSpanDraw()[0], isDrawFirst = isSpanDraw()[1], isDrawSpanLast = isSpanDraw()[2], isDrawLast = isSpanDraw()[3];
+
+		outLeft = isSpanFirst ? (isDrawSpanFirst ? sDivider.getIntrinsicWidth() : 0) : sDivider.getIntrinsicWidth() / 2;
+		outTop = isFirst ? (isDrawFirst ? sDivider.getIntrinsicHeight() : 0) : sDivider.getIntrinsicHeight() / 2;
+		outRight = isSpanLast ? (isDrawSpanLast ? sDivider.getIntrinsicHeight() : 0) : sDivider.getIntrinsicWidth() / 2;
+		outBottom = isLast ? (isDrawLast ? sDivider.getIntrinsicHeight() : 0) : sDivider.getIntrinsicHeight() / 2;
+
+		outRect.set(outLeft, outTop, outRight, outBottom);
+	}
+
+	protected void setHorizontalItemOffsets(Rect outRect, boolean[] spanParam)
+	{
+
 	}
 
 	/**
 	 * 获取当前控件的方向
 	 *
-	 * @param parent
-	 * @return
+	 * @param parentLayoutManager
+	 * @return true(Vertical); false(Horizontal)
 	 */
-	protected int getOrientation(RecyclerView parent)
+	protected boolean getOrientation(RecyclerView.LayoutManager parentLayoutManager)
 	{
-		int orientation = -1;
-		RecyclerView.LayoutManager layoutManager = parent.getLayoutManager();
-		if (layoutManager instanceof GridLayoutManager)
+		if (parentLayoutManager instanceof LinearLayoutManager)
 		{
-			orientation = ((GridLayoutManager) layoutManager).getOrientation();
+			return ((LinearLayoutManager) parentLayoutManager).getOrientation() == LinearLayoutManager.VERTICAL;
 		}
-		else if (layoutManager instanceof StaggeredGridLayoutManager)
+		else if (parentLayoutManager instanceof GridLayoutManager)
 		{
-			orientation = ((StaggeredGridLayoutManager) layoutManager).getOrientation();
+			return ((GridLayoutManager) parentLayoutManager).getOrientation() == LinearLayoutManager.VERTICAL;
 		}
-		return orientation;
+		else if (parentLayoutManager instanceof StaggeredGridLayoutManager)
+		{
+			return ((StaggeredGridLayoutManager) parentLayoutManager).getOrientation() == StaggeredGridLayoutManager.VERTICAL;
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 	/**
@@ -145,131 +251,56 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 	protected int getSpanCount(RecyclerView parent)
 	{
 		// 列数
-		int spanCount = -1;
 		RecyclerView.LayoutManager layoutManager = parent.getLayoutManager();
 		if (layoutManager instanceof GridLayoutManager)
 		{
-			spanCount = ((GridLayoutManager) layoutManager).getSpanCount();
+			return ((GridLayoutManager) layoutManager).getSpanCount();
 		}
 		else if (layoutManager instanceof StaggeredGridLayoutManager)
 		{
-			spanCount = ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
+			return ((StaggeredGridLayoutManager) layoutManager).getSpanCount();
 		}
-		return spanCount;
+		else
+		{
+			return 1;
+		}
 	}
 
 	/**
 	 * 判断是否绘制分割线
+	 * 处理空数据、头部、底部，三种情况
 	 *
+	 * @param adapter
 	 * @param totalCount      数据的最大量
 	 * @param currentPosition 当前的位置
 	 * @return
 	 */
-	public abstract boolean isDrawDivide(int totalCount, int currentPosition);
-
-	/**
-	 * 绘制 分割线
-	 *
-	 * @param c
-	 * @param divide
-	 * @param currentPosition
-	 * @param childLeft
-	 * @param childTop
-	 * @param childRight
-	 * @param childBottom
-	 */
-	public abstract void drawVerticalDivider(Canvas c, Drawable divide, int currentPosition, int childLeft, int childTop, int childRight, int childBottom);
-
-	/**
-	 * 绘制 分割线
-	 *
-	 * @param c
-	 * @param divide
-	 * @param currentPosition
-	 * @param childLeft
-	 * @param childTop
-	 * @param childRight
-	 * @param childBottom
-	 */
-	public abstract void drawHorizontalDivider(Canvas c, Drawable divide, int currentPosition, int childLeft, int childTop, int childRight, int childBottom);
-
-	/**
-	 * 校验是否是最后一行(可重写)
-	 * 默认按照标准排列计算
-	 * 默认最后一行，不绘制底部
-	 *
-	 * @param totalCount      标准排列情况下的总数
-	 * @param currentPosition 标准排列下的当前位置
-	 * @param spanCount       标准排列情况下的列数
-	 */
-	public boolean isLastLine(int totalCount, int currentPosition, int spanCount)
+	protected boolean isDrawDivide(RecyclerView.Adapter adapter, int totalCount, int currentPosition)
 	{
-		int tempTotalCount = totalCount / spanCount * spanCount + (totalCount % spanCount == 0 ? 0 : spanCount);
-
-		if (currentPosition >= tempTotalCount - spanCount && currentPosition < tempTotalCount)
+		if (adapter instanceof CommonEmptyRecyclerAdapter)
 		{
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * 校验是否是最后一列(可重写)
-	 *
-	 * @param currentPosition 标准排列情况下的总数
-	 * @param spanCount       标准排列情况下的列数
-	 * @return
-	 */
-	public boolean isLastSpan(int currentPosition, int spanCount)
-	{
-		boolean isLastSpan = currentPosition % spanCount == (spanCount - 1); // 判断是否是 最后一个span
-		return isLastSpan;
-	}
-
-	/**
-	 * 依据情形绘制偏移量
-	 *
-	 * @param outRect     设置对象
-	 * @param divide      分割线资源
-	 * @param orientation 布局方向
-	 * @param isLastLine  是否是最后一行
-	 * @param isLastSpan  是否是最后一列
-	 */
-	public void setItemOffsets(Rect outRect, Drawable divide, int orientation, boolean isLastLine, boolean isLastSpan)
-	{
-		if (isLastLine)
-		{
-			if (!isLastSpan)
+			if (adapter.getItemViewType(currentPosition) == CommonEmptyRecyclerAdapter.EmptyType)
 			{
-				if (LinearLayoutManager.VERTICAL == orientation)
-				{
-					outRect.set(0, 0, divide.getIntrinsicWidth(), 0);
-				}
-				else if (LinearLayoutManager.HORIZONTAL == orientation)
-				{
-					outRect.set(0, 0, 0, divide.getIntrinsicHeight());
-				}
+				return false;
 			}
 		}
-		else
+		
+		if (adapter instanceof IHeadFootCallback)
 		{
-			if (isLastSpan)
+			// 头部
+			if (currentPosition < ((IHeadFootCallback) adapter).getHeadersCount())
 			{
-				if (LinearLayoutManager.VERTICAL == orientation)
-				{
-					outRect.set(0, 0, 0, divide.getIntrinsicHeight());
-				}
-				else if (LinearLayoutManager.HORIZONTAL == orientation)
-				{
-					outRect.set(0, 0, divide.getIntrinsicWidth(), 0);
-				}
+				return false;
 			}
-			else
+			
+			// 底部
+			if (currentPosition > totalCount - 1 - ((IHeadFootCallback) adapter).getFootersCount())
 			{
-				outRect.set(0, 0, divide.getIntrinsicWidth(), divide.getIntrinsicHeight());
+				return false;
 			}
 		}
+		
+		return true;
 	}
 
 	/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 提供重写的参数 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
