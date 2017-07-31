@@ -62,6 +62,7 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 			
 			int[] drawParam = initDrawParam(child);
 			boolean[] spanParam = initSpanParam(parent.getAdapter(), totalCount, spanCount, currentPosition);
+
 			if (getOrientation(parent.getLayoutManager()))
 			{
 				drawVerticalDivider(c, drawParam, spanParam);
@@ -74,6 +75,8 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 	}
 
 	/**
+	 * 获取到 child 四个方位
+	 *
 	 * @param child
 	 * @return {left, top, right, bottom}
 	 */
@@ -118,15 +121,26 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 	}
 
 	/**
-	 * 初始化设置，是否绘制
-	 *
-	 * @return {left, top, right, bottom}
+	 * 初始化 Vertical时，四个方向，偏移量
+	 * @param spanParam
+	 * @return
 	 */
-	protected boolean[] isSpanDraw()
+	protected int[] initVerticalDivider(boolean[] spanParam)
 	{
-		return new boolean[]{true, true, true, true};
+		// 计算开始
+		int outLeft = 0, outTop = 0, outRight = 0, outBottom = 0; // 每一个方向上，对应的宽度
+		boolean isSpanFirst = spanParam[0], isFirst = spanParam[1], isSpanLast = spanParam[2], isLast = spanParam[3];
+		boolean isDrawSpanFirst = isSpanDraw()[0], isDrawFirst = isSpanDraw()[1], isDrawSpanLast = isSpanDraw()[2], isDrawLast = isSpanDraw()[3];
+
+		// 计算 外轮廓
+		outLeft = isSpanFirst ? (isDrawSpanFirst ? sDivider.getIntrinsicWidth() : 0) : sDivider.getIntrinsicWidth() / 2;
+		outTop = isFirst ? (isDrawFirst ? sDivider.getIntrinsicHeight() : 0) : sDivider.getIntrinsicHeight() / 2;
+		outRight = isSpanLast ? (isDrawSpanLast ? sDivider.getIntrinsicHeight() : 0) : sDivider.getIntrinsicWidth() / 2;
+		outBottom = isLast ? (isDrawLast ? sDivider.getIntrinsicHeight() : 0) : sDivider.getIntrinsicHeight() / 2;
+
+		return new int[]{outLeft, outTop, outRight, outBottom};
 	}
-	
+
 	protected void drawVerticalDivider(Canvas c, int[] drawParam, boolean[] spanParam)
 	{
 		// 参数排除
@@ -135,15 +149,8 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 			return;
 		}
 
-		// 计算开始
-		int outLeft = 0, outTop = 0, outRight = 0, outBottom = 0; // 每一个方向上，对应的宽度
-		boolean isSpanFirst = spanParam[0], isFirst = spanParam[1], isSpanLast = spanParam[2], isLast = spanParam[3];
-		boolean isDrawSpanFirst = isSpanDraw()[0], isDrawFirst = isSpanDraw()[1], isDrawSpanLast = isSpanDraw()[2], isDrawLast = isSpanDraw()[3];
-
-		outLeft = isSpanFirst ? (isDrawSpanFirst ? sDivider.getIntrinsicWidth() : 0) : sDivider.getIntrinsicWidth() / 2;
-		outTop = isFirst ? (isDrawFirst ? sDivider.getIntrinsicHeight() : 0) : sDivider.getIntrinsicHeight() / 2;
-		outRight = isSpanLast ? (isDrawSpanLast ? sDivider.getIntrinsicHeight() : 0) : sDivider.getIntrinsicWidth() / 2;
-		outBottom = isLast ? (isDrawLast ? sDivider.getIntrinsicHeight() : 0) : sDivider.getIntrinsicHeight() / 2;
+		int[] outRect = initVerticalDivider(spanParam);
+		int outLeft = outRect[0], outTop = outRect[1], outRight = outRect[2], outBottom = outRect[3]; // 每一个方向上，对应的宽度
 
 		// 绘制开始
 		int childLeft = drawParam[0], childTop = drawParam[1], childRight = drawParam[2], childBottom = drawParam[3];
@@ -163,6 +170,22 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 		sDivider.setBounds(childLeft - outLeft, childBottom, childRight + outRight, childBottom + outBottom);
 		sDivider.draw(c);
 	}
+
+	protected int[] initHorizontalDivider(boolean[] spanParam)
+	{
+		// 计算开始；换转方向上；is.
+		int outLeft = 0, outTop = 0, outRight = 0, outBottom = 0; // 每一个方向上，对应的宽度
+		boolean isSpanFirst = spanParam[0], isFirst = spanParam[1], isSpanLast = spanParam[2], isLast = spanParam[3];
+		boolean isDrawSpanFirst = isSpanDraw()[0], isDrawFirst = isSpanDraw()[1], isDrawSpanLast = isSpanDraw()[2], isDrawLast = isSpanDraw()[3]; // 用户以为的 left,top,right,bottom
+
+		// 计算 外轮廓
+		outLeft = isFirst ? (isDrawSpanFirst ? sDivider.getIntrinsicWidth() : 0) : sDivider.getIntrinsicWidth() / 2;
+		outTop = isSpanFirst ? (isDrawFirst ? sDivider.getIntrinsicHeight() : 0) : sDivider.getIntrinsicHeight() / 2;
+		outRight = isLast ? (isDrawSpanLast ? sDivider.getIntrinsicHeight() : 0) : sDivider.getIntrinsicWidth() / 2;
+		outBottom = isSpanLast ? (isDrawLast ? sDivider.getIntrinsicHeight() : 0) : sDivider.getIntrinsicHeight() / 2;
+
+		return new int[]{outLeft, outTop, outRight, outBottom};
+	}
 	
 	protected void drawHorizontalDivider(Canvas c, int[] drawParam, boolean[] spanParam)
 	{
@@ -170,6 +193,28 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 		{
 			return;
 		}
+
+		// 获取，横向方向上的，left,top,right,bottom
+		int[] outRect = initHorizontalDivider(spanParam);
+		int outLeft = outRect[0], outTop = outRect[1], outRight = outRect[2], outBottom = outRect[3]; // 每一个方向上，对应的宽度
+
+		// 绘制开始
+		int childLeft = drawParam[0], childTop = drawParam[1], childRight = drawParam[2], childBottom = drawParam[3];
+		// 绘制左边
+		sDivider.setBounds(childLeft - outLeft, childTop - outTop, childLeft, childBottom + outBottom);
+		sDivider.draw(c);
+
+		// 绘制顶部
+		sDivider.setBounds(childLeft - outLeft, childTop - outTop, childRight + outRight, childTop);
+		sDivider.draw(c);
+
+		// 绘制右边
+		sDivider.setBounds(childRight, childTop - outTop, childRight + outRight, childBottom + outBottom);
+		sDivider.draw(c);
+
+		// 绘制底部
+		sDivider.setBounds(childLeft - outLeft, childBottom, childRight + outRight, childBottom + outBottom);
+		sDivider.draw(c);
 	}
 
 	@Override
@@ -198,22 +243,14 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 
 	protected void setVerticalItemOffsets(Rect outRect, boolean[] spanParam)
 	{
-		// 计算开始
-		int outLeft = 0, outTop = 0, outRight = 0, outBottom = 0; // 每一个方向上，对应的宽度
-		boolean isSpanFirst = spanParam[0], isFirst = spanParam[1], isSpanLast = spanParam[2], isLast = spanParam[3];
-		boolean isDrawSpanFirst = isSpanDraw()[0], isDrawFirst = isSpanDraw()[1], isDrawSpanLast = isSpanDraw()[2], isDrawLast = isSpanDraw()[3];
-
-		outLeft = isSpanFirst ? (isDrawSpanFirst ? sDivider.getIntrinsicWidth() : 0) : sDivider.getIntrinsicWidth() / 2;
-		outTop = isFirst ? (isDrawFirst ? sDivider.getIntrinsicHeight() : 0) : sDivider.getIntrinsicHeight() / 2;
-		outRight = isSpanLast ? (isDrawSpanLast ? sDivider.getIntrinsicHeight() : 0) : sDivider.getIntrinsicWidth() / 2;
-		outBottom = isLast ? (isDrawLast ? sDivider.getIntrinsicHeight() : 0) : sDivider.getIntrinsicHeight() / 2;
-
-		outRect.set(outLeft, outTop, outRight, outBottom);
+		int[] initRect = initVerticalDivider(spanParam);
+		outRect.set(initRect[0], initRect[1], initRect[2], initRect[3]);
 	}
 
 	protected void setHorizontalItemOffsets(Rect outRect, boolean[] spanParam)
 	{
-
+		int[] initRect = initHorizontalDivider(spanParam);
+		outRect.set(initRect[0], initRect[1], initRect[2], initRect[3]);
 	}
 
 	/**
@@ -304,6 +341,16 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 	}
 
 	/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 提供重写的参数 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
+
+	/**
+	 * 初始化设置，是否绘制
+	 *
+	 * @return {left, top, right, bottom}
+	 */
+	protected boolean[] isSpanDraw()
+	{
+		return new boolean[]{true, true, true, true};
+	}
 
 	/**
 	 * 分割线资源
