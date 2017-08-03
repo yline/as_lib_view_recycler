@@ -123,13 +123,18 @@
 	ProgressBar setProgress(int viewId, int progress)
 	...
 
-同时使用添加头部、底部时，显示效果
+添加头部、底部、空数据、带item时，效果   
+![](https://github.com/yline/as_lib_view_recycler/blob/master/LibViewRecyclerDemo/src/main/assets/empty.jpeg)
 
-
+添加头部、底部、有数据、带item时，效果   
+![](https://github.com/yline/as_lib_view_recycler/blob/master/LibViewRecyclerDemo/src/main/assets/data.jpeg)
 
 ## 版本    
 ### Version 1.0.2
-> 
+> ViewHolder View控件操作   
+> 空数据时，RecyclerView显示   
+> RecyclwView添加头部和底部   
+> ItemDecoration 适配了Linear、Grid、StaggerGrid
 
 
 
