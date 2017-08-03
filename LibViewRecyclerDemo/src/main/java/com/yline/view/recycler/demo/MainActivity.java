@@ -20,7 +20,7 @@ public class MainActivity extends BaseTestActivity
 	@Override
 	public void testStart(View view, Bundle savedInstanceState)
 	{
-		addTextView("Simple 系列");
+		addTextView("Simple 系列，无ItemDecoration");
 		addButton("SimpleListAdapter", new View.OnClickListener()
 		{
 			@Override
@@ -57,7 +57,7 @@ public class MainActivity extends BaseTestActivity
 			}
 		});
 
-		addTextView("Linear 系列");
+		addTextView("Linear ItemDecoration 系列");
 		addButton("LinearRecyclerActivity", new View.OnClickListener()
 		{
 			@Override
@@ -85,7 +85,7 @@ public class MainActivity extends BaseTestActivity
 			}
 		});
 
-		addTextView("Grid 系列");
+		addTextView("Grid ItemDecoration 系列");
 		addButton("GridRecyclerActivity", new View.OnClickListener()
 		{
 			@Override
