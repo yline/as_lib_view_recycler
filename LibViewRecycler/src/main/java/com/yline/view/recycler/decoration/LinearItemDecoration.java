@@ -78,7 +78,7 @@ public abstract class LinearItemDecoration extends RecyclerView.ItemDecoration
 				final int childTop = child.getTop() - params.topMargin;
 				final int childBottom = child.getBottom() + params.bottomMargin;
 
-				drawVerticalDivider(c, currentPosition, childLeft, childTop, childRight, childBottom);
+				drawVerticalDivider(c, parent, currentPosition, childLeft, childTop, childRight, childBottom);
 			}
 		}
 	}
@@ -102,7 +102,7 @@ public abstract class LinearItemDecoration extends RecyclerView.ItemDecoration
 				final int childLeft = child.getLeft() - params.leftMargin;
 				final int childRight = child.getRight() + params.rightMargin;
 
-				drawHorizontalDivider(c, currentPosition, childLeft, childTop, childRight, childBottom);
+				drawHorizontalDivider(c, parent, currentPosition, childLeft, childTop, childRight, childBottom);
 			}
 		}
 	}
@@ -145,13 +145,14 @@ public abstract class LinearItemDecoration extends RecyclerView.ItemDecoration
 	 * RecyclerView.Vertical 时，绘制 底部 分割线
 	 *
 	 * @param c               画布
+	 *                        @param parent RecycleView
 	 * @param currentPosition item 当前位置
 	 * @param childLeft       item left
 	 * @param childTop        item top
 	 * @param childRight      item right
 	 * @param childBottom     item bottom
 	 */
-	protected void drawVerticalDivider(Canvas c, int currentPosition, int childLeft, int childTop, int childRight, int childBottom)
+	protected void drawVerticalDivider(Canvas c, RecyclerView parent, int currentPosition, int childLeft, int childTop, int childRight, int childBottom)
 	{
 		sDivider.setBounds(childLeft, childBottom, childRight, childBottom + sDivider.getIntrinsicHeight());
 		sDivider.draw(c);
@@ -161,13 +162,14 @@ public abstract class LinearItemDecoration extends RecyclerView.ItemDecoration
 	 * RecyclerView.Horizontal 时，绘制 右侧 分割线
 	 *
 	 * @param c               画布
+	 *                        @param parent RecyclerView
 	 * @param currentPosition item 当前位置
 	 * @param childLeft       item left
 	 * @param childTop        item top
 	 * @param childRight      item right
 	 * @param childBottom     item bottom
 	 */
-	protected void drawHorizontalDivider(Canvas c, int currentPosition, int childLeft, int childTop, int childRight, int childBottom)
+	protected void drawHorizontalDivider(Canvas c, RecyclerView parent, int currentPosition, int childLeft, int childTop, int childRight, int childBottom)
 	{
 		sDivider.setBounds(childRight, childTop, childRight + sDivider.getIntrinsicWidth(), childBottom);
 		sDivider.draw(c);
@@ -187,11 +189,11 @@ public abstract class LinearItemDecoration extends RecyclerView.ItemDecoration
 			{
 				if (((LinearLayoutManager) layoutManager).getOrientation() == LinearLayoutManager.VERTICAL)
 				{
-					setVerticalOffsets(outRect, currentPosition);
+					setVerticalOffsets(outRect, parent, currentPosition);
 				}
 				else
 				{
-					setHorizontalOffsets(outRect, currentPosition);
+					setHorizontalOffsets(outRect, parent, currentPosition);
 				}
 			}
 		}
@@ -201,9 +203,10 @@ public abstract class LinearItemDecoration extends RecyclerView.ItemDecoration
 	 * RecyclerView.Vertical 时，设置 底部 偏移量
 	 *
 	 * @param outRect
+	 * @param parent
 	 * @param currentPosition
 	 */
-	protected void setVerticalOffsets(Rect outRect, int currentPosition)
+	protected void setVerticalOffsets(Rect outRect, RecyclerView parent, int currentPosition)
 	{
 		outRect.set(0, 0, 0, sDivider.getIntrinsicHeight());
 	}
@@ -212,9 +215,10 @@ public abstract class LinearItemDecoration extends RecyclerView.ItemDecoration
 	 * RecyclerView.Horizontal 时，设置 右边 偏移量
 	 *
 	 * @param outRect
+	 * @param parent
 	 * @param currentPosition
 	 */
-	protected void setHorizontalOffsets(Rect outRect, int currentPosition)
+	protected void setHorizontalOffsets(Rect outRect, RecyclerView parent,int currentPosition)
 	{
 		outRect.set(0, 0, sDivider.getIntrinsicWidth(), 0);
 	}

@@ -65,11 +65,11 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 
 			if (getOrientation(parent.getLayoutManager()))
 			{
-				drawVerticalDivider(c, drawParam, spanParam);
+				drawVerticalDivider(c, parent, drawParam, spanParam);
 			}
 			else
 			{
-				drawHorizontalDivider(c, drawParam, spanParam);
+				drawHorizontalDivider(c, parent, drawParam, spanParam);
 			}
 		}
 	}
@@ -122,10 +122,12 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 
 	/**
 	 * 初始化 Vertical时，四个方向，偏移量
+	 *
+	 * @param parent
 	 * @param spanParam
 	 * @return
 	 */
-	protected int[] initVerticalDivider(boolean[] spanParam)
+	protected int[] initVerticalDivider(RecyclerView parent, boolean[] spanParam)
 	{
 		// 计算开始
 		int outLeft = 0, outTop = 0, outRight = 0, outBottom = 0; // 每一个方向上，对应的宽度
@@ -141,7 +143,7 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 		return new int[]{outLeft, outTop, outRight, outBottom};
 	}
 
-	protected void drawVerticalDivider(Canvas c, int[] drawParam, boolean[] spanParam)
+	protected void drawVerticalDivider(Canvas c, RecyclerView parent, int[] drawParam, boolean[] spanParam)
 	{
 		// 参数排除
 		if (drawParam.length != 4 || spanParam.length != 4)
@@ -149,7 +151,7 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 			return;
 		}
 
-		int[] outRect = initVerticalDivider(spanParam);
+		int[] outRect = initVerticalDivider(parent, spanParam);
 		int outLeft = outRect[0], outTop = outRect[1], outRight = outRect[2], outBottom = outRect[3]; // 每一个方向上，对应的宽度
 
 		// 绘制开始
@@ -171,7 +173,7 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 		sDivider.draw(c);
 	}
 
-	protected int[] initHorizontalDivider(boolean[] spanParam)
+	protected int[] initHorizontalDivider(RecyclerView parent, boolean[] spanParam)
 	{
 		// 计算开始；换转方向上；is.
 		int outLeft = 0, outTop = 0, outRight = 0, outBottom = 0; // 每一个方向上，对应的宽度
@@ -187,7 +189,7 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 		return new int[]{outLeft, outTop, outRight, outBottom};
 	}
 	
-	protected void drawHorizontalDivider(Canvas c, int[] drawParam, boolean[] spanParam)
+	protected void drawHorizontalDivider(Canvas c, RecyclerView parent,int[] drawParam, boolean[] spanParam)
 	{
 		if (drawParam.length != 4 || spanParam.length != 4)
 		{
@@ -195,7 +197,7 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 		}
 
 		// 获取，横向方向上的，left,top,right,bottom
-		int[] outRect = initHorizontalDivider(spanParam);
+		int[] outRect = initHorizontalDivider(parent, spanParam);
 		int outLeft = outRect[0], outTop = outRect[1], outRight = outRect[2], outBottom = outRect[3]; // 每一个方向上，对应的宽度
 
 		// 绘制开始
@@ -233,23 +235,23 @@ public abstract class GridItemDecoration extends RecyclerView.ItemDecoration
 		boolean[] spanParam = initSpanParam(parent.getAdapter(), totalCount, spanCount, currentPosition);
 		if (getOrientation(parent.getLayoutManager()))
 		{
-			setVerticalItemOffsets(outRect, spanParam);
+			setVerticalItemOffsets(parent, outRect, spanParam);
 		}
 		else
 		{
-			setHorizontalItemOffsets(outRect, spanParam);
+			setHorizontalItemOffsets(parent, outRect, spanParam);
 		}
 	}
 
-	protected void setVerticalItemOffsets(Rect outRect, boolean[] spanParam)
+	protected void setVerticalItemOffsets(RecyclerView parent, Rect outRect, boolean[] spanParam)
 	{
-		int[] initRect = initVerticalDivider(spanParam);
+		int[] initRect = initVerticalDivider(parent, spanParam);
 		outRect.set(initRect[0], initRect[1], initRect[2], initRect[3]);
 	}
 
-	protected void setHorizontalItemOffsets(Rect outRect, boolean[] spanParam)
+	protected void setHorizontalItemOffsets(RecyclerView parent, Rect outRect, boolean[] spanParam)
 	{
-		int[] initRect = initHorizontalDivider(spanParam);
+		int[] initRect = initHorizontalDivider(parent, spanParam);
 		outRect.set(initRect[0], initRect[1], initRect[2], initRect[3]);
 	}
 

@@ -36,27 +36,27 @@ public class CommonLinearDecoration extends LinearItemDecoration
 	}
 
 	@Override
-	protected void drawVerticalDivider(Canvas c, int currentPosition, int childLeft, int childTop, int childRight, int childBottom)
+	protected void drawVerticalDivider(Canvas c, RecyclerView parent, int currentPosition, int childLeft, int childTop, int childRight, int childBottom)
 	{
-		super.drawVerticalDivider(c, currentPosition, childLeft, childTop, childRight, childBottom);
+		super.drawVerticalDivider(c, parent, currentPosition, childLeft, childTop, childRight, childBottom);
 	}
 
 	@Override
-	protected void drawHorizontalDivider(Canvas c, int currentPosition, int childLeft, int childTop, int childRight, int childBottom)
+	protected void drawHorizontalDivider(Canvas c, RecyclerView parent, int currentPosition, int childLeft, int childTop, int childRight, int childBottom)
 	{
-		super.drawHorizontalDivider(c, currentPosition, childLeft, childTop, childRight, childBottom);
+		super.drawHorizontalDivider(c, parent, currentPosition, childLeft, childTop, childRight, childBottom);
 	}
 
 	@Override
-	protected void setVerticalOffsets(Rect outRect, int currentPosition)
+	protected void setVerticalOffsets(Rect outRect, RecyclerView parent, int currentPosition)
 	{
-		super.setVerticalOffsets(outRect, currentPosition);
+		super.setVerticalOffsets(outRect, parent, currentPosition);
 	}
-	
+
 	@Override
-	protected void setHorizontalOffsets(Rect outRect, int currentPosition)
+	protected void setHorizontalOffsets(Rect outRect, RecyclerView parent, int currentPosition)
 	{
-		super.setHorizontalOffsets(outRect, currentPosition);
+		super.setHorizontalOffsets(outRect, parent, currentPosition);
 	}
 
 	/**
