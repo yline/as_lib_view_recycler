@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.yline.view.recycler.refresh.view.CircleProgressBar
+        android:id="@+id/widget_progress_bar"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_centerHorizontal="true">
+    </com.yline.view.recycler.refresh.view.CircleProgressBar>
+</RelativeLayout>

@@ -11,6 +11,9 @@ import com.yline.view.recycler.demo.grid.GridHeadFootRecyclerActivity;
 import com.yline.view.recycler.demo.grid.GridRecyclerActivity;
 import com.yline.view.recycler.demo.linear.LinearHeadFootRecyclerActivity;
 import com.yline.view.recycler.demo.linear.LinearRecyclerActivity;
+import com.yline.view.recycler.demo.refresh.CircleProgressActivity;
+import com.yline.view.recycler.demo.refresh.CustomRefreshActivity;
+import com.yline.view.recycler.demo.refresh.SimpleRefreshActivity;
 
 public class MainActivity extends BaseTestActivity
 {
@@ -80,6 +83,28 @@ public class MainActivity extends BaseTestActivity
 			public void onClick(View v)
 			{
 				GridHeadFootRecyclerActivity.actionStart(MainActivity.this);
+			}
+		});
+
+		addTextView("Refresh 系列");
+		addButton("CircleProgressBar", new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				CircleProgressActivity.launcher(MainActivity.this);
+			}
+		});
+
+		addButton("SimpleRefresh", new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				SimpleRefreshActivity.launcher(MainActivity.this);
+			}
+		});
+
+		addButton("CustomRefresh", new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				CustomRefreshActivity.launcher(MainActivity.this);
 			}
 		});
 	}
