@@ -17,7 +17,6 @@
         <!-- adapter -->
         <activity android:name=".adapter.SimpleListActivity"/>
         <activity android:name=".adapter.SimpleRecyclerActivity"/>
-        <activity android:name=".adapter.SimpleEmptyRecyclerActivity"/>
         <activity android:name=".adapter.SimpleHeadFootRecyclerActivity"/>
         <!-- linear -->
         <activity android:name=".linear.LinearRecyclerActivity"/>

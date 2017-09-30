@@ -4,14 +4,11 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.yline.test.BaseTestActivity;
-import com.yline.view.recycler.demo.adapter.SimpleEmptyRecyclerActivity;
 import com.yline.view.recycler.demo.adapter.SimpleHeadFootRecyclerActivity;
 import com.yline.view.recycler.demo.adapter.SimpleListActivity;
 import com.yline.view.recycler.demo.adapter.SimpleRecyclerActivity;
-import com.yline.view.recycler.demo.grid.GridEmptyRecyclerActivity;
 import com.yline.view.recycler.demo.grid.GridHeadFootRecyclerActivity;
 import com.yline.view.recycler.demo.grid.GridRecyclerActivity;
-import com.yline.view.recycler.demo.linear.LinearEmptyRecyclerActivity;
 import com.yline.view.recycler.demo.linear.LinearHeadFootRecyclerActivity;
 import com.yline.view.recycler.demo.linear.LinearRecyclerActivity;
 
@@ -39,15 +36,6 @@ public class MainActivity extends BaseTestActivity
 			}
 		});
 
-		addButton("SimpleEmptyRecyclerAdapter", new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				SimpleEmptyRecyclerActivity.actionStart(MainActivity.this);
-			}
-		});
-
 		addButton("SimpleHeadFootRecyclerActivity", new View.OnClickListener()
 		{
 			@Override
@@ -67,15 +55,6 @@ public class MainActivity extends BaseTestActivity
 			}
 		});
 
-		addButton("LinearEmptyRecyclerActivity", new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				LinearEmptyRecyclerActivity.actionStart(MainActivity.this);
-			}
-		});
-
 		addButton("LinearHeadFootRecyclerActivity", new View.OnClickListener()
 		{
 			@Override
@@ -92,15 +71,6 @@ public class MainActivity extends BaseTestActivity
 			public void onClick(View v)
 			{
 				GridRecyclerActivity.actionStart(MainActivity.this);
-			}
-		});
-		
-		addButton("GridEmptyRecyclerActivity", new View.OnClickListener()
-		{
-			@Override
-			public void onClick(View v)
-			{
-				GridEmptyRecyclerActivity.actionStart(MainActivity.this);
 			}
 		});
 

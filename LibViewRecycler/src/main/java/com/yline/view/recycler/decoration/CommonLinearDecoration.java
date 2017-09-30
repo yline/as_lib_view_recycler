@@ -5,7 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 
-import com.yline.view.recycler.callback.IHeadFootCallback;
+import com.yline.view.recycler.holder.Callback;
 
 /**
  * 绘制 线性 分割线封装
@@ -14,58 +14,43 @@ import com.yline.view.recycler.callback.IHeadFootCallback;
  * @author yline 2017/5/9 -- 17:23
  * @version 1.0.0
  */
-public class CommonLinearDecoration extends LinearItemDecoration
-{
-	public CommonLinearDecoration(Context context)
-	{
-		super(context);
-	}
+public class CommonLinearDecoration extends LinearItemDecoration {
+    public CommonLinearDecoration(Context context) {
+        super(context);
+    }
 
-	@Override
-	protected boolean isDrawDivide(RecyclerView.Adapter adapter, int totalCount, int currentPosition)
-	{
-		if (adapter instanceof IHeadFootCallback)
-		{
-			// 最后一个数据
-			if ((currentPosition == totalCount - 1 - ((IHeadFootCallback) adapter).getFootersCount()) && !isDivideLastLine())
-			{
-				return false;
-			}
-		}
-		return super.isDrawDivide(adapter, totalCount, currentPosition);
-	}
+    @Override
+    protected boolean isDrawDivide(RecyclerView.Adapter adapter, int totalCount, int currentPosition) {
+        if (adapter instanceof Callback.IHeadFootCallback) {
+            // 最后一个数据
+            if ((currentPosition == totalCount - 1 - ((Callback.IHeadFootCallback) adapter).getFootersCount()) && !isDivideLastLine()) {
+                return false;
+            }
+        }
+        return super.isDrawDivide(adapter, totalCount, currentPosition);
+    }
 
-	@Override
-	protected void drawVerticalDivider(Canvas c, RecyclerView parent, int currentPosition, int childLeft, int childTop, int childRight, int childBottom)
-	{
-		super.drawVerticalDivider(c, parent, currentPosition, childLeft, childTop, childRight, childBottom);
-	}
+    @Override
+    protected void setVerticalOffsets(Rect outRect, RecyclerView parent, int currentPosition) {
+        super.setVerticalOffsets(outRect, parent, currentPosition);
+    }
 
-	@Override
-	protected void drawHorizontalDivider(Canvas c, RecyclerView parent, int currentPosition, int childLeft, int childTop, int childRight, int childBottom)
-	{
-		super.drawHorizontalDivider(c, parent, currentPosition, childLeft, childTop, childRight, childBottom);
-	}
+    @Override
+    protected void drawVerticalDivider(Canvas c, RecyclerView parent, int currentPosition, int childLeft, int childTop, int childRight, int childBottom) {
+        super.drawVerticalDivider(c, parent, currentPosition, childLeft, childTop, childRight, childBottom);
+    }
 
-	@Override
-	protected void setVerticalOffsets(Rect outRect, RecyclerView parent, int currentPosition)
-	{
-		super.setVerticalOffsets(outRect, parent, currentPosition);
-	}
+    @Override
+    protected void setHorizontalOffsets(Rect outRect, RecyclerView parent, int currentPosition) {
+        super.setHorizontalOffsets(outRect, parent, currentPosition);
+    }
 
-	@Override
-	protected void setHorizontalOffsets(Rect outRect, RecyclerView parent, int currentPosition)
-	{
-		super.setHorizontalOffsets(outRect, parent, currentPosition);
-	}
+    @Override
+    protected void drawHorizontalDivider(Canvas c, RecyclerView parent, int currentPosition, int childLeft, int childTop, int childRight, int childBottom) {
+        super.drawHorizontalDivider(c, parent, currentPosition, childLeft, childTop, childRight, childBottom);
+    }
 
-	/**
-	 * 最后一个分割线是否绘制
-	 *
-	 * @return
-	 */
-	protected boolean isDivideLastLine()
-	{
-		return false;
-	}
+    protected boolean isDivideLastLine() {
+        return false;
+    }
 }

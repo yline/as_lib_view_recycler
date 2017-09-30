@@ -7,15 +7,13 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.yline.view.recycler.callback.IViewHolderCallback;
-
 /**
  * 资源文件 帮助类 ViewHolder
  *
  * @author yline 2017/3/19 -- 3:03
  * @version 1.0.0
  */
-public class ViewHolder implements IViewHolderCallback<View>
+public class ViewHolder implements Callback.IViewHolderCallback
 {
 	private SparseArrayCompat<View> sArray;
 

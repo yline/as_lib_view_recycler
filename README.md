@@ -4,7 +4,7 @@
 * ViewHolder 类似注解的作用，管理findViewById()
 * ListView的公共Adapter，提供数据管理功能；暂时有16个数据管理的Api
 * RecyclerView的公共Adapter，提供数据管理功能；暂时有16个数据管理的Api
-* 提供处理Recycler空数据、添加头部和底部的情况
+* 提供处理Recycler添加头部和底部的情况
 * ItemDecoration，RecyclerView的分割线处理
 
 技术交流群：[644213963](https://jq.qq.com/?_wv=1027&k=4ETdgdJ)   
@@ -54,12 +54,6 @@
 	// 更新数据
 	boolean update(int index, E e);
 	boolean update(int index[], E[] arrays);
-
-> CommonEmptyRecyclerAdapter   
-> 重写以下两个函数即可
-
-	int getEmptyItemRes() // 空数据时，布局文件
-	void onBindEmptyViewHolder(RecyclerViewHolder viewHolder, int position) // 空数据时，进行的操作
 
 > HeadFootRecyclerAdapter
 
@@ -122,9 +116,6 @@
 	setOnClickListener(int viewId, View.OnClickListener listener)
 	ProgressBar setProgress(int viewId, int progress)
 	...
-
-添加头部、底部、空数据、带item时，效果   
-![](https://github.com/yline/as_lib_view_recycler/blob/master/LibViewRecyclerDemo/src/main/assets/empty.jpeg)
 
 添加头部、底部、有数据、带item时，效果   
 ![](https://github.com/yline/as_lib_view_recycler/blob/master/LibViewRecyclerDemo/src/main/assets/data.jpeg)

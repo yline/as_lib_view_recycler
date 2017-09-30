@@ -11,16 +11,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.yline.base.BaseAppCompatActivity;
-import com.yline.log.LogFileUtil;
 import com.yline.utils.UIScreenUtil;
 import com.yline.view.recycler.demo.DataAdapterTest;
 import com.yline.view.recycler.demo.R;
-import com.yline.view.recycler.holder.RecyclerViewHolder;
 import com.yline.view.recycler.simple.SimpleHeadFootRecyclerAdapter;
 
 public class SimpleHeadFootRecyclerActivity extends BaseAppCompatActivity
 {
-	private SimpleHeadFootAdapter simpleAdapter;
+	private SimpleHeadFootRecyclerAdapter simpleAdapter;
 
 	public static void actionStart(Context context)
 	{
@@ -39,9 +37,8 @@ public class SimpleHeadFootRecyclerActivity extends BaseAppCompatActivity
 	private void initView()
 	{
 		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler);
-		simpleAdapter = new SimpleHeadFootAdapter();
+		simpleAdapter = new SimpleHeadFootRecyclerAdapter();
 
-		LogFileUtil.v("adapter isEmptyViewShow = " + simpleAdapter.isEmptyViewShow());
 		initRecyclerView(recyclerView);
 		recyclerView.setAdapter(simpleAdapter);
 
@@ -73,27 +70,5 @@ public class SimpleHeadFootRecyclerActivity extends BaseAppCompatActivity
 	{
 		StaggeredGridLayoutManager gridLayoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
 		recyclerView.setLayoutManager(gridLayoutManager);
-	}
-
-	private class SimpleHeadFootAdapter extends SimpleHeadFootRecyclerAdapter
-	{
-		@Override
-		public int getEmptyItemRes()
-		{
-			return R.layout.global_empty;
-		}
-
-		@Override
-		public void onBindEmptyViewHolder(RecyclerViewHolder viewHolder, int position)
-		{
-			viewHolder.setOnClickListener(R.id.btn_empty_recycler, new View.OnClickListener()
-			{
-				@Override
-				public void onClick(View v)
-				{
-					finish();
-				}
-			});
-		}
 	}
 }
