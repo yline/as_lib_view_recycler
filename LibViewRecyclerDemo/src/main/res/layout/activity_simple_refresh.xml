@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_super_swipe_simple"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.yline.view.recycler.demo.refresh.SimpleRefreshActivity">
+    android:layout_height="match_parent">
 
-</android.support.constraint.ConstraintLayout>
+    <com.yline.view.recycler.refresh.SuperSwipeRefreshLayout
+        android:id="@+id/super_swipe_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_super_swipe"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </android.support.v7.widget.RecyclerView>
+    </com.yline.view.recycler.refresh.SuperSwipeRefreshLayout>
+</RelativeLayout>
