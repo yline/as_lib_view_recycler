@@ -1,6 +1,6 @@
 package com.yline.view.recycler.simple;
 
-import com.yline.view.recycler.adapter.HeadFootRecyclerAdapter;
+import com.yline.view.recycler.adapter.AbstractHeadFootRecyclerAdapter;
 import com.yline.view.recycler.holder.RecyclerViewHolder;
 
 /**
@@ -9,7 +9,7 @@ import com.yline.view.recycler.holder.RecyclerViewHolder;
  * @author yline 2017/5/23 -- 10:20
  * @version 1.0.0
  */
-public class SimpleHeadFootRecyclerAdapter extends HeadFootRecyclerAdapter<String>
+public class SimpleHeadFootRecyclerAdapter extends AbstractHeadFootRecyclerAdapter<String>
 {
 	@Override
 	public int getItemRes()
@@ -20,6 +20,6 @@ public class SimpleHeadFootRecyclerAdapter extends HeadFootRecyclerAdapter<Strin
 	@Override
 	public void onBindViewHolder(RecyclerViewHolder holder, int position)
 	{
-		holder.setText(android.R.id.text1, sList.get(position));
+		holder.setText(android.R.id.text1, getItem(position));
 	}
 }

@@ -3,7 +3,7 @@ package com.yline.view.recycler.simple;
 import android.content.Context;
 import android.view.ViewGroup;
 
-import com.yline.view.recycler.adapter.CommonListAdapter;
+import com.yline.view.recycler.adapter.AbstractListAdapter;
 import com.yline.view.recycler.holder.ViewHolder;
 
 /**
@@ -12,7 +12,7 @@ import com.yline.view.recycler.holder.ViewHolder;
  * @author yline 2017/5/23 -- 10:16
  * @version 1.0.0
  */
-public class SimpleListAdapter extends CommonListAdapter<String>
+public class SimpleListAdapter extends AbstractListAdapter<String>
 {
 	public SimpleListAdapter(Context context)
 	{
@@ -28,6 +28,6 @@ public class SimpleListAdapter extends CommonListAdapter<String>
 	@Override
 	protected void onBindViewHolder(ViewGroup parent, ViewHolder viewHolder, int position)
 	{
-		viewHolder.setText(android.R.id.text1, sList.get(position));
+		viewHolder.setText(android.R.id.text1, getItem(position));
 	}
 }

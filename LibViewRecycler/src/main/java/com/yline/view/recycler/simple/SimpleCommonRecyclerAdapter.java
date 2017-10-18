@@ -1,15 +1,15 @@
 package com.yline.view.recycler.simple;
 
-import com.yline.view.recycler.adapter.CommonRecyclerAdapter;
+import com.yline.view.recycler.adapter.AbstractCommonRecyclerAdapter;
 import com.yline.view.recycler.holder.RecyclerViewHolder;
 
 
-public class SimpleRecyclerAdapter extends CommonRecyclerAdapter<String>
+public class SimpleCommonRecyclerAdapter extends AbstractCommonRecyclerAdapter<String>
 {
 	@Override
 	public void onBindViewHolder(RecyclerViewHolder viewHolder, int position)
 	{
-		viewHolder.setText(android.R.id.text1, sList.get(position));
+		viewHolder.setText(android.R.id.text1, getItem(position));
 	}
 
 	@Override

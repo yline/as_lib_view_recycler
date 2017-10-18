@@ -8,11 +8,9 @@ import android.view.ViewGroup;
 
 import com.yline.view.recycler.holder.Callback;
 import com.yline.view.recycler.holder.RecyclerViewHolder;
+import com.yline.view.recycler.manager.CommonRecyclerDataManager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -21,11 +19,11 @@ import java.util.List;
  * @author yline 2017/5/23 -- 10:28
  * @version 1.0.0
  */
-public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<RecyclerViewHolder> implements Callback.IDataAdapterCallback<T> {
-    protected List<T> sList;
+public abstract class AbstractCommonRecyclerAdapter<T> extends RecyclerView.Adapter<RecyclerViewHolder> implements Callback.IDataAdapterCallback<T> {
+    private CommonRecyclerDataManager<T> mDataManager;
 
-    public CommonRecyclerAdapter() {
-        this.sList = new ArrayList<>();
+    public AbstractCommonRecyclerAdapter() {
+        this.mDataManager = new CommonRecyclerDataManager<>(this);
     }
 
     @Override
@@ -40,182 +38,92 @@ public abstract class CommonRecyclerAdapter<T> extends RecyclerView.Adapter<Recy
 
     @Override
     public int getItemCount() {
-        return sList.size();
+        return mDataManager.getDataSize();
     }
 
     @Override
     public List<T> getDataList() {
-        return Collections.unmodifiableList(sList);
+        return mDataManager.getDataList();
     }
 
     @Override
     public void setDataList(List<T> tList, boolean isNotify) {
-        if (null != tList) {
-            this.sList = new ArrayList<>(tList);
-            if (isNotify) {
-                this.notifyDataSetChanged();
-            }
-        }
+        mDataManager.setDataList(tList, isNotify);
     }
 
     @Override
     public T getItem(int position) {
-        if (position >= sList.size()) {
-            throw new IllegalArgumentException("invalid position");
-        }
-        return sList.get(position);
+        return mDataManager.getItem(position);
     }
 
     @Override
     public int getDataSize() {
-        return sList.size();
+        return mDataManager.getDataSize();
     }
 
     @Override
     public boolean contains(T element) {
-        return sList.contains(element);
+        return mDataManager.contains(element);
     }
 
     @Override
-    public boolean containsAll(Collection collection) {
-        return sList.containsAll(collection);
+    public boolean containsAll(Collection<? extends T> collection) {
+        return mDataManager.containsAll(collection);
     }
 
     @Override
     public boolean isEmpty() {
-        return sList.isEmpty();
+        return mDataManager.isEmpty();
     }
 
     @Override
-    public boolean add(T object, boolean isNotify) {
-        boolean result = sList.add(object);
-        if (isNotify) {
-            this.notifyItemInserted(sList.size() - 1);
-        }
-        return result;
+    public boolean add(T t, boolean isNotify) {
+        return mDataManager.add(t, isNotify);
     }
 
     @Override
     public void add(int index, T element, boolean isNotify) {
-        sList.add(index, element);
-        if (isNotify) {
-            this.notifyItemInserted(index);
-        }
+        mDataManager.add(index, element, isNotify);
     }
 
     @Override
     public boolean addAll(Collection<? extends T> collection, boolean isNotify) {
-        boolean result = sList.addAll(collection);
-        if (isNotify) {
-            this.notifyDataSetChanged();
-        }
-        return result;
+        return mDataManager.addAll(collection, isNotify);
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends T> collection, boolean isNotify) {
-        boolean result = sList.addAll(index, collection);
-        if (isNotify) {
-            this.notifyItemRangeInserted(index, collection.size());
-        }
-        return result;
+        return mDataManager.addAll(index, collection, isNotify);
     }
 
     @Override
     public T remove(int index, boolean isNotify) {
-        if (sList.size() > index) {
-            T t = sList.remove(index);
-            if (isNotify) {
-                this.notifyItemRemoved(index);
-            }
-            return t;
-        }
-        return null;
+        return mDataManager.remove(index, isNotify);
     }
 
     @Override
     public boolean remove(T t, boolean isNotify) {
-        List<Integer> objectList = new ArrayList<>();
-        for (int i = sList.size() - 1; i >= 0; i--) {
-            if (null != t && sList.get(i).equals(t)) {
-                objectList.add(i);
-            }
-        }
-
-        boolean result = sList.removeAll(Arrays.asList(t));
-        if (result && isNotify) {
-            for (Integer integer : objectList) {
-                this.notifyItemRemoved(integer);
-            }
-        }
-
-        return result;
+        return mDataManager.remove(t, isNotify);
     }
 
     @Override
     public boolean removeAll(Collection<? extends T> collection, boolean isNotify) {
-        int length = sList.size();
-        if (null == collection || collection.size() > length) {
-            return false;
-        }
-
-        List<Integer> objectList = new ArrayList<>();
-        for (int i = sList.size() - 1; i >= 0; i--) {
-            if (collection.contains(sList.get(i))) {
-                objectList.add(i);
-            }
-        }
-
-        boolean result = sList.removeAll(collection);
-        if (result && isNotify) {
-            for (Integer integer : objectList) {
-                this.notifyItemRemoved(integer);
-            }
-        }
-
-        return result;
+        return mDataManager.removeAll(collection, isNotify);
     }
 
     @Override
     public void clear(boolean isNotify) {
-        sList.clear();
-        if (isNotify) {
-            this.notifyDataSetChanged();
-        }
+        mDataManager.clear(isNotify);
     }
 
     @Override
     public boolean update(int index, T t, boolean isNotify) {
-        if (index >= sList.size()) {
-            return false;
-        }
-
-        sList.remove(index);
-        sList.add(index, t);
-        if (isNotify) {
-            this.notifyItemChanged(index);
-        }
-
-        return true;
+        return mDataManager.update(index, t, isNotify);
     }
 
     @Override
-    public boolean update(int index[], T[] arrays, boolean isNotify) {
-        if (index.length != arrays.length || index.length > sList.size()) {
-            return false;
-        }
-
-        for (int i : index) {
-            if (i >= sList.size()) {
-                return false;
-            }
-        }
-
-        for (int i = 0; i < arrays.length; i++) {
-            update(index[i], arrays[i], isNotify);
-        }
-
-        return true;
+    public boolean update(int[] index, T[] arrays, boolean isNotify) {
+        return mDataManager.update(index, arrays, isNotify);
     }
 
     /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& 适配情形 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& */

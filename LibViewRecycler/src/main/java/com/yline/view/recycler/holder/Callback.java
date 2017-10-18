@@ -128,7 +128,7 @@ public class Callback {
          * @param isNotify 是否更新界面
          * @return 是否成功
          */
-        boolean update(int index[], E[] arrays, boolean isNotify);
+        boolean update(int[] index, E[] arrays, boolean isNotify);
     }
 
     /**

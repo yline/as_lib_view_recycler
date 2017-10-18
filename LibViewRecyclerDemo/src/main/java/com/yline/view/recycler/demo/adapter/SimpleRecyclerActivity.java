@@ -10,11 +10,11 @@ import android.support.v7.widget.RecyclerView;
 import com.yline.base.BaseAppCompatActivity;
 import com.yline.view.recycler.demo.DataAdapterTest;
 import com.yline.view.recycler.demo.R;
-import com.yline.view.recycler.simple.SimpleRecyclerAdapter;
+import com.yline.view.recycler.simple.SimpleCommonRecyclerAdapter;
 
 public class SimpleRecyclerActivity extends BaseAppCompatActivity
 {
-	protected SimpleRecyclerAdapter homeAdapter;
+	protected SimpleCommonRecyclerAdapter homeAdapter;
 
 	public static void actionStart(Context context)
 	{
@@ -30,7 +30,7 @@ public class SimpleRecyclerActivity extends BaseAppCompatActivity
 		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler);
 		initRecyclerView(recyclerView);
 
-		homeAdapter = new SimpleRecyclerAdapter();
+		homeAdapter = new SimpleCommonRecyclerAdapter();
 		recyclerView.setAdapter(homeAdapter);
 
 		TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_recycler);

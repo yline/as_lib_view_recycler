@@ -28,7 +28,8 @@
         <activity android:name=".grid.GridHeadFootRecyclerActivity" />
         <activity android:name=".refresh.CircleProgressActivity" />
         <activity android:name=".refresh.CustomRefreshActivity" />
-        <activity android:name=".refresh.SimpleRefreshActivity"></activity>
+        <activity android:name=".refresh.SimpleRefreshActivity"/>
+        <activity android:name=".multi.SimpleMultiRecyclerActivity"/>
     </application>
 
 </manifest>
