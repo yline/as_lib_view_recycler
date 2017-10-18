@@ -1,6 +1,5 @@
-package com.yline.view.recycler.demo.multi;
+package com.yline.view.recycler.simple;
 
-import com.yline.test.StrConstant;
 import com.yline.view.recycler.adapter.ItemDelegateCallback;
 import com.yline.view.recycler.adapter.ItemMultiRecyclerAdapter;
 import com.yline.view.recycler.holder.RecyclerViewHolder;
@@ -18,16 +17,6 @@ public class SimpleMultiRecyclerAdapter extends ItemMultiRecyclerAdapter {
     public SimpleMultiRecyclerAdapter() {
         super();
         mItemDelegateManager.addItemDelegate(new ContentItemDelegate());
-    }
-
-    @Override
-    public void onBindViewHolder(RecyclerViewHolder holder, int position, List<Object> payloads) {
-        super.onBindViewHolder(holder, position, payloads);
-    }
-
-    @Override
-    public void onBindViewHolder(RecyclerViewHolder holder, int position) {
-        super.onBindViewHolder(holder, position);
     }
 
     private class ContentItemDelegate implements ItemDelegateCallback<String> {
@@ -52,12 +41,13 @@ public class SimpleMultiRecyclerAdapter extends ItemMultiRecyclerAdapter {
         }
     }
 
-    public void setData(){
-        List<Object> data = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            data.add(i, StrConstant.getListFive(20).get(i));
+    public void setDataList(List<String> list, boolean isNotify) {
+        if (null != list) {
+            List<Object> dataList = new ArrayList<>();
+            for (String tempStr : list) {
+                dataList.add(tempStr);
+            }
+            mDataManager.setDataList(dataList, isNotify);
         }
-
-        mList = data;
     }
 }

@@ -8,9 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.yline.view.recycler.holder.RecyclerViewHolder;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.yline.view.recycler.manager.AbstractMultiDataManager;
 
 /**
  * 支持多种数据类型 的RecyclerAdapter
@@ -20,11 +18,15 @@ import java.util.List;
  */
 public class ItemMultiRecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     protected final ItemDelegateManager mItemDelegateManager;
-    protected List<Object> mList;
+    protected AbstractMultiDataManager mDataManager;
 
     public ItemMultiRecyclerAdapter() {
-        mList = new ArrayList<>();
+        initDataManager();
         mItemDelegateManager = new ItemDelegateManager();
+    }
+
+    protected void initDataManager() {
+        mDataManager = new AbstractMultiDataManager(this);
     }
 
     @Override
@@ -41,17 +43,17 @@ public class ItemMultiRecyclerAdapter extends RecyclerView.Adapter<RecyclerViewH
 
     @Override
     public int getItemViewType(int position) {
-        return mItemDelegateManager.getItemType(mList.get(position), position);
+        return mItemDelegateManager.getItemType(mDataManager.getItem(position), position);
     }
 
     @Override
     public void onBindViewHolder(RecyclerViewHolder holder, int position) {
-        mItemDelegateManager.onBindHolder(holder, mList.get(position), position);
+        mItemDelegateManager.onBindHolder(holder, mDataManager.getItem(position), position);
     }
 
     @Override
     public int getItemCount() {
-        return mList.size();
+        return mDataManager.getDataSize();
     }
 
     /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& 适配情形 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& */

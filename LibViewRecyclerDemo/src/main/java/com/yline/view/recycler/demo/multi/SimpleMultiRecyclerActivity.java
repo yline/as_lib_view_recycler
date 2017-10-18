@@ -10,7 +10,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.yline.base.BaseAppCompatActivity;
+import com.yline.test.StrConstant;
 import com.yline.view.recycler.demo.R;
+import com.yline.view.recycler.simple.SimpleMultiRecyclerAdapter;
 
 /**
  * 
@@ -44,12 +46,10 @@ public class SimpleMultiRecyclerActivity extends BaseAppCompatActivity {
         homeAdapter = new SimpleMultiRecyclerAdapter();
         recyclerView.setAdapter(homeAdapter);
 
-        homeAdapter.setData();
-        homeAdapter.notifyDataSetChanged();
+        homeAdapter.setDataList(StrConstant.getListFive(20), true);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_recycler);
         tabLayout.setVisibility(View.GONE);
-        //new DataAdapterTest(tabLayout, homeAdapter);
     }
 
     protected void initRecyclerView(RecyclerView recyclerView)
