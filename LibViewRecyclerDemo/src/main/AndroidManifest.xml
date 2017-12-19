@@ -28,8 +28,9 @@
         <activity android:name=".grid.GridHeadFootRecyclerActivity" />
         <activity android:name=".refresh.CircleProgressActivity" />
         <activity android:name=".refresh.CustomRefreshActivity" />
-        <activity android:name=".refresh.SimpleRefreshActivity"/>
-        <activity android:name=".multi.SimpleMultiRecyclerActivity"/>
+        <activity android:name=".refresh.SimpleRefreshActivity" />
+        <activity android:name=".multi.SimpleMultiRecyclerActivity" />
+        <activity android:name=".test.MultiLevelActivity" />
     </application>
 
 </manifest>

@@ -15,26 +15,22 @@ import com.yline.view.recycler.demo.R;
 import com.yline.view.recycler.simple.SimpleMultiRecyclerAdapter;
 
 /**
- * 
  * @author yline 2017/10/18 -- 14:50
  * @version 1.0.0
  */
 public class SimpleMultiRecyclerActivity extends BaseAppCompatActivity {
     protected SimpleMultiRecyclerAdapter homeAdapter;
 
-    public static void launcher(Context context)
-    {
-    	if (null != context)
-    	{
-    		Intent intent = new Intent(context, SimpleMultiRecyclerActivity.class);
-    		if (!(context instanceof Activity))
-    		{
-    			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);	
-    		}
-    		context.startActivity(intent);
-    	}
+    public static void launcher(Context context) {
+        if (null != context) {
+            Intent intent = new Intent(context, SimpleMultiRecyclerActivity.class);
+            if (!(context instanceof Activity)) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            }
+            context.startActivity(intent);
+        }
     }
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,8 +48,7 @@ public class SimpleMultiRecyclerActivity extends BaseAppCompatActivity {
         tabLayout.setVisibility(View.GONE);
     }
 
-    protected void initRecyclerView(RecyclerView recyclerView)
-    {
+    protected void initRecyclerView(RecyclerView recyclerView) {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
         gridLayoutManager.setSpanCount(3);
         recyclerView.setLayoutManager(gridLayoutManager);
