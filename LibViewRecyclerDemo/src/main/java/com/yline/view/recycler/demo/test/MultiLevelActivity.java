@@ -104,7 +104,6 @@ public class MultiLevelActivity extends BaseAppCompatActivity {
 
     /**
      * 剩余问题
-     * 1，打开时，未清除同级别其它[第一级、第二级]
      */
     private class AbstractMultiLevelAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
         private List<Object> mDataList;
@@ -155,6 +154,9 @@ public class MultiLevelActivity extends BaseAppCompatActivity {
         }
 
         public void onBindProvinceViewHolder(RecyclerViewHolder holder, final MultiLevelModel.ProvinceModel provinceModel, final int position) {
+            // 点击 浙江
+            // 打开时，打开 浙江下一级所有城市，关闭其它省份以及其他省份下的城市
+            // 关闭时，关闭 浙江所有城市、地区
             holder.getItemView().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -172,6 +174,25 @@ public class MultiLevelActivity extends BaseAppCompatActivity {
                         } else {
                             mProvinceStateArray.put(key, true);
                             mDataList.addAll(position + 1, provinceModel.getCity());
+
+                            // 修改状态
+                            mProvinceStateArray = new SparseBooleanArray(); // 关闭其它省份
+                            mCityStateArray = new SparseBooleanArray(); // 关闭其它省份下的城市
+                            mProvinceStateArray.put(key, true); // 打开对应的项
+
+                            // 修改数据，必须先添加后删减，否则顺序会乱
+                            // 添加需要的数据
+                            List<MultiLevelModel.CityModel> newAttachCityList = provinceModel.getCity();
+                            mDataList.addAll(position + 1, newAttachCityList);
+
+                            // 清除其它数据
+                            for (Object object : new ArrayList<>(mDataList)) {
+                                if (object instanceof MultiLevelModel.CityModel && !newAttachCityList.contains(object)) {
+                                    mDataList.remove(object);
+                                } else if (object instanceof MultiLevelModel.AreaModel) {
+                                    mDataList.remove(object);
+                                }
+                            }
                         }
 
                         notifyDataSetChanged();
@@ -181,6 +202,9 @@ public class MultiLevelActivity extends BaseAppCompatActivity {
         }
 
         public void onBindCityViewHolder(RecyclerViewHolder holder, final MultiLevelModel.CityModel cityModel, final int position) {
+            // 点击 杭州
+            // 打开时，打开 杭州所有地区，关闭浙江省的其它城市
+            // 关闭时，关闭 杭州地区
             holder.getItemView().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -190,8 +214,21 @@ public class MultiLevelActivity extends BaseAppCompatActivity {
                             mCityStateArray.put(key, false);
                             mDataList.removeAll(cityModel.getArea());
                         } else {
-                            mCityStateArray.put(key, true);
+                            // 修改状态
+                            mCityStateArray = new SparseBooleanArray(); // 关闭其它城市
+                            mCityStateArray.put(key, true); // 打开对应的项
+
+                            // 修改数据，必须先添加后删减，否则顺序会乱
+                            // 添加需要的数据
+                            List<MultiLevelModel.AreaModel> newAttachAreaList = cityModel.getArea();
                             mDataList.addAll(position + 1, cityModel.getArea());
+
+                            // 清除其它数据
+                            for (Object object : new ArrayList<>(mDataList)) {
+                                if (object instanceof MultiLevelModel.AreaModel && !newAttachAreaList.contains(object)) {
+                                    mDataList.remove(object);
+                                }
+                            }
                         }
                     }
 
