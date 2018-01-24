@@ -30,7 +30,6 @@
         <activity android:name=".refresh.CustomRefreshActivity" />
         <activity android:name=".refresh.SimpleRefreshActivity" />
         <activity android:name=".multi.SimpleMultiRecyclerActivity" />
-        <activity android:name=".test.MultiLevelActivity" />
     </application>
 
 </manifest>

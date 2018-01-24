@@ -18,7 +18,6 @@ import com.yline.view.recycler.demo.multi.SimpleMultiRecyclerActivity;
 import com.yline.view.recycler.demo.refresh.CircleProgressActivity;
 import com.yline.view.recycler.demo.refresh.CustomRefreshActivity;
 import com.yline.view.recycler.demo.refresh.SimpleRefreshActivity;
-import com.yline.view.recycler.demo.test.MultiLevelActivity;
 
 public class MainActivity extends BaseTestActivity {
     public static void launcher(Context context) {
@@ -115,11 +114,5 @@ public class MainActivity extends BaseTestActivity {
         });
 
         addTextView("Test 系列");
-        addButton("三级列表", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MultiLevelActivity.launcher(MainActivity.this);
-            }
-        });
     }
 }
