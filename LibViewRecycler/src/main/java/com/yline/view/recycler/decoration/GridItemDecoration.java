@@ -20,12 +20,11 @@ import com.yline.view.recycler.adapter.AbstractHeadFootRecyclerAdapter;
  * @author yline 2017/5/23 -- 10:30
  * @version 1.0.0
  */
-abstract class GridItemDecoration extends RecyclerView.ItemDecoration {
+public class GridItemDecoration extends RecyclerView.ItemDecoration {
     private static final int[] ATTRS = new int[]{android.R.attr.listDivider};
-
     protected Drawable sDivider;
 
-    GridItemDecoration(Context context) {
+    public GridItemDecoration(Context context) {
         if (-1 != getDivideResourceId()) {
             sDivider = ContextCompat.getDrawable(context, getDivideResourceId());
         } else {

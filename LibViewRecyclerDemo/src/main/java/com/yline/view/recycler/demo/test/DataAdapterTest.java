@@ -1,4 +1,4 @@
-package com.yline.view.recycler.demo;
+package com.yline.view.recycler.demo.test;
 
 import android.support.design.widget.TabLayout;
 

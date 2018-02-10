@@ -79,7 +79,7 @@
 	simpleAdapter.addFootView(footViewB);
 
 ### ItemDecoration
-	recyclerView.addItemDecoration(new CommonGridDecoration(this)
+	recyclerView.addItemDecoration(new GridItemDecoration(this)
 	{
 		// 重写 间隔 的资源文件 
 		@Override

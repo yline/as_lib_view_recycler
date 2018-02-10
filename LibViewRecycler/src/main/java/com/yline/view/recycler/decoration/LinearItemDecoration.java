@@ -19,12 +19,11 @@ import com.yline.view.recycler.adapter.AbstractHeadFootRecyclerAdapter;
  * @author yline 2017/5/23 -- 10:31
  * @version 1.0.0
  */
-abstract class LinearItemDecoration extends RecyclerView.ItemDecoration {
+public class LinearItemDecoration extends RecyclerView.ItemDecoration {
     private static final int[] ATTRS = new int[]{android.R.attr.listDivider};
-
     protected Drawable sDivider;
 
-    LinearItemDecoration(Context context) {
+    public LinearItemDecoration(Context context) {
         if (-1 != getDivideResourceId()) {
             sDivider = ContextCompat.getDrawable(context, getDivideResourceId());
         } else {
@@ -101,6 +100,11 @@ abstract class LinearItemDecoration extends RecyclerView.ItemDecoration {
         if (adapter instanceof AbstractHeadFootRecyclerAdapter) {
             // 头部
             if (AbstractHeadFootRecyclerAdapter.HEAD_COUNT > currentPosition) {
+                return false;
+            }
+
+            // 最后一个数据
+            if ((currentPosition == totalCount - 1 - AbstractHeadFootRecyclerAdapter.FOOT_COUNT)) {
                 return false;
             }
 

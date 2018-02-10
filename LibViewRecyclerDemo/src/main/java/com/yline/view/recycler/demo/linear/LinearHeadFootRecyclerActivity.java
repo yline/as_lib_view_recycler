@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.yline.view.recycler.decoration.CommonLinearDecoration;
+import com.yline.view.recycler.decoration.LinearItemDecoration;
 import com.yline.view.recycler.demo.R;
 import com.yline.view.recycler.demo.adapter.SimpleHeadFootRecyclerActivity;
 
@@ -17,7 +17,7 @@ public class LinearHeadFootRecyclerActivity extends SimpleHeadFootRecyclerActivi
     @Override
     protected void initRecyclerView(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        recyclerView.addItemDecoration(new CommonLinearDecoration(this) {
+        recyclerView.addItemDecoration(new LinearItemDecoration(this) {
             @Override
             protected int getDivideResourceId() {
                 return R.drawable.recycler_divider_black_normal;

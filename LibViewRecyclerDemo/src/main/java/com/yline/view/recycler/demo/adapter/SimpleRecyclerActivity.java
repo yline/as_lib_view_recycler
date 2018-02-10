@@ -8,7 +8,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.yline.base.BaseAppCompatActivity;
-import com.yline.view.recycler.demo.DataAdapterTest;
+import com.yline.view.recycler.demo.test.DataAdapterTest;
 import com.yline.view.recycler.demo.R;
 import com.yline.view.recycler.simple.SimpleRecyclerAdapter;
 
