@@ -40,7 +40,7 @@ public class MainActivity extends BaseTestActivity {
             }
         });
 
-        addButton("SimpleCommonRecyclerAdapter", new View.OnClickListener() {
+        addButton("SimpleRecyclerAdapter", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 SimpleRecyclerActivity.actionStart(MainActivity.this);

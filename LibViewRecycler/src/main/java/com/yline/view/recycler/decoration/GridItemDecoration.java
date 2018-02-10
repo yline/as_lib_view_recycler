@@ -12,7 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 
-import com.yline.view.recycler.holder.Callback;
+import com.yline.view.recycler.adapter.AbstractHeadFootRecyclerAdapter;
 
 /**
  * 公众的 GridItemDecoration
@@ -88,9 +88,9 @@ abstract class GridItemDecoration extends RecyclerView.ItemDecoration {
      */
     private boolean[] initSpanParam(RecyclerView.Adapter adapter, int totalCount, int spanCount, int currentPos) {
         int headCount = 0, footCount = 0;
-        if (adapter instanceof Callback.IHeadFootCallback) {
-            headCount = ((Callback.IHeadFootCallback) adapter).getHeadersCount();
-            footCount = ((Callback.IHeadFootCallback) adapter).getFootersCount();
+        if (adapter instanceof AbstractHeadFootRecyclerAdapter) {
+            headCount = AbstractHeadFootRecyclerAdapter.HEAD_COUNT;
+            footCount = AbstractHeadFootRecyclerAdapter.FOOT_COUNT;
         }
 
         boolean isSpanFirst = ((currentPos - headCount) % spanCount == 0);
@@ -265,14 +265,14 @@ abstract class GridItemDecoration extends RecyclerView.ItemDecoration {
      * @return true 则绘制
      */
     protected boolean isDrawDivide(RecyclerView.Adapter adapter, int totalCount, int currentPosition) {
-        if (adapter instanceof Callback.IHeadFootCallback) {
+        if (adapter instanceof AbstractHeadFootRecyclerAdapter) {
             // 头部
-            if (currentPosition < ((Callback.IHeadFootCallback) adapter).getHeadersCount()) {
+            if (currentPosition < AbstractHeadFootRecyclerAdapter.HEAD_COUNT) {
                 return false;
             }
 
             // 底部
-            if (currentPosition > totalCount - 1 - ((Callback.IHeadFootCallback) adapter).getFootersCount()) {
+            if (currentPosition > totalCount - 1 - AbstractHeadFootRecyclerAdapter.FOOT_COUNT) {
                 return false;
             }
         }

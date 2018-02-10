@@ -5,7 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 
-import com.yline.view.recycler.holder.Callback;
+import com.yline.view.recycler.adapter.AbstractHeadFootRecyclerAdapter;
 
 /**
  * 绘制 线性 分割线封装
@@ -21,9 +21,9 @@ public class CommonLinearDecoration extends LinearItemDecoration {
 
     @Override
     protected boolean isDrawDivide(RecyclerView.Adapter adapter, int totalCount, int currentPosition) {
-        if (adapter instanceof Callback.IHeadFootCallback) {
+        if (adapter instanceof AbstractHeadFootRecyclerAdapter) {
             // 最后一个数据
-            if ((currentPosition == totalCount - 1 - ((Callback.IHeadFootCallback) adapter).getFootersCount()) && !isDivideLastLine()) {
+            if ((currentPosition == totalCount - 1 - AbstractHeadFootRecyclerAdapter.FOOT_COUNT) && !isDivideLastLine()) {
                 return false;
             }
         }

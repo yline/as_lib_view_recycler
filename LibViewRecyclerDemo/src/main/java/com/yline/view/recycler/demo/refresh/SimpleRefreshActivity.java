@@ -19,8 +19,6 @@ import java.util.Random;
 public class SimpleRefreshActivity extends BaseAppCompatActivity {
     private SuperSwipeRefreshLayout swipeRefreshLayout;
 
-    private RecyclerView recyclerView;
-
     private SimpleHeadFootRecyclerAdapter recyclerAdapter;
 
     @Override
@@ -29,8 +27,8 @@ public class SimpleRefreshActivity extends BaseAppCompatActivity {
         setContentView(R.layout.activity_simple_refresh);
 
         swipeRefreshLayout = (SuperSwipeRefreshLayout) findViewById(R.id.super_swipe_refresh);
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_super_swipe);
-        recyclerAdapter = new SimpleHeadFootRecyclerAdapter();
+        final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_super_swipe);
+         recyclerAdapter = new SimpleHeadFootRecyclerAdapter(this);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(recyclerAdapter);
@@ -58,7 +56,7 @@ public class SimpleRefreshActivity extends BaseAppCompatActivity {
                     public void run() {
                         swipeRefreshLayout.setLoadMore(false);
                         // 更新recyclerView
-                        int itemNumber = recyclerAdapter.getItemCount();
+                        int itemNumber = recyclerAdapter.size();
                         recyclerAdapter.add(itemNumber, "Loaded Item + " + new Random().nextInt(300), true);
                         recyclerView.scrollToPosition(itemNumber);
                     }

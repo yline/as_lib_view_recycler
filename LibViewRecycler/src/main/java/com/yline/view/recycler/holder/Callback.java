@@ -6,7 +6,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 /**
  * @author yline 2017/9/30 -- 11:43
@@ -15,135 +17,197 @@ import java.util.List;
 public class Callback {
 
     /**
+     * 查看数据信息
+     *
+     * @param <E> 数据类型
+     */
+    public interface IDataInfoCallback<E> {
+        /**
+         * 数据大小
+         *
+         * @return 大小
+         */
+        int size();
+
+        /**
+         * 数据是否为空
+         *
+         * @return true or false
+         */
+        boolean isEmpty();
+
+        /**
+         * 是否包含某数据
+         *
+         * @param element 数据对象
+         * @return true or false
+         */
+        boolean contains(E element);
+
+        /**
+         * 是否包含，所有数据
+         *
+         * @param collection 数据集合
+         * @return true of false
+         */
+        boolean containsAll(Collection<? extends E> collection);
+
+        /**
+         * 获取单条数据
+         *
+         * @param index 数据位置
+         * @return 单条数据
+         * @throws IndexOutOfBoundsException if the index is out of range
+         */
+        E get(int index);
+
+        /**
+         * 返回数据的位置
+         *
+         * @param element 单个数据
+         * @return 从前面遍历，第一个符合条件的位置
+         */
+        int indexOf(E element);
+
+        /**
+         * 返回数据的位置
+         *
+         * @param element 单个数据
+         * @return 从后面遍历，第一个符合条件的位置
+         */
+        int lastIndexOf(E element);
+
+        /**
+         * 获取截取的数据
+         *
+         * @param fromIndex 开始位置
+         * @param toIndex   结束位置
+         * @return 截取的List
+         * @throws IndexOutOfBoundsException for an illegal endpoint index value
+         */
+        List<E> subList(int fromIndex, int toIndex);
+    }
+
+    /**
      * Adapter 支持的数据操作
      *
      * @param <E> 数据类型
      */
-    public interface IDataAdapterCallback<E> {
+    public interface IDataListCallback<E> {
         /**
+         * 返回所有数据
+         *
          * @return 不可修改的数据集
          */
         List<E> getDataList();
 
         /**
+         * 清空之前的数据，替换掉所有数据
+         *
          * @param list     放入数据
          * @param isNotify 是否更新数据
          */
         void setDataList(List<E> list, boolean isNotify);
+    }
 
+    public interface IDataAdapterCallback<E> extends IDataInfoCallback<E>, IDataListCallback<E> {
         /**
-         * @param position 位置信息
-         * @return 单个数据
-         */
-        E getItem(int position);
-
-        /**
-         * @return 数据长度
-         */
-        int getDataSize();
-
-        /**
-         * @param element 单个刷数据
-         * @return 是否含有
-         */
-        boolean contains(E element);
-
-        /**
-         * @param collection 数据集
-         * @return 是否含有
-         */
-        boolean containsAll(Collection<? extends E> collection);
-
-        /**
-         * @return 数据长度是否为空，或者长度为零
-         */
-        boolean isEmpty();
-
-        /**
-         * @param element  增加一条数据
+         * 添加数据
+         *
+         * @param element  单个数据
          * @param isNotify 是否更新界面
-         * @return 是否成功
+         * @return true or false
          */
         boolean add(E element, boolean isNotify);
 
         /**
-         * @param index    指定位置
-         * @param element  添加数据
+         * 添加数据
+         *
+         * @param index    数据位置
+         * @param element  单个数据
          * @param isNotify 是否更新界面
          */
         void add(int index, E element, boolean isNotify);
 
         /**
-         * @param collection 添加一个数据集
+         * 添加数据
+         *
+         * @param collection 数据集合
          * @param isNotify   是否更新界面
-         * @return 是否成功
+         * @return true or false
          */
         boolean addAll(Collection<? extends E> collection, boolean isNotify);
 
         /**
-         * @param index      指定位置
-         * @param collection 添加一个数据集
+         * 添加数据集合
+         *
+         * @param index      开始位置
+         * @param collection 数据集合
          * @param isNotify   是否更新界面
-         * @return 是否成功
+         * @return true or false
          */
         boolean addAll(int index, Collection<? extends E> collection, boolean isNotify);
 
         /**
+         * 删除数据
+         *
          * @param index    指定位置
          * @param isNotify 是否更新界面
-         * @return 移除的数据
+         * @return 删除的数据
          */
         E remove(int index, boolean isNotify);
 
         /**
-         * @param e        单个数据
+         * 删除，遍历到符合条件的第一条数据
+         *
+         * @param element  单个数据
          * @param isNotify 是否更新界面
-         * @return 是否成功
+         * @return true or false
          */
-        boolean remove(E e, boolean isNotify);
+        boolean remove(E element, boolean isNotify);
 
         /**
-         * @param collection 数据集
+         * 删除数据集合，删除所有包含在该集合内的数据
+         *
+         * @param collection 数据集合
          * @param isNotify   是否更新界面
-         * @return 是否成功
+         * @return true or false
          */
         boolean removeAll(Collection<? extends E> collection, boolean isNotify);
 
         /**
+         * 删除所有数据
+         *
          * @param isNotify 是否更新界面
          */
         void clear(boolean isNotify);
 
         /**
-         * @param index    指定位置
-         * @param e        单个新数据
+         * 替换掉，某一条数据
+         *
+         * @param index    数据位置
+         * @param element  替换之后的元素
          * @param isNotify 是否更新界面
-         * @return 是否成功
+         * @return 替换前的元素
+         * @throws IndexOutOfBoundsException if the index is out of range
          */
-        boolean update(int index, E e, boolean isNotify);
+        E set(int index, E element, boolean isNotify);
 
         /**
-         * @param index    指定位置
-         * @param arrays   数据集
+         * 按照传入的规则，替换掉所有数据
+         *
+         * @param operator 替换的规则
          * @param isNotify 是否更新界面
-         * @return 是否成功
          */
-        boolean update(int[] index, E[] arrays, boolean isNotify);
-    }
-
-    /**
-     * RecyclerAdapter, 头部和底部的个数
-     */
-    public interface IHeadFootCallback {
-        /**
-         * @return 头部个数
-         */
-        int getHeadersCount();
+        void replaceAll(UnaryOperator<E> operator, boolean isNotify);
 
         /**
-         * @return 底部个数
+         * 按照传入的规则，对所有数据排序
+         *
+         * @param comparator 排序的规则
+         * @param isNotify   是否更新界面
          */
-        int getFootersCount();
+        void sort(Comparator<? super E> comparator, boolean isNotify);
     }
 
     /**
@@ -207,6 +271,8 @@ public class Callback {
 
     public interface OnRecyclerItemClickListener<T> {
         /**
+         * 条目，点击
+         *
          * @param viewHolder Item布局
          * @param t          数据
          * @param position   当前位置
@@ -216,6 +282,8 @@ public class Callback {
 
     public interface onRecyclerItemLongClickListener<T> {
         /**
+         * 条目，长按
+         *
          * @param viewHolder Item布局
          * @param t          数据
          * @param position   当前位置

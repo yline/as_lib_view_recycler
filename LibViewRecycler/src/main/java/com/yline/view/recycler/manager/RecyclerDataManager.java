@@ -1,39 +1,35 @@
 package com.yline.view.recycler.manager;
 
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 
 import com.yline.view.recycler.holder.Callback;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 /**
- * 对应 AbstractCommonRecyclerAdapter
+ * 对应 AbstractRecyclerAdapter
  *
  * @author yline 2017/10/18 -- 15:49
  * @version 1.0.0
  */
-public class CommonRecyclerDataManager<Model> implements Callback.IDataAdapterCallback<Model> {
-    private RecyclerView.Adapter mAdapter;
-    private List<Model> mList;
+public class RecyclerDataManager<Model> extends AbstractDataManager<Model> implements Callback.IDataAdapterCallback<Model> {
+    final RecyclerView.Adapter mAdapter;
 
-    public CommonRecyclerDataManager(RecyclerView.Adapter adapter) {
+    public RecyclerDataManager(RecyclerView.Adapter adapter) {
+        super();
         this.mAdapter = adapter;
-        this.mList = new ArrayList<>();
-    }
-
-    @Override
-    public List<Model> getDataList() {
-        return Collections.unmodifiableList(mList);
     }
 
     @Override
     public void setDataList(List<Model> list, boolean isNotify) {
         if (null != list) {
-            this.mList = new ArrayList<>(list);
+            mList = new ArrayList<>(list);
             if (isNotify) {
                 mAdapter.notifyDataSetChanged();
             }
@@ -41,38 +37,10 @@ public class CommonRecyclerDataManager<Model> implements Callback.IDataAdapterCa
     }
 
     @Override
-    public Model getItem(int position) {
-        if (position >= mList.size()) {
-            throw new IllegalArgumentException("invalid position");
-        }
-        return mList.get(position);
-    }
-
-    @Override
-    public int getDataSize() {
-        return mList.size();
-    }
-
-    @Override
-    public boolean contains(Model element) {
-        return mList.contains(element);
-    }
-
-    @Override
-    public boolean containsAll(Collection<? extends Model> collection) {
-        return mList.containsAll(collection);
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return mList.isEmpty();
-    }
-
-    @Override
     public boolean add(Model element, boolean isNotify) {
         boolean result = mList.add(element);
         if (isNotify) {
-            mAdapter.notifyItemInserted(mList.size() - 1);
+            mAdapter.notifyItemChanged(mList.size() - 1);
         }
         return result;
     }
@@ -105,32 +73,20 @@ public class CommonRecyclerDataManager<Model> implements Callback.IDataAdapterCa
 
     @Override
     public Model remove(int index, boolean isNotify) {
-        if (mList.size() > index) {
-            Model t = mList.remove(index);
-            if (isNotify) {
-                mAdapter.notifyItemRemoved(index);
-            }
-            return t;
+        Model model = mList.remove(index);
+        if (isNotify) {
+            mAdapter.notifyItemRemoved(index);
         }
-        return null;
+        return model;
     }
 
     @Override
-    public boolean remove(Model model, boolean isNotify) {
-        List<Integer> objectList = new ArrayList<>();
-        for (int i = mList.size() - 1; i >= 0; i--) {
-            if (null != model && mList.get(i).equals(model)) {
-                objectList.add(i);
-            }
+    public boolean remove(Model element, boolean isNotify) {
+        int index = mList.indexOf(element);
+        boolean result = mList.remove(element);
+        if (result && index != -1 && isNotify) {
+            mAdapter.notifyItemRemoved(index);
         }
-
-        boolean result = mList.removeAll(Arrays.asList(model));
-        if (result && isNotify) {
-            for (Integer integer : objectList) {
-                mAdapter.notifyItemRemoved(integer);
-            }
-        }
-
         return result;
     }
 
@@ -167,36 +123,29 @@ public class CommonRecyclerDataManager<Model> implements Callback.IDataAdapterCa
     }
 
     @Override
-    public boolean update(int index, Model model, boolean isNotify) {
-        if (index >= mList.size()) {
-            return false;
-        }
-
-        mList.remove(index);
-        mList.add(index, model);
+    public Model set(int index, Model element, boolean isNotify) {
+        Model model = mList.set(index, element);
         if (isNotify) {
             mAdapter.notifyItemChanged(index);
         }
-
-        return true;
+        return model;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
-    public boolean update(int[] index, Model[] arrays, boolean isNotify) {
-        if (index.length != arrays.length || index.length > mList.size()) {
-            return false;
+    public void replaceAll(UnaryOperator<Model> operator, boolean isNotify) {
+        mList.replaceAll(operator);
+        if (isNotify) {
+            mAdapter.notifyDataSetChanged();
         }
+    }
 
-        for (int i : index) {
-            if (i >= mList.size()) {
-                return false;
-            }
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public void sort(Comparator<? super Model> comparator, boolean isNotify) {
+        mList.sort(comparator);
+        if (isNotify) {
+            mAdapter.notifyDataSetChanged();
         }
-
-        for (int i = 0; i < arrays.length; i++) {
-            update(index[i], arrays[i], isNotify);
-        }
-
-        return true;
     }
 }

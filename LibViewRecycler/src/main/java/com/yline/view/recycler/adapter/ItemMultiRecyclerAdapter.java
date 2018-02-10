@@ -2,13 +2,13 @@ package com.yline.view.recycler.adapter;
 
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.yline.view.recycler.holder.RecyclerViewHolder;
-import com.yline.view.recycler.manager.AbstractMultiDataManager;
+import com.yline.view.recycler.manager.RecyclerDataManager;
+import com.yline.view.recycler.manager.RecyclerSpanManager;
 
 /**
  * 支持多种数据类型 的RecyclerAdapter
@@ -18,15 +18,11 @@ import com.yline.view.recycler.manager.AbstractMultiDataManager;
  */
 public class ItemMultiRecyclerAdapter extends RecyclerView.Adapter<RecyclerViewHolder> {
     protected final ItemDelegateManager mItemDelegateManager;
-    protected AbstractMultiDataManager mDataManager;
+    protected final RecyclerDataManager mDataManager;
 
     public ItemMultiRecyclerAdapter() {
-        initDataManager();
+        mDataManager = new RecyclerDataManager(this);
         mItemDelegateManager = new ItemDelegateManager();
-    }
-
-    protected void initDataManager() {
-        mDataManager = new AbstractMultiDataManager(this);
     }
 
     @Override
@@ -43,17 +39,17 @@ public class ItemMultiRecyclerAdapter extends RecyclerView.Adapter<RecyclerViewH
 
     @Override
     public int getItemViewType(int position) {
-        return mItemDelegateManager.getItemType(mDataManager.getItem(position), position);
+        return mItemDelegateManager.getItemType(mDataManager.get(position), position);
     }
 
     @Override
     public void onBindViewHolder(RecyclerViewHolder holder, int position) {
-        mItemDelegateManager.onBindHolder(holder, mDataManager.getItem(position), position);
+        mItemDelegateManager.onBindHolder(holder, mDataManager.get(position), position);
     }
 
     @Override
     public int getItemCount() {
-        return mDataManager.getDataSize();
+        return mDataManager.size();
     }
 
     /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& 适配情形 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& */
@@ -62,58 +58,26 @@ public class ItemMultiRecyclerAdapter extends RecyclerView.Adapter<RecyclerViewH
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
 
-        RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
-        if (layoutManager instanceof GridLayoutManager) {
-            final GridLayoutManager gridLayoutManager = (GridLayoutManager) layoutManager;
-            final GridLayoutManager.SpanSizeLookup spanSizeLookup = gridLayoutManager.getSpanSizeLookup();
-
-            gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-                @Override
-                public int getSpanSize(int position) {
-                    return onConfigGridLayoutManager(gridLayoutManager, spanSizeLookup, position);
+        RecyclerSpanManager.onAttachedToRecyclerView(recyclerView, new RecyclerSpanManager.OnGridCallback() {
+            @Override
+            public int onGridConfig(GridLayoutManager gridLayoutManager, GridLayoutManager.SpanSizeLookup spanSizeLookup, int position) {
+                if (spanSizeLookup != null) {
+                    return spanSizeLookup.getSpanSize(position);
                 }
-            });
-
-            gridLayoutManager.setSpanCount(gridLayoutManager.getSpanCount());
-        }
-    }
-
-    /**
-     * 适配 GridLayoutManager
-     *
-     * @param gridLayoutManager 方向器
-     * @param spanSizeLookup    原本的spanSize
-     * @param position          当前位置
-     * @return 列数
-     */
-    protected int onConfigGridLayoutManager(GridLayoutManager gridLayoutManager, GridLayoutManager.SpanSizeLookup spanSizeLookup, int position) {
-        if (spanSizeLookup != null) {
-            return spanSizeLookup.getSpanSize(position);
-        }
-        return 0;
+                return 0;
+            }
+        });
     }
 
     @Override
     public void onViewAttachedToWindow(RecyclerViewHolder holder) {
         super.onViewAttachedToWindow(holder);
-        int position = holder.getLayoutPosition();
-        if (onConfigStaggeredGridLayoutManager(position)) {
-            ViewGroup.LayoutParams lp = holder.itemView.getLayoutParams();
-            if (lp != null && lp instanceof StaggeredGridLayoutManager.LayoutParams) {
-                StaggeredGridLayoutManager.LayoutParams params = (StaggeredGridLayoutManager.LayoutParams) lp;
 
-                params.setFullSpan(true);
+        RecyclerSpanManager.onViewAttachedToWindow(holder, new RecyclerSpanManager.OnStaggerCallback() {
+            @Override
+            public boolean onStaggerConfig(int position) {
+                return false;
             }
-        }
-    }
-
-    /**
-     * 适配 StaggeredGridLayoutManager
-     *
-     * @param position 当前位置
-     * @return true 则处理为一行
-     */
-    protected boolean onConfigStaggeredGridLayoutManager(int position) {
-        return false;
+        });
     }
 }

@@ -11,30 +11,26 @@ import com.yline.view.recycler.demo.DataAdapterTest;
 import com.yline.view.recycler.demo.R;
 import com.yline.view.recycler.simple.SimpleListAdapter;
 
-public class SimpleListActivity extends BaseActivity
-{
-	private ListView lvDemo;
+public class SimpleListActivity extends BaseActivity {
+    private ListView lvDemo;
+    private SimpleListAdapter listAdapter;
 
-	private SimpleListAdapter listAdapter;
+    public static void actionStart(Context context) {
+        context.startActivity(new Intent(context, SimpleListActivity.class));
+    }
 
-	public static void actionStart(Context context)
-	{
-		context.startActivity(new Intent(context, SimpleListActivity.class));
-	}
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.global_list);
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.global_list);
+        lvDemo = (ListView) findViewById(R.id.list_view);
 
-		lvDemo = (ListView) findViewById(R.id.list_view);
+        listAdapter = new SimpleListAdapter(this);
+        lvDemo.setAdapter(listAdapter);
 
-		listAdapter = new SimpleListAdapter(this);
-		lvDemo.setAdapter(listAdapter);
-
-		// 数据操作
-		TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout_list);
-		new DataAdapterTest(tabLayout, listAdapter);
-	}
+        // 数据操作
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout_list);
+        new DataAdapterTest(tabLayout, listAdapter);
+    }
 }

@@ -1,16 +1,16 @@
 package com.yline.view.recycler.adapter;
 
-import android.content.Context;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 
 import com.yline.view.recycler.holder.Callback;
-import com.yline.view.recycler.holder.ViewHolder;
-import com.yline.view.recycler.manager.ListDataManager;
+import com.yline.view.recycler.holder.RecyclerViewHolder;
+import com.yline.view.recycler.manager.RecyclerDataManager;
+import com.yline.view.recycler.manager.RecyclerSpanManager;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -18,70 +18,63 @@ import java.util.List;
 import java.util.function.UnaryOperator;
 
 /**
- * ListView 公共的 Adapter
+ * RecyclerView 公共的 Adapter
  *
- * @author yline 2017/5/23 -- 10:27
+ * @author yline 2017/5/23 -- 10:28
  * @version 1.0.0
  */
-public abstract class AbstractListAdapter<T> extends BaseAdapter implements Callback.IDataAdapterCallback<T> {
-    private final ListDataManager<T> mDataManager;
-    private final Context mContext;
+public abstract class AbstractRecyclerAdapter<T> extends RecyclerView.Adapter<RecyclerViewHolder> implements Callback.IDataAdapterCallback<T> {
+    private final RecyclerDataManager<T> mDataManager;
 
-    public AbstractListAdapter(Context context) {
-        this.mContext = context;
-        this.mDataManager = new ListDataManager<>(this);
+    public AbstractRecyclerAdapter() {
+        this.mDataManager = new RecyclerDataManager<>(this);
     }
 
     @Override
-    public int getCount() {
+    public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new RecyclerViewHolder(LayoutInflater.from(parent.getContext()).inflate(getItemRes(), parent, false));
+    }
+
+    /**
+     * 设置图片，资源文件
+     *
+     * @return item 资源文件
+     */
+    public abstract int getItemRes();
+
+    @Override
+    public int getItemCount() {
         return mDataManager.size();
     }
 
-    @Override
-    public T getItem(int position) {
-        return mDataManager.get(position);
-    }
+    /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& 适配情形 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& */
 
     @Override
-    public long getItemId(int position) {
-        return position;
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+
+        RecyclerSpanManager.onAttachedToRecyclerView(recyclerView, new RecyclerSpanManager.OnGridCallback() {
+            @Override
+            public int onGridConfig(GridLayoutManager gridLayoutManager, GridLayoutManager.SpanSizeLookup spanSizeLookup, int position) {
+                if (spanSizeLookup != null) {
+                    return spanSizeLookup.getSpanSize(position);
+                }
+                return 0;
+            }
+        });
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
-        if (convertView == null) {
-            convertView = LayoutInflater.from(mContext).inflate(getItemRes(position), parent, false);
-            holder = new ViewHolder(convertView);
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
+    public void onViewAttachedToWindow(RecyclerViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
 
-        onBindViewHolder(parent, holder, position);
-
-        return convertView;
+        RecyclerSpanManager.onViewAttachedToWindow(holder, new RecyclerSpanManager.OnStaggerCallback() {
+            @Override
+            public boolean onStaggerConfig(int position) {
+                return false;
+            }
+        });
     }
-
-    /**
-     * @param position 当前的位置
-     * @return item 资源文件
-     */
-    protected abstract int getItemRes(int position);
-
-    /**
-     * 对内容设置
-     *
-     * @param parent     副控件(一般不用)
-     * @param viewHolder ViewHolder
-     * @param position   当前item位置
-     */
-    protected abstract void onBindViewHolder(ViewGroup parent, ViewHolder viewHolder, int position);
-
-    Context getContext() {
-        return mContext;
-    }
-
 
     /* &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& 数据情形 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&& */
     @Override

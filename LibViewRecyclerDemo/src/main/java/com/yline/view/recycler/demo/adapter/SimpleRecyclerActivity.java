@@ -10,37 +10,33 @@ import android.support.v7.widget.RecyclerView;
 import com.yline.base.BaseAppCompatActivity;
 import com.yline.view.recycler.demo.DataAdapterTest;
 import com.yline.view.recycler.demo.R;
-import com.yline.view.recycler.simple.SimpleCommonRecyclerAdapter;
+import com.yline.view.recycler.simple.SimpleRecyclerAdapter;
 
-public class SimpleRecyclerActivity extends BaseAppCompatActivity
-{
-	protected SimpleCommonRecyclerAdapter homeAdapter;
+public class SimpleRecyclerActivity extends BaseAppCompatActivity {
+    protected SimpleRecyclerAdapter homeAdapter;
 
-	public static void actionStart(Context context)
-	{
-		context.startActivity(new Intent(context, SimpleRecyclerActivity.class));
-	}
+    public static void actionStart(Context context) {
+        context.startActivity(new Intent(context, SimpleRecyclerActivity.class));
+    }
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.global_recycler);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.global_recycler);
 
-		RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler);
-		initRecyclerView(recyclerView);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler);
+        initRecyclerView(recyclerView);
 
-		homeAdapter = new SimpleCommonRecyclerAdapter();
-		recyclerView.setAdapter(homeAdapter);
+        homeAdapter = new SimpleRecyclerAdapter();
+        recyclerView.setAdapter(homeAdapter);
 
-		TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_recycler);
-		new DataAdapterTest(tabLayout, homeAdapter);
-	}
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_recycler);
+        new DataAdapterTest(tabLayout, homeAdapter);
+    }
 
-	protected void initRecyclerView(RecyclerView recyclerView)
-	{
-		GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
-		gridLayoutManager.setSpanCount(3);
-		recyclerView.setLayoutManager(gridLayoutManager);
-	}
+    protected void initRecyclerView(RecyclerView recyclerView) {
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 3);
+        gridLayoutManager.setSpanCount(3);
+        recyclerView.setLayoutManager(gridLayoutManager);
+    }
 }

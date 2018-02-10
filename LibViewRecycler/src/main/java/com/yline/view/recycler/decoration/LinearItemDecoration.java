@@ -10,7 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.yline.view.recycler.holder.Callback;
+import com.yline.view.recycler.adapter.AbstractHeadFootRecyclerAdapter;
 
 /**
  * 公共的 LinearItemDecoration
@@ -98,14 +98,14 @@ abstract class LinearItemDecoration extends RecyclerView.ItemDecoration {
      * @return true 则绘制
      */
     protected boolean isDrawDivide(RecyclerView.Adapter adapter, int totalCount, int currentPosition) {
-        if (adapter instanceof Callback.IHeadFootCallback) {
+        if (adapter instanceof AbstractHeadFootRecyclerAdapter) {
             // 头部
-            if (((Callback.IHeadFootCallback) adapter).getHeadersCount() > currentPosition) {
+            if (AbstractHeadFootRecyclerAdapter.HEAD_COUNT > currentPosition) {
                 return false;
             }
 
             // 底部
-            if (currentPosition > totalCount - 1 - ((Callback.IHeadFootCallback) adapter).getFootersCount()) {
+            if (currentPosition > totalCount - 1 - AbstractHeadFootRecyclerAdapter.FOOT_COUNT) {
                 return false;
             }
         }

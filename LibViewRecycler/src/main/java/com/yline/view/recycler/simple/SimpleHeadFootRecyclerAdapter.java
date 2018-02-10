@@ -1,5 +1,7 @@
 package com.yline.view.recycler.simple;
 
+import android.content.Context;
+
 import com.yline.view.recycler.adapter.AbstractHeadFootRecyclerAdapter;
 import com.yline.view.recycler.holder.RecyclerViewHolder;
 
@@ -9,17 +11,18 @@ import com.yline.view.recycler.holder.RecyclerViewHolder;
  * @author yline 2017/5/23 -- 10:20
  * @version 1.0.0
  */
-public class SimpleHeadFootRecyclerAdapter extends AbstractHeadFootRecyclerAdapter<String>
-{
-	@Override
-	public int getItemRes()
-	{
-		return android.R.layout.simple_list_item_1;
-	}
+public class SimpleHeadFootRecyclerAdapter extends AbstractHeadFootRecyclerAdapter<String> {
+    public SimpleHeadFootRecyclerAdapter(Context context) {
+        super(context);
+    }
 
-	@Override
-	public void onBindViewHolder(RecyclerViewHolder holder, int position)
-	{
-		holder.setText(android.R.id.text1, getItem(position));
-	}
+    @Override
+    public int getItemRes() {
+        return android.R.layout.simple_list_item_1;
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerViewHolder holder, int position) {
+        holder.setText(android.R.id.text1, get(position));
+    }
 }

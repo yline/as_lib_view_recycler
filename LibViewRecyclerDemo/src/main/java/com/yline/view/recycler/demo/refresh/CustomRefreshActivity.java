@@ -20,76 +20,68 @@ import com.yline.view.recycler.simple.SimpleHeadFootRecyclerAdapter;
 import java.util.Random;
 
 public class CustomRefreshActivity extends BaseAppCompatActivity {
-	private SuperSwipeRefreshLayout swipeRefreshLayout;
+    private SuperSwipeRefreshLayout swipeRefreshLayout;
 
-	private RecyclerView recyclerView;
+    private RecyclerView recyclerView;
 
-	private SimpleHeadFootRecyclerAdapter recyclerAdapter;
+    private SimpleHeadFootRecyclerAdapter recyclerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_refresh);
 
-		swipeRefreshLayout = (SuperSwipeRefreshLayout) findViewById(R.id.super_swipe_refresh);
-		recyclerView = (RecyclerView) findViewById(R.id.recycler_super_swipe);
-		recyclerAdapter = new SimpleHeadFootRecyclerAdapter();
+        swipeRefreshLayout = (SuperSwipeRefreshLayout) findViewById(R.id.super_swipe_refresh);
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_super_swipe);
+        recyclerAdapter = new SimpleHeadFootRecyclerAdapter(this);
 
-		swipeRefreshLayout.setRefreshAdapter(new SimpleRefreshAdapter(this)
-		{
-			// 动画下拉时，距离变动
-			@Override
-			protected void onCreating(float dragDistance, float targetDistance)
-			{
-				super.onCreating(dragDistance, targetDistance);
-			}
+        swipeRefreshLayout.setRefreshAdapter(new SimpleRefreshAdapter(this) {
+            // 动画下拉时，距离变动
+            @Override
+            protected void onCreating(float dragDistance, float targetDistance) {
+                super.onCreating(dragDistance, targetDistance);
+            }
 
-			// 传递你需要定制的view;
-			@NonNull
-			@Override
-			protected View getView(Context context)
-			{
-				return super.getView(context);
-			}
+            // 传递你需要定制的view;
+            @NonNull
+            @Override
+            protected View getView(Context context) {
+                return super.getView(context);
+            }
 
-			// 正在刷新时，执行的操作
-			@Override
-			protected void onAnimate()
-			{
-				super.onAnimate();
+            // 正在刷新时，执行的操作
+            @Override
+            protected void onAnimate() {
+                super.onAnimate();
 
-				new Handler().postDelayed(new Runnable()
-				{
+                new Handler().postDelayed(new Runnable() {
 
-					@Override
-					public void run()
-					{
-						swipeRefreshLayout.setRefreshing(false);
-						// 更新recyclerView
-						recyclerAdapter.add(0, "Refresh Item + " + new Random().nextInt(300), true);
-						recyclerView.scrollToPosition(0);
-					}
-				}, 4000);
-			}
+                    @Override
+                    public void run() {
+                        swipeRefreshLayout.setRefreshing(false);
+                        // 更新recyclerView
+                        recyclerAdapter.add(0, "Refresh Item + " + new Random().nextInt(300), true);
+                        recyclerView.scrollToPosition(0);
+                    }
+                }, 4000);
+            }
 
-			// 设置是否在表面；true:子View随下拉而一起滑动； false:子view不下滑，只是浮在上面
-			@Override
-			public boolean isTargetScroll()
-			{
-				return super.isTargetScroll();
-			}
+            // 设置是否在表面；true:子View随下拉而一起滑动； false:子view不下滑，只是浮在上面
+            @Override
+            public boolean isTargetScroll() {
+                return super.isTargetScroll();
+            }
 
-			// 返回背景颜色
-			@Override
-			public int getBackgroundResource()
-			{
-				return super.getBackgroundResource();
-			}
-		});
+            // 返回背景颜色
+            @Override
+            public int getBackgroundResource() {
+                return super.getBackgroundResource();
+            }
+        });
 
-		// 支持自定义（view）
-		swipeRefreshLayout.setLoadAdapter(null);
-		/*swipeRefreshLayout.setOnLoadListener(new ViewSwipeRefreshLayout.OnSwipeListener()
+        // 支持自定义（view）
+        swipeRefreshLayout.setLoadAdapter(null);
+        /*swipeRefreshLayout.setOnLoadListener(new ViewSwipeRefreshLayout.OnSwipeListener()
 		{
 			@Override
 			public void onAnimate()
@@ -110,22 +102,19 @@ public class CustomRefreshActivity extends BaseAppCompatActivity {
 			}
 		});*/
 
-		recyclerView.setLayoutManager(new LinearLayoutManager(this));
-		recyclerView.setAdapter(recyclerAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(recyclerAdapter);
 
-		recyclerAdapter.setDataList(StrConstant.getListSeven(20), true);
+        recyclerAdapter.setDataList(StrConstant.getListSeven(20), true);
     }
-    
-    public static void launcher(Context context)
-    {
-    	if (null != context)
-    	{
-    		Intent intent = new Intent(context, CustomRefreshActivity.class);
-    		if (!(context instanceof Activity))
-    		{
-    			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);	
-    		}
-    		context.startActivity(intent);
-    	}
+
+    public static void launcher(Context context) {
+        if (null != context) {
+            Intent intent = new Intent(context, CustomRefreshActivity.class);
+            if (!(context instanceof Activity)) {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            }
+            context.startActivity(intent);
+        }
     }
 }

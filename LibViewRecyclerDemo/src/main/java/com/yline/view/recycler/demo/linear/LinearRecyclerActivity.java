@@ -9,25 +9,19 @@ import com.yline.view.recycler.decoration.CommonLinearDecoration;
 import com.yline.view.recycler.demo.R;
 import com.yline.view.recycler.demo.adapter.SimpleRecyclerActivity;
 
-public class LinearRecyclerActivity extends SimpleRecyclerActivity
-{
-	public static void actionStart(Context context)
-	{
-		context.startActivity(new Intent(context, LinearRecyclerActivity.class));
-	}
-	
-	@Override
-	protected void initRecyclerView(RecyclerView recyclerView)
-	{
-		recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-		recyclerView.addItemDecoration(new CommonLinearDecoration(this)
-		{
-			@Override
-			protected int getDivideResourceId()
-			{
-				return R.drawable.recycler_divider_black_normal;
-			}
-		});
-		// super.initRecyclerView(recyclerView);
-	}
+public class LinearRecyclerActivity extends SimpleRecyclerActivity {
+    public static void actionStart(Context context) {
+        context.startActivity(new Intent(context, LinearRecyclerActivity.class));
+    }
+
+    @Override
+    protected void initRecyclerView(RecyclerView recyclerView) {
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        recyclerView.addItemDecoration(new CommonLinearDecoration(this) {
+            @Override
+            protected int getDivideResourceId() {
+                return R.drawable.recycler_divider_black_normal;
+            }
+        });
+    }
 }
