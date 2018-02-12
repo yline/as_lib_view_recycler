@@ -1,4 +1,4 @@
-package com.yline.view.recycler.refresh;
+package com.yline.view.recycler.refresh.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -12,22 +12,14 @@ import android.view.View;
  * @author yline 2017/5/23 -- 10:36
  * @version 1.0.0
  */
-public abstract class CommonRefreshAdapter {
-    protected Context sContext;
-
-    public CommonRefreshAdapter(Context context) {
-        this.sContext = context;
-    }
-
-	/* ----------------- 提供四个方法可被重写 ------------------ */
-
+public abstract class AbstractRefreshAdapter {
     /**
      * 手势操作时，一直调用
      *
      * @param dragDistance   实时改变的内容
      * @param targetDistance 目标内容
      */
-    protected abstract void onCreating(float dragDistance, float targetDistance);
+    public abstract void onCreating(float dragDistance, float targetDistance);
 
     /**
      * 开始动画时,被调用一次
@@ -35,14 +27,20 @@ public abstract class CommonRefreshAdapter {
     protected void onAnimate() {
     }
 
+    /**
+     * 下拉刷新时，展示的View
+     *
+     * @param context 上下文
+     * @return 展示的View对象
+     */
     @NonNull
-    protected abstract View getView(Context context);
+    public abstract View getView(Context context);
 
     /**
      * 子View是否跟随,手指的滑动,而移动
      * 【目前只有头布局实现了】
      *
-     * @return
+     * @return true(RecyclerView跟随滚动而移动)，false(加载布局，悬浮在RecyclerView上方)
      */
     public boolean isTargetScroll() {
         return false;
@@ -59,23 +57,13 @@ public abstract class CommonRefreshAdapter {
     }
 
     /* ---------------------------------------- 被SuperSwipeRefreshLayout调用;一般不重写 ---------------------------------------------------- */
-    private RefreshLayout.OnSwipeListener refreshListener;
+    private OnSwipeListener refreshListener;
 
-    void setSwipeAnimatingListener(RefreshLayout.OnSwipeListener refreshListener) {
+    public void setSwipeAnimatingListener(OnSwipeListener refreshListener) {
         this.refreshListener = refreshListener;
     }
 
-    /**
-     * 拖出界面
-     *
-     * @param dragDistance   手指拖动距离
-     * @param targetDistance 目标距离
-     */
-    void creating(float dragDistance, float targetDistance) {
-        onCreating(dragDistance, targetDistance);
-    }
-
-    void animate() {
+    public void animate() {
         onAnimate();
         if (null != refreshListener) {
             refreshListener.onAnimate();
@@ -83,11 +71,12 @@ public abstract class CommonRefreshAdapter {
     }
 
     /**
-     * 创建布局
-     *
-     * @return
+     * 给用户使用
      */
-    View getView() {
-        return getView(sContext);
+    public interface OnSwipeListener {
+        /**
+         * 动画中
+         */
+        void onAnimate();
     }
 }

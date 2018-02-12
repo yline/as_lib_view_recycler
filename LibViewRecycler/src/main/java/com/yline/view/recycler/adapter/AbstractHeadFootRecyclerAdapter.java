@@ -40,8 +40,10 @@ public abstract class AbstractHeadFootRecyclerAdapter<T> extends RecyclerView.Ad
     private final HeadFootRecyclerDataManager<T> mDataManager;
 
     public AbstractHeadFootRecyclerAdapter(Context context) {
-        mHeadView = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.view_recycler_adapter_container, null);
-        mFootView = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.view_recycler_adapter_container, null);
+        mHeadView = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.view_recycler_head_container, null);
+        mHeadView.setMinimumHeight(1); // 若头部高度为0，则外部刷新框架下拉刷新无效
+        mFootView = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.view_recycler_foot_container, null);
+        mFootView.setMinimumHeight(1); // 若底部高度为0，则外部刷新框架下拉刷新无效
 
         mDataManager = new HeadFootRecyclerDataManager<>(this);
     }
@@ -61,8 +63,9 @@ public abstract class AbstractHeadFootRecyclerAdapter<T> extends RecyclerView.Ad
             return TYPE_FOOT;
         }
 
-        return super.getItemViewType(position - TYPE_HEAD);
+        return super.getItemViewType(position - HEAD_COUNT);
     }
+
 
     @Override
     public RecyclerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

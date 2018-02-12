@@ -4,14 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.yline.application.SDKManager;
 import com.yline.base.BaseAppCompatActivity;
 import com.yline.test.StrConstant;
 import com.yline.view.recycler.demo.R;
 import com.yline.view.recycler.refresh.SuperSwipeRefreshLayout;
+import com.yline.view.recycler.refresh.adapter.AbstractRefreshAdapter;
 import com.yline.view.recycler.simple.SimpleHeadFootRecyclerAdapter;
 
 import java.util.Random;
@@ -28,15 +29,15 @@ public class SimpleRefreshActivity extends BaseAppCompatActivity {
 
         swipeRefreshLayout = (SuperSwipeRefreshLayout) findViewById(R.id.super_swipe_refresh);
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_super_swipe);
-         recyclerAdapter = new SimpleHeadFootRecyclerAdapter(this);
+        recyclerAdapter = new SimpleHeadFootRecyclerAdapter(this);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(recyclerAdapter);
 
-        swipeRefreshLayout.setOnRefreshListener(new SuperSwipeRefreshLayout.OnSwipeListener() {
+        swipeRefreshLayout.setOnRefreshListener(new AbstractRefreshAdapter.OnSwipeListener() {
             @Override
             public void onAnimate() {
-                new Handler().postDelayed(new Runnable() {
+                SDKManager.getHandler().postDelayed(new Runnable() {
 
                     @Override
                     public void run() {
@@ -48,10 +49,10 @@ public class SimpleRefreshActivity extends BaseAppCompatActivity {
                 }, 4000);
             }
         });
-        swipeRefreshLayout.setOnLoadListener(new SuperSwipeRefreshLayout.OnSwipeListener() {
+        swipeRefreshLayout.setOnLoadListener(new AbstractRefreshAdapter.OnSwipeListener() {
             @Override
             public void onAnimate() {
-                new Handler().postDelayed(new Runnable() {
+                SDKManager.getHandler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         swipeRefreshLayout.setLoadMore(false);

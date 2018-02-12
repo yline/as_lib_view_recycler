@@ -14,6 +14,7 @@ import com.yline.view.recycler.demo.grid.GridHeadFootRecyclerActivity;
 import com.yline.view.recycler.demo.grid.GridRecyclerActivity;
 import com.yline.view.recycler.demo.linear.LinearHeadFootRecyclerActivity;
 import com.yline.view.recycler.demo.linear.LinearRecyclerActivity;
+import com.yline.view.recycler.demo.multi.SimpleLoadingRecyclerActivity;
 import com.yline.view.recycler.demo.multi.SimpleMultiRecyclerActivity;
 import com.yline.view.recycler.demo.refresh.CircleProgressActivity;
 import com.yline.view.recycler.demo.refresh.CustomRefreshActivity;
@@ -110,6 +111,13 @@ public class MainActivity extends BaseTestActivity {
             @Override
             public void onClick(View v) {
                 SimpleMultiRecyclerActivity.launcher(MainActivity.this);
+            }
+        });
+
+        addButton("SimpleLoadingRecyclerAdapter", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SimpleLoadingRecyclerActivity.launcher(MainActivity.this);
             }
         });
 

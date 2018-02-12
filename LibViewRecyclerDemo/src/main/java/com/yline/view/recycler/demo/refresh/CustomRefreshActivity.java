@@ -4,16 +4,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.yline.application.SDKManager;
 import com.yline.base.BaseAppCompatActivity;
 import com.yline.test.StrConstant;
 import com.yline.view.recycler.demo.R;
-import com.yline.view.recycler.refresh.SimpleRefreshAdapter;
+import com.yline.view.recycler.refresh.adapter.DefaultRefreshAdapter;
 import com.yline.view.recycler.refresh.SuperSwipeRefreshLayout;
 import com.yline.view.recycler.simple.SimpleHeadFootRecyclerAdapter;
 
@@ -35,17 +35,17 @@ public class CustomRefreshActivity extends BaseAppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.recycler_super_swipe);
         recyclerAdapter = new SimpleHeadFootRecyclerAdapter(this);
 
-        swipeRefreshLayout.setRefreshAdapter(new SimpleRefreshAdapter(this) {
+        swipeRefreshLayout.setRefreshAdapter(new DefaultRefreshAdapter() {
             // 动画下拉时，距离变动
             @Override
-            protected void onCreating(float dragDistance, float targetDistance) {
+            public void onCreating(float dragDistance, float targetDistance) {
                 super.onCreating(dragDistance, targetDistance);
             }
 
             // 传递你需要定制的view;
             @NonNull
             @Override
-            protected View getView(Context context) {
+            public View getView(Context context) {
                 return super.getView(context);
             }
 
@@ -54,8 +54,7 @@ public class CustomRefreshActivity extends BaseAppCompatActivity {
             protected void onAnimate() {
                 super.onAnimate();
 
-                new Handler().postDelayed(new Runnable() {
-
+                SDKManager.getHandler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         swipeRefreshLayout.setRefreshing(false);
@@ -63,7 +62,7 @@ public class CustomRefreshActivity extends BaseAppCompatActivity {
                         recyclerAdapter.add(0, "Refresh Item + " + new Random().nextInt(300), true);
                         recyclerView.scrollToPosition(0);
                     }
-                }, 4000);
+                }, 2000);
             }
 
             // 设置是否在表面；true:子View随下拉而一起滑动； false:子view不下滑，只是浮在上面
@@ -82,7 +81,7 @@ public class CustomRefreshActivity extends BaseAppCompatActivity {
         // 支持自定义（view）
         swipeRefreshLayout.setLoadAdapter(null);
         /*swipeRefreshLayout.setOnLoadListener(new ViewSwipeRefreshLayout.OnSwipeListener()
-		{
+        {
 			@Override
 			public void onAnimate()
 			{
