@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Transformation;
 import android.widget.RelativeLayout;
 
@@ -20,12 +21,20 @@ import com.yline.view.recycler.R;
  */
 public class HeadViewContainer extends RelativeLayout {
     private static final int SCALE_DOWN_DURATION = 150;
+    private static final int ANIMATE_TO_TRIGGER_DURATION = 200;
+    private static final int ANIMATE_TO_START_DURATION = 200;
+    private static final float DECELERATE_INTERPOLATION_FACTOR = 2f;
 
     private OnHeadAnimationCallback mAnimationListener;
     private RelativeLayout mContainer;
 
-    private Animation scaleUpAnimation;
-    private Animation scaleDownAnimation;
+    private Animation mScaleUpAnimation;
+    private Animation mScaleDownAnimation;
+
+    private OnApplyAnimationCallback mTargetAnimationCallback;
+    private Animation mOffsetTargetAnimation; // 滚动到指定位置
+    private OnApplyAnimationCallback mStartAnimationCallback;
+    private Animation mOffsetStartAnimation; // 滚动到开始位置
 
     public static HeadViewContainer attachViewContainer(@NonNull ViewGroup viewGroup) {
         HeadViewContainer viewContainer = new HeadViewContainer(viewGroup.getContext());
@@ -94,6 +103,26 @@ public class HeadViewContainer extends RelativeLayout {
         attachAnimation(scaleAnimation, listener);
     }
 
+    public void startTargetAnimation(OnApplyAnimationCallback callback, HeadViewContainer.OnHeadAnimationCallback listener) {
+        mTargetAnimationCallback = callback;
+        Animation animation = getOffsetTargetAnimation();
+        animation.reset();
+        animation.setDuration(ANIMATE_TO_TRIGGER_DURATION);
+        animation.setInterpolator(new DecelerateInterpolator(DECELERATE_INTERPOLATION_FACTOR));
+
+        attachAnimation(animation, listener);
+    }
+
+    public void startStartAnimation(OnApplyAnimationCallback callback, HeadViewContainer.OnHeadAnimationCallback listener){
+        mStartAnimationCallback = callback;
+        Animation animation = getOffsetStartAnimation();
+        animation.reset();
+        animation.setDuration(ANIMATE_TO_START_DURATION);
+        animation.setInterpolator(new DecelerateInterpolator(DECELERATE_INTERPOLATION_FACTOR));
+
+        attachAnimation(animation, listener);
+    }
+
     /**
      * 给 头部容器，设置动画和回调
      *
@@ -107,8 +136,8 @@ public class HeadViewContainer extends RelativeLayout {
     }
 
     private Animation getScaleUpAnimation() {
-        if (null == scaleUpAnimation) {
-            scaleUpAnimation = new Animation() {
+        if (null == mScaleUpAnimation) {
+            mScaleUpAnimation = new Animation() {
                 @Override
                 protected void applyTransformation(float interpolatedTime, Transformation t) {
                     super.applyTransformation(interpolatedTime, t);
@@ -118,14 +147,14 @@ public class HeadViewContainer extends RelativeLayout {
                 }
             };
             int duration = getResources().getInteger(android.R.integer.config_mediumAnimTime);
-            scaleUpAnimation.setDuration(duration);
+            mScaleUpAnimation.setDuration(duration);
         }
-        return scaleUpAnimation;
+        return mScaleUpAnimation;
     }
 
     private Animation getScaleDownAnimation() {
-        if (null == scaleDownAnimation) {
-            scaleDownAnimation = new Animation() {
+        if (null == mScaleDownAnimation) {
+            mScaleDownAnimation = new Animation() {
                 @Override
                 protected void applyTransformation(float interpolatedTime, Transformation t) {
                     super.applyTransformation(interpolatedTime, t);
@@ -134,9 +163,48 @@ public class HeadViewContainer extends RelativeLayout {
                     setScaleY(1 - interpolatedTime);
                 }
             };
-            scaleDownAnimation.setDuration(SCALE_DOWN_DURATION);
+            mScaleDownAnimation.setDuration(SCALE_DOWN_DURATION);
         }
-        return scaleDownAnimation;
+        return mScaleDownAnimation;
+    }
+
+    private Animation getOffsetTargetAnimation() {
+        if (null == mOffsetTargetAnimation) {
+            mOffsetTargetAnimation = new Animation() {
+                @Override
+                protected void applyTransformation(float interpolatedTime, Transformation t) {
+                    super.applyTransformation(interpolatedTime, t);
+                    if (null != mTargetAnimationCallback) {
+                        mTargetAnimationCallback.onApply(interpolatedTime);
+                    }
+                }
+            };
+        }
+        return mOffsetTargetAnimation;
+    }
+
+    private Animation getOffsetStartAnimation(){
+        if (null == mOffsetStartAnimation){
+            mOffsetStartAnimation = new Animation() {
+                @Override
+                protected void applyTransformation(float interpolatedTime, Transformation t) {
+                    super.applyTransformation(interpolatedTime, t);
+                    if (null != mStartAnimationCallback){
+                        mStartAnimationCallback.onApply(interpolatedTime);
+                    }
+                }
+            };
+        }
+        return mOffsetStartAnimation;
+    }
+
+    public interface OnApplyAnimationCallback {
+        /**
+         * 修改动画偏移
+         *
+         * @param interpolatedTime 间隔时间，0-1
+         */
+        void onApply(float interpolatedTime);
     }
 
     public interface OnHeadAnimationCallback {
