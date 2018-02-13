@@ -89,6 +89,18 @@ public class HeadViewContainer extends RelativeLayout {
     }
 
     /**
+     * 重新设定布局
+     *
+     * @param refreshLayout 父布局
+     * @param topOffset     距离顶部距离
+     */
+    public void resetLayout(@NonNull ViewGroup refreshLayout, int topOffset) {
+        int left = (refreshLayout.getWidth() - getMeasuredWidth()) / 2;
+        int right = (refreshLayout.getWidth() + getMeasuredWidth()) / 2;
+        layout(left, topOffset, right, topOffset + getMeasuredHeight());
+    }
+
+    /**
      * 开启动画
      *
      * @param listener 回调
@@ -113,7 +125,7 @@ public class HeadViewContainer extends RelativeLayout {
         attachAnimation(animation, listener);
     }
 
-    public void startStartAnimation(OnApplyAnimationCallback callback, HeadViewContainer.OnHeadAnimationCallback listener){
+    public void startStartAnimation(OnApplyAnimationCallback callback, HeadViewContainer.OnHeadAnimationCallback listener) {
         mStartAnimationCallback = callback;
         Animation animation = getOffsetStartAnimation();
         animation.reset();
@@ -183,13 +195,13 @@ public class HeadViewContainer extends RelativeLayout {
         return mOffsetTargetAnimation;
     }
 
-    private Animation getOffsetStartAnimation(){
-        if (null == mOffsetStartAnimation){
+    private Animation getOffsetStartAnimation() {
+        if (null == mOffsetStartAnimation) {
             mOffsetStartAnimation = new Animation() {
                 @Override
                 protected void applyTransformation(float interpolatedTime, Transformation t) {
                     super.applyTransformation(interpolatedTime, t);
-                    if (null != mStartAnimationCallback){
+                    if (null != mStartAnimationCallback) {
                         mStartAnimationCallback.onApply(interpolatedTime);
                     }
                 }

@@ -343,29 +343,18 @@ class RefreshLayout extends ViewGroup {
         }
 
         // 获取控件 原始宽高（依据Measure中的值获取）
-        final int width = getMeasuredWidth();
-        final int height = getMeasuredHeight();
-        final int originalHeight = getMeasuredHeight();
+        mChildHelper.layout(this, headTargetDistance - footTargetDistance);
+        mHeadViewContainer.resetLayout(this, headCurrentTargetOffset);
+        mFootViewContainer.resetLayout(this, pushDistance);
+    }
 
-        final int childLeft = getPaddingLeft();
-        final int childTop = getPaddingTop() + headTargetDistance - footTargetDistance; // 根据偏移量headTargetDistance更新
-        final int childWidth = width - getPaddingLeft() - getPaddingRight();
-        final int childHeight = originalHeight - getPaddingTop() - getPaddingBottom();
-
-        // 更新目标View的位置
-        mChildHelper.layout(childLeft, childTop, childLeft + childWidth, childTop + childHeight);
-
-        // 更新  0
-        int headViewWidth = mHeadViewContainer.getMeasuredWidth();
-        int headViewHeight = mHeadViewContainer.getMeasuredHeight();
-        mHeadViewContainer.layout(((width - headViewWidth) / 2), headCurrentTargetOffset,
-                ((width + headViewWidth) / 2), headCurrentTargetOffset + headViewHeight);
-
-        // 更新 底部布局位置
-        int footViewWidth = mFootViewContainer.getMeasuredWidth();
-        int footViewHeight = mFootViewContainer.getMeasuredHeight();
-        mFootViewContainer.layout(((width - footViewWidth) / 2), height - pushDistance,
-                ((width + footViewWidth) / 2), height + footViewHeight - pushDistance);
+    /**
+     * 重置Target的位置
+     */
+    public void resetTargetLayout() {
+        mChildHelper.resetLayout(this);
+        mHeadViewContainer.resetLayout(this, -mHeadViewContainer.getMeasuredHeight());
+        mFootViewContainer.resetLayout(this, 0);
     }
 
     private boolean isHeadFloat() {
@@ -384,7 +373,7 @@ class RefreshLayout extends ViewGroup {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         boolean isChildExist = mChildHelper.checkChild(this, mHeadViewContainer, mFootViewContainer);
-        if (!isChildExist){
+        if (!isChildExist) {
             return false;
         }
 
@@ -759,24 +748,6 @@ class RefreshLayout extends ViewGroup {
         }, delay);
     }
 
-    /**
-     * 重置Target的位置
-     */
-    public void resetTargetLayout() {
-        final int width = getMeasuredWidth();
-        final int height = getMeasuredHeight();
-
-        mChildHelper.resetLayout(this);
-
-        int headViewWidth = mHeadViewContainer.getMeasuredWidth();
-        int headViewHeight = mHeadViewContainer.getMeasuredHeight();
-        mHeadViewContainer.layout((width / 2 - headViewWidth / 2), -headViewHeight,
-                (width / 2 + headViewWidth / 2), 0);// 更新头布局的位置
-        int footViewWidth = mFootViewContainer.getMeasuredWidth();
-        int footViewHeight = mFootViewContainer.getMeasuredHeight();
-        mFootViewContainer.layout((width / 2 - footViewWidth / 2), height,
-                (width / 2 + footViewWidth / 2), height + footViewHeight);
-    }
 
     /**
      * 修改底部布局的位置-敏感pushDistance

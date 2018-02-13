@@ -40,6 +40,11 @@ public class FootViewContainer extends RelativeLayout {
         initView();
     }
 
+    private void initView() {
+        LayoutInflater.from(getContext()).inflate(R.layout.view_recycler_foot_refresh_container, this, true);
+        mContainer = findViewById(R.id.view_recycler_foot_refresh_container);
+    }
+
     /**
      * 填充子控件
      *
@@ -50,8 +55,22 @@ public class FootViewContainer extends RelativeLayout {
         mContainer.addView(childView);
     }
 
-    private void initView() {
-        LayoutInflater.from(getContext()).inflate(R.layout.view_recycler_foot_refresh_container, this, true);
-        mContainer = findViewById(R.id.view_recycler_foot_refresh_container);
+    public void resetLayout(@NonNull ViewGroup refreshLayout, int bottomOffset) {
+        int left = (refreshLayout.getMeasuredWidth() - getMeasuredWidth()) / 2;
+        int top = refreshLayout.getHeight() - bottomOffset;
+        int right = (refreshLayout.getMeasuredWidth() + getMeasuredWidth()) / 2;
+        layout(left, top, right, top + getMeasuredHeight());
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+

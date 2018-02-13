@@ -39,9 +39,13 @@ public class RefreshChildHelper {
         }
     }
 
-    public void layout(int left, int top, int right, int bottom) {
+    public void layout(@NonNull ViewGroup refreshLayout, int topOffset) {
         if (null != mChildTarget) {
-            mChildTarget.layout(left, top, right, bottom);
+            int childLeft = refreshLayout.getPaddingLeft();
+            int childTop = refreshLayout.getPaddingTop() + topOffset;
+            int childRight = refreshLayout.getMeasuredWidth() - refreshLayout.getPaddingRight();
+            int childBottom = refreshLayout.getMeasuredHeight() - refreshLayout.getPaddingBottom();
+            mChildTarget.layout(childLeft, childTop, childRight, childBottom);
         }
     }
 
