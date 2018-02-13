@@ -1,0 +1,127 @@
+package com.yline.view.recycler.refresh.helper;
+
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.NestedScrollView;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.ScrollView;
+
+/**
+ * 管理子类
+ *
+ * @author yline 2018/2/13 -- 10:19
+ * @version 1.0.0
+ */
+public class RefreshChildHelper {
+    private View mChildTarget; // 刷新控件的主内容
+
+    public boolean checkChild(@NonNull ViewGroup refreshLayout, @NonNull View headView, @NonNull View footView) {
+        if (null == mChildTarget) {
+            for (int i = 0; i < refreshLayout.getChildCount(); i++) {
+                View child = refreshLayout.getChildAt(i);
+                if (!child.equals(headView) && !child.equals(footView)) {
+                    mChildTarget = child;
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public void measure(int width, int height) {
+        if (null != mChildTarget) {
+            mChildTarget.measure(width, height);
+        }
+    }
+
+    public void layout(int left, int top, int right, int bottom) {
+        if (null != mChildTarget) {
+            mChildTarget.layout(left, top, right, bottom);
+        }
+    }
+
+    public void resetLayout(@NonNull ViewGroup refreshLayout) {
+        if (null != mChildTarget) {
+            int childLeft = refreshLayout.getPaddingLeft();
+            int childTop = refreshLayout.getPaddingTop();
+            int childRight = mChildTarget.getWidth() - refreshLayout.getPaddingRight();
+            int childBottom = mChildTarget.getHeight() - refreshLayout.getPaddingBottom();
+            mChildTarget.layout(childLeft, childTop, childRight, childBottom);
+        }
+    }
+
+    /**
+     * 判断目标View是否滑动到顶部-还能否继续滑动
+     *
+     * @return true 在顶部
+     */
+    public boolean isChildScrollToTop() {
+        if (Build.VERSION.SDK_INT < 14) {
+            if (mChildTarget instanceof AbsListView) {
+                final AbsListView absListView = (AbsListView) mChildTarget;
+                return !(absListView.getChildCount() > 0 && (absListView
+                        .getFirstVisiblePosition() > 0 || absListView
+                        .getChildAt(0).getTop() < absListView.getPaddingTop()));
+            } else {
+                return !(mChildTarget.getScrollY() > 0);
+            }
+        } else {
+            return !ViewCompat.canScrollVertically(mChildTarget, -1);
+        }
+    }
+
+    /**
+     * 判断目标View是否滑动到底部-还能否继续滑动
+     *
+     * @return true 在底部
+     */
+    public boolean isChildScrollToBottom() {
+        if (isChildScrollToTop()) {
+            return false;
+        }
+
+        if (null != mChildTarget) {
+            if (mChildTarget instanceof RecyclerView) {
+                boolean canScrollVertically = mChildTarget.canScrollVertically(1); // 判断是否能向上滑动
+                return !canScrollVertically;
+            } else if (mChildTarget instanceof AbsListView) {
+                AbsListView absListView = (AbsListView) mChildTarget;
+                int count = absListView.getAdapter().getCount();
+                int firstPosition = absListView.getFirstVisiblePosition();
+                if (firstPosition == 0 && absListView.getChildAt(0).getTop() >= absListView.getPaddingTop()) {
+                    return false;
+                }
+                int lastPos = absListView.getLastVisiblePosition();
+                if (lastPos > 0 && count > 0 && lastPos == count - 1) {
+                    return true;
+                }
+                return false;
+            } else if (mChildTarget instanceof ScrollView) {
+                ScrollView scrollView = (ScrollView) mChildTarget;
+                View view = (View) scrollView.getChildAt(scrollView.getChildCount() - 1);
+                if (view != null) {
+                    int diff = (view.getBottom() - (scrollView.getHeight() + scrollView.getScrollY()));
+                    if (diff == 0) {
+                        return true;
+                    }
+                }
+            } else if (mChildTarget instanceof NestedScrollView) {
+                NestedScrollView nestedScrollView = (NestedScrollView) mChildTarget;
+                View view = (View) nestedScrollView.getChildAt(nestedScrollView.getChildCount() - 1);
+                if (view != null) {
+                    int diff = (view.getBottom() - (nestedScrollView.getHeight() + nestedScrollView.getScrollY()));
+                    if (diff == 0) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+}
