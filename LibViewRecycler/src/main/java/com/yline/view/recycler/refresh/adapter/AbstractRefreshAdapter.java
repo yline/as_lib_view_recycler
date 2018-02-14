@@ -57,16 +57,16 @@ public abstract class AbstractRefreshAdapter {
     }
 
     /* ---------------------------------------- 被SuperSwipeRefreshLayout调用;一般不重写 ---------------------------------------------------- */
-    private OnSwipeListener refreshListener;
+    private OnSwipeListener mOnRefreshListener;
 
     public void setSwipeAnimatingListener(OnSwipeListener refreshListener) {
-        this.refreshListener = refreshListener;
+        this.mOnRefreshListener = refreshListener;
     }
 
     public void animate() {
         onAnimate();
-        if (null != refreshListener) {
-            refreshListener.onAnimate();
+        if (null != mOnRefreshListener) {
+            mOnRefreshListener.onAnimate();
         }
     }
 

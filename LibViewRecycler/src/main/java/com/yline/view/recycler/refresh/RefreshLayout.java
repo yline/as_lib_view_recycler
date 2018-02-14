@@ -63,37 +63,23 @@ class RefreshLayout extends ViewGroup {
 
     private static final int INVALID_POINTER = -1;
     private static final float DRAG_RATE = .5f;
-    private static final int SCALE_DOWN_DURATION = 150;
     private static final int ANIMATE_TO_START_DURATION = 200;
 
     /* 下拉刷新[有新建,就代表有默认值] */
     private boolean isHeadRefreshing = false; // 是否正在下拉刷新
-    private int headViewIndex = -1; // 头部位置
     protected int headOriginalOffset; // 顶部一定的初始距离, 等于 负的头部高度
     private int headCurrentTargetOffset; // 容器，距离顶部的实时偏移量
     private boolean isHeadOriginalOffsetCalculated = false; // 顶部初始化距离是否计算过了
 
-
     private boolean isFootLoading = false; // 是否正在上拉加载
-
-    private int footViewIndex = -1; // 底部位置
-
     private float mInitialMotionY;
-
     private boolean mIsBeingDragged;
-
     private int mActivePointerId = INVALID_POINTER;
-
-    protected int mFrom;
-
     private boolean mNotify;
-
     private int pushDistance = 0;
 
     /* ---------------------------------- 常量 ---------------------------------- */
     private static final float DECELERATE_INTERPOLATION_FACTOR = 2f;
-
-    private final int screenWidth;
 
     // 表示滑动的时候，手的移动要大于这个距离才开始移动控件。如果小于这个距离就不触发移动控件
     private final int touchSlop;
@@ -119,7 +105,6 @@ class RefreshLayout extends ViewGroup {
         // getScaledTouchSlop是一个距离，表示滑动的时候，手的移动要大于这个距离才开始移动控件。如果小于这个距离就不触发移动控件
         touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 
-        screenWidth = getScreenWidth(context);
         mHeadViewHeight = dp2px(context, HEAD_VIEW_HEIGHT);
         mFootViewHeight = dp2px(context, FOOT_VIEW_HEIGHT);
         mDefaultTargetDistance = dp2px(context, DEFAULT_TARGET_DISTANCE);
@@ -138,6 +123,54 @@ class RefreshLayout extends ViewGroup {
         // 初始化 footLoadAdapter
         mFootLoadAdapter = new DefaultRefreshAdapter();
         setLoadAdapter(mFootLoadAdapter);
+    }
+
+    /**
+     * 设置，下拉加载适配器
+     *
+     * @param refreshAdapter 刷新控件的适配器
+     */
+    public void setRefreshAdapter(AbstractRefreshAdapter refreshAdapter) {
+        this.mHeadRefreshAdapter = refreshAdapter;
+        if (null != mHeadRefreshAdapter) {
+            View child = mHeadRefreshAdapter.getView(getContext());
+            mHeadViewContainer.attachChild(child);
+        }
+    }
+
+    /**
+     * 设置，下拉加载监听事件
+     *
+     * @param onRefreshListener 头部刷新，回调
+     */
+    public void setOnRefreshListener(AbstractRefreshAdapter.OnSwipeListener onRefreshListener) {
+        if (null != mHeadRefreshAdapter) {
+            mHeadRefreshAdapter.setSwipeAnimatingListener(onRefreshListener);
+        }
+    }
+
+    /**
+     * 设置，上拉加载适配器
+     *
+     * @param loadAdapter 底部上拉，适配器
+     */
+    public void setLoadAdapter(AbstractRefreshAdapter loadAdapter) {
+        this.mFootLoadAdapter = loadAdapter;
+        if (null != mFootLoadAdapter) {
+            View child = mFootLoadAdapter.getView(getContext());
+            mFootViewContainer.attachChild(child);
+        }
+    }
+
+    /**
+     * 设置，上拉加载监听事件
+     *
+     * @param onLoadListener 底部上拉，回调
+     */
+    public void setOnLoadListener(AbstractRefreshAdapter.OnSwipeListener onLoadListener) {
+        if (null != mFootLoadAdapter) {
+            mFootLoadAdapter.setSwipeAnimatingListener(onLoadListener);
+        }
     }
 
     /**
@@ -163,82 +196,6 @@ class RefreshLayout extends ViewGroup {
             headCurrentTargetOffset = mHeadViewContainer.getTop();
         }
     };
-
-    /**
-     * 下拉刷新
-     *
-     * @param headRefreshAdapter
-     */
-    public void setRefreshAdapter(AbstractRefreshAdapter headRefreshAdapter) {
-        this.mHeadRefreshAdapter = headRefreshAdapter;
-        if (null != headRefreshAdapter) {
-            View child = headRefreshAdapter.getView(getContext());
-            mHeadViewContainer.attachChild(child);
-        }
-    }
-
-    /**
-     * 监听动画
-     *
-     * @param onRefreshListener
-     */
-    public void setOnRefreshListener(AbstractRefreshAdapter.OnSwipeListener onRefreshListener) {
-        if (null != mHeadRefreshAdapter) {
-            mHeadRefreshAdapter.setSwipeAnimatingListener(onRefreshListener);
-        }
-    }
-
-    /**
-     * 上拉加载
-     *
-     * @param footLoadAdapter
-     */
-    public void setLoadAdapter(AbstractRefreshAdapter footLoadAdapter) {
-        this.mFootLoadAdapter = footLoadAdapter;
-
-        if (null != footLoadAdapter) {
-            View child = footLoadAdapter.getView(getContext());
-            if (null != mFootViewContainer) {
-                mFootViewContainer.attachChild(child);
-            }
-        }
-    }
-
-    public void setOnLoadListener(AbstractRefreshAdapter.OnSwipeListener onLoadListener) {
-        if (null != mFootLoadAdapter) {
-            mFootLoadAdapter.setSwipeAnimatingListener(onLoadListener);
-        }
-    }
-
-    /**
-     * 孩子节点绘制的顺序
-     *
-     * @param childCount
-     * @param i
-     * @return
-     */
-    @Override
-    protected int getChildDrawingOrder(int childCount, int i) {
-        // 将新添加的View,放到最后绘制
-        if (headViewIndex < 0 && footViewIndex < 0) {
-            return i;
-        }
-        if (i == childCount - 2) {
-            return headViewIndex;
-        }
-        if (i == childCount - 1) {
-            return footViewIndex;
-        }
-        int bigIndex = footViewIndex > headViewIndex ? footViewIndex : headViewIndex;
-        int smallIndex = footViewIndex < headViewIndex ? footViewIndex : headViewIndex;
-        if (i >= smallIndex && i < bigIndex - 1) {
-            return i + 1;
-        }
-        if (i >= bigIndex || (i == bigIndex - 1)) {
-            return i + 2;
-        }
-        return i;
-    }
 
     /**
      * Notify the widget that refresh state has changed. Do not call this when
@@ -274,6 +231,41 @@ class RefreshLayout extends ViewGroup {
         }
     }
 
+    private void animateOffsetToCorrectPosition(int from, HeadViewContainer.OnHeadAnimationCallback listener) {
+        final int targetFrom = from;
+        mHeadViewContainer.startTargetAnimation(new HeadViewContainer.OnApplyAnimationCallback() {
+            @Override
+            public void onApply(float interpolatedTime) {
+                int endTarget = (int) (mDefaultTargetDistance - Math.abs(headOriginalOffset));
+                int targetTop = (targetFrom + (int) ((endTarget - targetFrom) * interpolatedTime));
+                int offset = targetTop - mHeadViewContainer.getTop();
+                setTargetOffsetTopAndBottom(offset, false /* requires update */);
+            }
+        }, listener);
+    }
+
+    private void animateOffsetToStartPosition(int from, HeadViewContainer.OnHeadAnimationCallback listener) {
+        final int startFrom = from;
+        mHeadViewContainer.startStartAnimation(new HeadViewContainer.OnApplyAnimationCallback() {
+            @Override
+            public void onApply(float interpolatedTime) {
+                int targetTop = (startFrom + (int) ((headOriginalOffset - startFrom) * interpolatedTime));
+                int offset = targetTop - mHeadViewContainer.getTop();
+                setTargetOffsetTopAndBottom(offset, false /* requires update */);
+            }
+        }, listener);
+        resetTargetLayoutDelay(ANIMATE_TO_START_DURATION);
+    }
+
+    private void setTargetOffsetTopAndBottom(int offset, boolean requiresUpdate) {
+        mHeadViewContainer.bringToFront();
+        mHeadViewContainer.offsetTopAndBottom(offset);
+        headCurrentTargetOffset = mHeadViewContainer.getTop();
+        if (requiresUpdate && Build.VERSION.SDK_INT < 11) {
+            invalidate();
+        }
+    }
+
     public boolean isRefreshing() {
         return isHeadRefreshing;
     }
@@ -289,43 +281,24 @@ class RefreshLayout extends ViewGroup {
             return;
         }
 
-        int measureWidth = MeasureSpec.makeMeasureSpec(getMeasuredWidth() - getPaddingLeft() - getPaddingRight(), MeasureSpec.EXACTLY);
+        int refreshWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
+        int measureWidth = MeasureSpec.makeMeasureSpec(refreshWidth, MeasureSpec.EXACTLY);
         int measureHeight = MeasureSpec.makeMeasureSpec(getMeasuredHeight() - getPaddingTop() - getPaddingBottom(), MeasureSpec.EXACTLY);
         mChildHelper.measure(measureWidth, measureHeight);
 
-        mHeadViewContainer.measure(MeasureSpec.makeMeasureSpec(screenWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(mHeadViewHeight, MeasureSpec.EXACTLY));
-        mFootViewContainer.measure(MeasureSpec.makeMeasureSpec(screenWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(mFootViewHeight, MeasureSpec.EXACTLY));
+        mHeadViewContainer.measure(MeasureSpec.makeMeasureSpec(refreshWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(mHeadViewHeight, MeasureSpec.EXACTLY));
+        mFootViewContainer.measure(MeasureSpec.makeMeasureSpec(refreshWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(mFootViewHeight, MeasureSpec.EXACTLY));
 
         if (!isHeadOriginalOffsetCalculated) {
             isHeadOriginalOffsetCalculated = true;
             headOriginalOffset = -mHeadViewContainer.getMeasuredHeight();
             headCurrentTargetOffset = headOriginalOffset;
         }
-
-        headViewIndex = -1;
-        for (int index = 0; index < getChildCount(); index++) {
-            if (getChildAt(index) == mHeadViewContainer) {
-                headViewIndex = index;
-                break;
-            }
-        }
-
-        footViewIndex = -1;
-        for (int index = 0; index < getChildCount(); index++) {
-            if (getChildAt(index) == mFootViewContainer) {
-                footViewIndex = index;
-                break;
-            }
-        }
     }
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         // 排除异常情况
-        if (getChildCount() == 0) {
-            return;
-        }
-
         boolean isChildExist = mChildHelper.checkChild(this, mHeadViewContainer, mFootViewContainer);
         if (!isChildExist) {
             return;
@@ -439,8 +412,7 @@ class RefreshLayout extends ViewGroup {
     }
 
     private float getMotionEventY(MotionEvent ev, int activePointerId) {
-        final int index = MotionEventCompat.findPointerIndex(ev,
-                activePointerId);
+        final int index = MotionEventCompat.findPointerIndex(ev, activePointerId);
         if (index < 0) {
             return -1;
         }
@@ -694,43 +666,6 @@ class RefreshLayout extends ViewGroup {
             } else {
                 animatorFooterToBottom(mFootViewHeight, 0);
             }
-        }
-    }
-
-    private void animateOffsetToCorrectPosition(int from, HeadViewContainer.OnHeadAnimationCallback listener) {
-        mFrom = from;
-        mHeadViewContainer.startTargetAnimation(new HeadViewContainer.OnApplyAnimationCallback() {
-            @Override
-            public void onApply(float interpolatedTime) {
-                int targetTop = 0;
-                int endTarget = 0;
-                endTarget = (int) (mDefaultTargetDistance - Math.abs(headOriginalOffset));
-                targetTop = (mFrom + (int) ((endTarget - mFrom) * interpolatedTime));
-                int offset = targetTop - mHeadViewContainer.getTop();
-                setTargetOffsetTopAndBottom(offset, false /* requires update */);
-            }
-        }, listener);
-    }
-
-    private void animateOffsetToStartPosition(int from, HeadViewContainer.OnHeadAnimationCallback listener) {
-        mFrom = from;
-        mHeadViewContainer.startStartAnimation(new HeadViewContainer.OnApplyAnimationCallback() {
-            @Override
-            public void onApply(float interpolatedTime) {
-                int targetTop = (mFrom + (int) ((headOriginalOffset - mFrom) * interpolatedTime));
-                int offset = targetTop - mHeadViewContainer.getTop();
-                setTargetOffsetTopAndBottom(offset, false /* requires update */);
-            }
-        }, listener);
-        resetTargetLayoutDelay(ANIMATE_TO_START_DURATION);
-    }
-
-    private void setTargetOffsetTopAndBottom(int offset, boolean requiresUpdate) {
-        mHeadViewContainer.bringToFront();
-        mHeadViewContainer.offsetTopAndBottom(offset);
-        headCurrentTargetOffset = mHeadViewContainer.getTop();
-        if (requiresUpdate && Build.VERSION.SDK_INT < 11) {
-            invalidate();
         }
     }
 

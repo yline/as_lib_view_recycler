@@ -19,6 +19,15 @@ import android.widget.ScrollView;
 public class RefreshChildHelper {
     private View mChildTarget; // 刷新控件的主内容
 
+    public int checkChildIndex(@NonNull ViewGroup refreshLayout, @NonNull View childView) {
+        for (int i = 0; i < refreshLayout.getChildCount(); i++) {
+            if (refreshLayout.getChildAt(i) == childView) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public boolean checkChild(@NonNull ViewGroup refreshLayout, @NonNull View headView, @NonNull View footView) {
         if (null == mChildTarget) {
             for (int i = 0; i < refreshLayout.getChildCount(); i++) {
