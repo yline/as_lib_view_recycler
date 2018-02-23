@@ -28,6 +28,7 @@ public class HeadViewContainer extends RelativeLayout {
     private OnHeadAnimationCallback mAnimationListener;
     private RelativeLayout mContainer;
 
+    private boolean mIsRefreshing;
     private boolean mIsOffsetInit; // 顶部初始化距离是否计算过了
     private int mOriginalOffset; // 顶部的初始距离，等于，负的头部高度
     private int mCurrentTargetOffset; // 距离顶部的实时偏移量
@@ -112,8 +113,20 @@ public class HeadViewContainer extends RelativeLayout {
      * @param listener 回调
      */
     public void startScaleUpAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
-        Animation scaleAnimation = getScaleUpAnimation();
-        attachAnimation(scaleAnimation, listener);
+        if (null == mScaleUpAnimation) {
+            mScaleUpAnimation = new Animation() {
+                @Override
+                protected void applyTransformation(float interpolatedTime, Transformation t) {
+                    super.applyTransformation(interpolatedTime, t);
+
+                    setScaleX(interpolatedTime);
+                    setScaleY(interpolatedTime);
+                }
+            };
+            int duration = getResources().getInteger(android.R.integer.config_mediumAnimTime);
+            mScaleUpAnimation.setDuration(duration);
+        }
+        attachAnimation(mScaleUpAnimation, listener);
     }
 
     public void startScaleDownAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
@@ -153,21 +166,15 @@ public class HeadViewContainer extends RelativeLayout {
         startAnimation(animation);
     }
 
-    private Animation getScaleUpAnimation() {
-        if (null == mScaleUpAnimation) {
-            mScaleUpAnimation = new Animation() {
-                @Override
-                protected void applyTransformation(float interpolatedTime, Transformation t) {
-                    super.applyTransformation(interpolatedTime, t);
-
-                    setScaleX(interpolatedTime);
-                    setScaleY(interpolatedTime);
-                }
-            };
-            int duration = getResources().getInteger(android.R.integer.config_mediumAnimTime);
-            mScaleUpAnimation.setDuration(duration);
-        }
-        return mScaleUpAnimation;
+    /**
+     * 设置上下偏移量
+     *
+     * @param offset 偏移量
+     */
+    public void setTargetOffsetTopAndBottom(int offset) {
+        bringToFront();
+        offsetTopAndBottom(offset);
+        setCurrentTargetOffset(getTop());
     }
 
     private Animation getScaleDownAnimation() {
@@ -234,6 +241,14 @@ public class HeadViewContainer extends RelativeLayout {
 
     public void setCurrentTargetOffset(int targetOffset) {
         this.mCurrentTargetOffset = targetOffset;
+    }
+
+    public void setRefreshing(boolean isRefreshing) {
+        this.mIsRefreshing = isRefreshing;
+    }
+
+    public boolean isRefreshing() {
+        return mIsRefreshing;
     }
 
     public interface OnApplyAnimationCallback {

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import com.yline.application.SDKManager;
 import com.yline.base.BaseAppCompatActivity;
@@ -59,13 +60,30 @@ public class SimpleRefreshActivity extends BaseAppCompatActivity {
                         // 更新recyclerView
                         int itemNumber = recyclerAdapter.size();
                         recyclerAdapter.add(itemNumber, "Loaded Item + " + new Random().nextInt(300), true);
-                        recyclerView.scrollToPosition(itemNumber);
+                        recyclerView.scrollToPosition(recyclerAdapter.getItemCount() - 1);
                     }
                 }, 4000);
             }
         });
 
         recyclerAdapter.setDataList(StrConstant.getListSeven(20), true);
+
+        findViewById(R.id.btn_click).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                swipeRefreshLayout.setRefreshing(true);
+                SDKManager.getHandler().postDelayed(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        swipeRefreshLayout.setRefreshing(false);
+                        // 更新recyclerView
+                        recyclerAdapter.add(0, "Refresh Item + " + new Random().nextInt(300), true);
+                        recyclerView.scrollToPosition(0);
+                    }
+                }, 4000);
+            }
+        });
     }
 
     public static void launcher(Context context) {

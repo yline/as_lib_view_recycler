@@ -66,8 +66,6 @@ class RefreshLayout extends ViewGroup {
     private static final int ANIMATE_TO_START_DURATION = 200;
 
     /* 下拉刷新[有新建,就代表有默认值] */
-    private boolean isHeadRefreshing = false; // 是否正在下拉刷新
-
     private boolean isFootLoading = false; // 是否正在上拉加载
     private float mInitialMotionY;
     private boolean mIsBeingDragged;
@@ -171,6 +169,45 @@ class RefreshLayout extends ViewGroup {
     }
 
     /**
+     * Notify the widget that refresh state has changed. Do not call this when
+     * refresh is triggered by a swipe gesture.
+     *
+     * @param refreshing Whether or not the view should show refresh progress.
+     */
+    public void setRefreshing(boolean refreshing) {
+        if (refreshing && !mHeadViewContainer.isRefreshing()) {
+            mHeadViewContainer.setRefreshing(true);
+            mNotify = false;
+
+            int endTarget = (int) (mDefaultTargetDistance + mHeadViewContainer.getOriginalOffset());
+            mHeadViewContainer.setTargetOffsetTopAndBottom(endTarget - mHeadViewContainer.getCurrentTargetOffset());
+            if (Build.VERSION.SDK_INT < 11) {
+                invalidate();
+            }
+
+
+            mHeadViewContainer.setVisibility(View.VISIBLE);
+            mHeadViewContainer.startScaleUpAnimation(mRefreshListener);
+        } else {
+            setRefreshing(false, false /* notify */);
+        }
+    }
+
+    private void setRefreshing(boolean refreshing, final boolean notify) {
+        if (mHeadViewContainer.isRefreshing() != refreshing) {
+            mHeadViewContainer.setRefreshing(refreshing);
+
+            mNotify = notify;
+            mChildHelper.checkChild(this, mHeadViewContainer, mFootViewContainer);
+            if (refreshing) {
+                animateOffsetToCorrectPosition(mHeadViewContainer.getCurrentTargetOffset(), mRefreshListener);
+            } else {
+                animateOffsetToStartPosition(mHeadViewContainer.getCurrentTargetOffset(), mRefreshListener);
+            }
+        }
+    }
+
+    /**
      * 下拉时，超过距离之后，弹回来的动画监听器
      */
     private HeadViewContainer.OnHeadAnimationCallback mRefreshListener = new HeadViewContainer.OnHeadAnimationCallback() {
@@ -180,7 +217,7 @@ class RefreshLayout extends ViewGroup {
 
         @Override
         public void onAnimationEnd(Animation animation) {
-            if (isHeadRefreshing) {
+            if (mHeadViewContainer.isRefreshing()) {
                 if (mNotify) {
                     if (mHeadRefreshAdapter != null) {
                         mHeadRefreshAdapter.animate();
@@ -188,45 +225,14 @@ class RefreshLayout extends ViewGroup {
                 }
             } else {
                 mHeadViewContainer.setVisibility(View.GONE);
-                setTargetOffsetTopAndBottom(mHeadViewContainer.getOriginalOffset() - mHeadViewContainer.getCurrentTargetOffset(), true);
+                mHeadViewContainer.setTargetOffsetTopAndBottom(mHeadViewContainer.getOriginalOffset() - mHeadViewContainer.getCurrentTargetOffset());
+                if (Build.VERSION.SDK_INT < 11) {
+                    invalidate();
+                }
             }
             mHeadViewContainer.setCurrentTargetOffset(mHeadViewContainer.getTop());
         }
     };
-
-    /**
-     * Notify the widget that refresh state has changed. Do not call this when
-     * refresh is triggered by a swipe gesture.
-     *
-     * @param refreshing Whether or not the view should show refresh progress.
-     */
-    public void setRefreshing(boolean refreshing) {
-        if (refreshing && isHeadRefreshing != refreshing) {
-            // scale and show
-            isHeadRefreshing = refreshing;
-            int endTarget = (int) (mDefaultTargetDistance + mHeadViewContainer.getOriginalOffset());
-            setTargetOffsetTopAndBottom(endTarget - mHeadViewContainer.getCurrentTargetOffset(), true /* requires update */);
-            mNotify = false;
-
-            mHeadViewContainer.setVisibility(View.VISIBLE);
-            mHeadViewContainer.startScaleUpAnimation(mRefreshListener);
-        } else {
-            setRefreshing(refreshing, false /* notify */);
-        }
-    }
-
-    private void setRefreshing(boolean refreshing, final boolean notify) {
-        if (isHeadRefreshing != refreshing) {
-            mNotify = notify;
-            mChildHelper.checkChild(this, mHeadViewContainer, mFootViewContainer);
-            isHeadRefreshing = refreshing;
-            if (isHeadRefreshing) {
-                animateOffsetToCorrectPosition(mHeadViewContainer.getCurrentTargetOffset(), mRefreshListener);
-            } else {
-                animateOffsetToStartPosition(mHeadViewContainer.getCurrentTargetOffset(), mRefreshListener);
-            }
-        }
-    }
 
     private void animateOffsetToCorrectPosition(int from, HeadViewContainer.OnHeadAnimationCallback listener) {
         final int targetFrom = from;
@@ -236,7 +242,7 @@ class RefreshLayout extends ViewGroup {
                 int endTarget = (int) (mDefaultTargetDistance - Math.abs(mHeadViewContainer.getOriginalOffset()));
                 int targetTop = (targetFrom + (int) ((endTarget - targetFrom) * interpolatedTime));
                 int offset = targetTop - mHeadViewContainer.getTop();
-                setTargetOffsetTopAndBottom(offset, false /* requires update */);
+                mHeadViewContainer.setTargetOffsetTopAndBottom(offset);
             }
         }, listener);
     }
@@ -248,7 +254,7 @@ class RefreshLayout extends ViewGroup {
             public void onApply(float interpolatedTime) {
                 int targetTop = (startFrom + (int) ((mHeadViewContainer.getOriginalOffset() - startFrom) * interpolatedTime));
                 int offset = targetTop - mHeadViewContainer.getTop();
-                setTargetOffsetTopAndBottom(offset, false /* requires update */);
+                mHeadViewContainer.setTargetOffsetTopAndBottom(offset);
             }
         }, listener);
         resetTargetLayoutDelay(ANIMATE_TO_START_DURATION);
@@ -268,16 +274,6 @@ class RefreshLayout extends ViewGroup {
         }, delay);
     }
 
-    private void setTargetOffsetTopAndBottom(int offset, boolean requiresUpdate) {
-        mHeadViewContainer.bringToFront();
-        mHeadViewContainer.offsetTopAndBottom(offset);
-
-        mHeadViewContainer.setCurrentTargetOffset(mHeadViewContainer.getTop());
-        if (requiresUpdate && Build.VERSION.SDK_INT < 11) {
-            invalidate();
-        }
-    }
-
     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         // 设置 控件的 改变的高度（动态改变，不再是原始高度）
@@ -289,13 +285,12 @@ class RefreshLayout extends ViewGroup {
             return;
         }
 
-        int refreshWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
-        int measureWidth = MeasureSpec.makeMeasureSpec(refreshWidth, MeasureSpec.EXACTLY);
+        int measureWidth = MeasureSpec.makeMeasureSpec(getMeasuredWidth() - getPaddingLeft() - getPaddingRight(), MeasureSpec.EXACTLY);
         int measureHeight = MeasureSpec.makeMeasureSpec(getMeasuredHeight() - getPaddingTop() - getPaddingBottom(), MeasureSpec.EXACTLY);
         mChildHelper.measure(measureWidth, measureHeight);
 
-        mHeadViewContainer.measure(MeasureSpec.makeMeasureSpec(refreshWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(mHeadViewHeight, MeasureSpec.EXACTLY));
-        mFootViewContainer.measure(MeasureSpec.makeMeasureSpec(refreshWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(mFootViewHeight, MeasureSpec.EXACTLY));
+        mHeadViewContainer.measure(measureWidth, MeasureSpec.makeMeasureSpec(mHeadViewHeight, MeasureSpec.EXACTLY));
+        mFootViewContainer.measure(measureWidth, MeasureSpec.makeMeasureSpec(mFootViewHeight, MeasureSpec.EXACTLY));
 
         mHeadViewContainer.initOffset(-mHeadViewContainer.getMeasuredHeight());
     }
@@ -356,7 +351,7 @@ class RefreshLayout extends ViewGroup {
 
         final int action = MotionEventCompat.getActionMasked(ev);
         boolean isChildScrollToBottom = mChildHelper.isChildScrollToBottom();
-        if (!isEnabled() || isHeadRefreshing || isFootLoading || (!mChildHelper.isChildScrollToTop() && !isChildScrollToBottom)) {
+        if (!isEnabled() || mHeadViewContainer.isRefreshing() || isFootLoading || (!mChildHelper.isChildScrollToTop() && !isChildScrollToBottom)) {
             // 如果子View可以滑动，不拦截事件，交给子View处理-下拉刷新
             // 或者子View没有滑动到底部不拦截事件-上拉加载更多
             return false;
@@ -365,7 +360,10 @@ class RefreshLayout extends ViewGroup {
         // 下拉刷新判断
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                setTargetOffsetTopAndBottom(mHeadViewContainer.getOriginalOffset() - mHeadViewContainer.getTop(), true);// 恢复HeaderView的初始位置
+                mHeadViewContainer.setTargetOffsetTopAndBottom(mHeadViewContainer.getOriginalOffset() - mHeadViewContainer.getTop());
+                if (Build.VERSION.SDK_INT < 11) {
+                    invalidate();
+                }
                 mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
                 mIsBeingDragged = false;
                 final float initialMotionY = getMotionEventY(ev, mActivePointerId);
@@ -491,7 +489,10 @@ class RefreshLayout extends ViewGroup {
                     if (null != mHeadRefreshAdapter) {
                         mHeadRefreshAdapter.onCreating(overScrollTop, mDefaultTargetDistance);
                     }
-                    setTargetOffsetTopAndBottom(targetY - mHeadViewContainer.getCurrentTargetOffset(), true);
+                    mHeadViewContainer.setTargetOffsetTopAndBottom(targetY - mHeadViewContainer.getCurrentTargetOffset());
+                    if (Build.VERSION.SDK_INT < 11) {
+                        invalidate();
+                    }
                 }
                 break;
             }
@@ -521,7 +522,7 @@ class RefreshLayout extends ViewGroup {
                 if (overScrollTop > mDefaultTargetDistance) {
                     setRefreshing(true, true /* notify */);
                 } else {
-                    isHeadRefreshing = false;
+                    mHeadViewContainer.setRefreshing(false);
                     animateOffsetToStartPosition(mHeadViewContainer.getCurrentTargetOffset(), new HeadViewContainer.OnHeadAnimationCallback() {
                         @Override
                         public void onAnimationStart(Animation animation) {
