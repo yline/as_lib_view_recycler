@@ -1,0 +1,20 @@
+1，为什么 foreach 比 fori 效率更高
+1）这句话并不完全正确，两种的写法如下：
+//一般迭代器的写法
+        for (Iterator iterator = list.iterator(); iterator.hasNext();) {
+            Integer integer = (Integer) iterator.next();
+            System.out.println(integer);
+        }
+//for写法
+        for(int i = 0; i < list.size(); i++){
+            System.out.println(list.get(i));
+        }
+由上可以看出，其实都是逐个遍历，只是一个遍历的是元素，一个遍历的是脚标，因此需要查看具体实现
+例如：
+ArrayList，遍历元素也是通过脚标，所以两者效率一致
+链表结构，则遍历元素相比较脚标速率快很多，特别当量大的时候。因为，n-1到n的过程，元素只有一次计算，而脚标有n次计算
+
+2，foreach 遍历的时候，修改内容是否会报异常；为什么
+ArrayList和LinkedList都不会，遍历时，查询语句会调用，next()
+而next()这个函数，会检查结构是否改变，因此只要结构未改变，就不会报异常
+

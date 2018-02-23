@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.yline.test.BaseTestActivity;
+import com.yline.utils.LogUtil;
 import com.yline.view.recycler.demo.adapter.SimpleHeadFootRecyclerActivity;
 import com.yline.view.recycler.demo.adapter.SimpleListActivity;
 import com.yline.view.recycler.demo.adapter.SimpleRecyclerActivity;
@@ -20,6 +21,12 @@ import com.yline.view.recycler.demo.refresh.CircleProgressActivity;
 import com.yline.view.recycler.demo.refresh.CustomRefreshActivity;
 import com.yline.view.recycler.demo.refresh.SimpleRefreshActivity;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
 public class MainActivity extends BaseTestActivity {
     public static void launcher(Context context) {
         if (null != context) {
@@ -29,6 +36,57 @@ public class MainActivity extends BaseTestActivity {
             }
             context.startActivity(intent);
         }
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Set s;
+        HashSet hs;
+
+        Boolean b;
+        Float f;
+        String ss;
+
+        addButton("test", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<String> dataList = new LinkedList<String>();
+                for (int i = 0; i < 10; i++) {
+                    dataList.add(String.valueOf(i));
+                }
+
+                for (String str : dataList) {
+                    int index = dataList.indexOf(str);
+                    dataList.set(index, "0" + str);
+                }
+
+                LogUtil.v("str = " + dataList);
+
+                String string = "01234567890123456789";
+                int code = string.hashCode();
+                int code2 = hashCode2(string);
+                LogUtil.v("code = " + code + ",code2 = " + code2 + ", same = " + (code == code2));
+
+
+                int i = 0x0001;
+
+                i = Integer.MAX_VALUE;
+                i = Integer.MIN_VALUE;
+
+                int max = 0x80000000 + 1;
+                LogUtil.v(String.format(Locale.CHINA, "-2 = %#x,-1 = %#x, 0 = %#x, 1 = %#x, 2 = %#x, max = %#x, min = %#x", -2, -1, 0, 1, 2, Integer.MAX_VALUE, Integer.MIN_VALUE));
+            }
+        });
+    }
+
+    public int hashCode2(String str) {
+        int h = 0;
+        for (int i = 0; i < str.length(); i++) {
+            h = 31 * h + str.charAt(i);
+        }
+        return h;
     }
 
     @Override

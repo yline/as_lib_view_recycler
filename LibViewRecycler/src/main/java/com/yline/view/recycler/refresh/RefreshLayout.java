@@ -257,6 +257,20 @@ class RefreshLayout extends ViewGroup {
         resetTargetLayoutDelay(ANIMATE_TO_START_DURATION);
     }
 
+    /**
+     * 重置Target位置
+     *
+     * @param delay
+     */
+    public void resetTargetLayoutDelay(int delay) {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                resetTargetLayout();
+            }
+        }, delay);
+    }
+
     private void setTargetOffsetTopAndBottom(int offset, boolean requiresUpdate) {
         mHeadViewContainer.bringToFront();
         mHeadViewContainer.offsetTopAndBottom(offset);
@@ -518,18 +532,17 @@ class RefreshLayout extends ViewGroup {
                     setRefreshing(true, true /* notify */);
                 } else {
                     isHeadRefreshing = false;
-                    HeadViewContainer.OnHeadAnimationCallback listener = new HeadViewContainer.OnHeadAnimationCallback() {
-
+                    animateOffsetToStartPosition(headCurrentTargetOffset, new HeadViewContainer.OnHeadAnimationCallback() {
                         @Override
                         public void onAnimationStart(Animation animation) {
+
                         }
 
                         @Override
                         public void onAnimationEnd(Animation animation) {
                             mHeadViewContainer.startScaleDownAnimation(null);
                         }
-                    };
-                    animateOffsetToStartPosition(headCurrentTargetOffset, listener);
+                    });
                 }
                 mActivePointerId = INVALID_POINTER;
                 return false;
@@ -668,21 +681,6 @@ class RefreshLayout extends ViewGroup {
             }
         }
     }
-
-    /**
-     * 重置Target位置
-     *
-     * @param delay
-     */
-    public void resetTargetLayoutDelay(int delay) {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                resetTargetLayout();
-            }
-        }, delay);
-    }
-
 
     /**
      * 修改底部布局的位置-敏感pushDistance
