@@ -13,14 +13,12 @@ import android.os.Handler;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 
@@ -49,9 +47,6 @@ class RefreshLayout extends ViewGroup {
     private final int mFootViewHeight;
     private static final int FOOT_VIEW_HEIGHT = 50;// FootView height (dp)
 
-    private final float mDefaultTargetDistance;
-    private static final int DEFAULT_TARGET_DISTANCE = 64; // 默认刷新控件，偏移距离
-
     // 控件、帮助类
     private AbstractRefreshAdapter mHeadRefreshAdapter;
     private HeadViewContainer mHeadViewContainer; // 头部
@@ -79,8 +74,7 @@ class RefreshLayout extends ViewGroup {
     // 表示滑动的时候，手的移动要大于这个距离才开始移动控件。如果小于这个距离就不触发移动控件
     private final int touchSlop;
 
-	/* ---------------------------------- 引用 ---------------------------------- */
-
+    /* ---------------------------------- 引用 ---------------------------------- */
     private final DecelerateInterpolator decelerateInterpolator;
 
     public RefreshLayout(Context context) {
@@ -102,7 +96,6 @@ class RefreshLayout extends ViewGroup {
 
         mHeadViewHeight = dp2px(context, HEAD_VIEW_HEIGHT);
         mFootViewHeight = dp2px(context, FOOT_VIEW_HEIGHT);
-        mDefaultTargetDistance = dp2px(context, DEFAULT_TARGET_DISTANCE);
 
         mChildHelper = new RefreshChildHelper();
         ViewCompat.setChildrenDrawingOrderEnabled(this, true);
@@ -179,12 +172,11 @@ class RefreshLayout extends ViewGroup {
             mHeadViewContainer.setRefreshing(true);
             mNotify = false;
 
-            int endTarget = (int) (mDefaultTargetDistance + mHeadViewContainer.getOriginalOffset());
-            mHeadViewContainer.setTargetOffsetTopAndBottom(endTarget - mHeadViewContainer.getCurrentTargetOffset());
+            int offset = mHeadViewContainer.getDefaultTargetDistance() + mHeadViewContainer.getOriginalOffset() - mHeadViewContainer.getCurrentTargetOffset();
+            mHeadViewContainer.setTargetOffsetTopAndBottom(offset);
             if (Build.VERSION.SDK_INT < 11) {
                 invalidate();
             }
-
 
             mHeadViewContainer.setVisibility(View.VISIBLE);
             mHeadViewContainer.startScaleUpAnimation(mRefreshListener);
@@ -196,11 +188,11 @@ class RefreshLayout extends ViewGroup {
     private void setRefreshing(boolean refreshing, final boolean notify) {
         if (mHeadViewContainer.isRefreshing() != refreshing) {
             mHeadViewContainer.setRefreshing(refreshing);
-
             mNotify = notify;
+
             mChildHelper.checkChild(this, mHeadViewContainer, mFootViewContainer);
             if (refreshing) {
-                animateOffsetToCorrectPosition(mHeadViewContainer.getCurrentTargetOffset(), mRefreshListener);
+                mHeadViewContainer.startTargetAnimation(mRefreshListener);
             } else {
                 animateOffsetToStartPosition(mHeadViewContainer.getCurrentTargetOffset(), mRefreshListener);
             }
@@ -234,18 +226,6 @@ class RefreshLayout extends ViewGroup {
         }
     };
 
-    private void animateOffsetToCorrectPosition(int from, HeadViewContainer.OnHeadAnimationCallback listener) {
-        final int targetFrom = from;
-        mHeadViewContainer.startTargetAnimation(new HeadViewContainer.OnApplyAnimationCallback() {
-            @Override
-            public void onApply(float interpolatedTime) {
-                int endTarget = (int) (mDefaultTargetDistance - Math.abs(mHeadViewContainer.getOriginalOffset()));
-                int targetTop = (targetFrom + (int) ((endTarget - targetFrom) * interpolatedTime));
-                int offset = targetTop - mHeadViewContainer.getTop();
-                mHeadViewContainer.setTargetOffsetTopAndBottom(offset);
-            }
-        }, listener);
-    }
 
     private void animateOffsetToStartPosition(int from, HeadViewContainer.OnHeadAnimationCallback listener) {
         final int startFrom = from;
@@ -464,21 +444,20 @@ class RefreshLayout extends ViewGroup {
                 final float y = MotionEventCompat.getY(ev, pointerIndex);
                 final float overScrollTop = (y - mInitialMotionY) * DRAG_RATE;
                 if (mIsBeingDragged) {
-                    float originalDragPercent = overScrollTop / mDefaultTargetDistance;
+                    float originalDragPercent = overScrollTop / mHeadViewContainer.getDefaultTargetDistance();
                     if (originalDragPercent < 0) {
                         return false;
                     }
                     float dragPercent = Math.min(1f, Math.abs(originalDragPercent));
-                    float extraOS = Math.abs(overScrollTop) - mDefaultTargetDistance;
-                    float slingshotDist = mDefaultTargetDistance;
+                    float extraOS = Math.abs(overScrollTop) - mHeadViewContainer.getDefaultTargetDistance();
+                    float slingshotDist = mHeadViewContainer.getDefaultTargetDistance();
                     float tensionSlingshotPercent = Math.max(0,
                             Math.min(extraOS, slingshotDist * 2) / slingshotDist);
                     float tensionPercent = (float) ((tensionSlingshotPercent / 4) - Math
                             .pow((tensionSlingshotPercent / 4), 2)) * 2f;
                     float extraMove = (slingshotDist) * tensionPercent * 2;
 
-                    int targetY = mHeadViewContainer.getOriginalOffset()
-                            + (int) ((slingshotDist * dragPercent) + extraMove);
+                    int targetY = mHeadViewContainer.getOriginalOffset() + (int) ((slingshotDist * dragPercent) + extraMove);
                     if (mHeadViewContainer.getVisibility() != View.VISIBLE) {
                         mHeadViewContainer.setVisibility(View.VISIBLE);
                     }
@@ -487,7 +466,7 @@ class RefreshLayout extends ViewGroup {
                     ViewCompat.setScaleY(mHeadViewContainer, 1f);
 
                     if (null != mHeadRefreshAdapter) {
-                        mHeadRefreshAdapter.onCreating(overScrollTop, mDefaultTargetDistance);
+                        mHeadRefreshAdapter.onCreating(overScrollTop, mHeadViewContainer.getDefaultTargetDistance());
                     }
                     mHeadViewContainer.setTargetOffsetTopAndBottom(targetY - mHeadViewContainer.getCurrentTargetOffset());
                     if (Build.VERSION.SDK_INT < 11) {
@@ -519,7 +498,7 @@ class RefreshLayout extends ViewGroup {
                 final float y = MotionEventCompat.getY(ev, pointerIndex);
                 final float overScrollTop = (y - mInitialMotionY) * DRAG_RATE;
                 mIsBeingDragged = false;
-                if (overScrollTop > mDefaultTargetDistance) {
+                if (overScrollTop > mHeadViewContainer.getDefaultTargetDistance()) {
                     setRefreshing(true, true /* notify */);
                 } else {
                     mHeadViewContainer.setRefreshing(false);
@@ -695,25 +674,8 @@ class RefreshLayout extends ViewGroup {
         }
     }
 
-    /**
-     * 获得屏幕宽度
-     *
-     * @param context 上下文
-     * @return such as 720 if success
-     */
-    public int getScreenWidth(Context context) {
-        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        DisplayMetrics outMetrics = new DisplayMetrics();
-        wm.getDefaultDisplay().getMetrics(outMetrics);
-        return outMetrics.widthPixels;
-    }
-
     public static int dp2px(Context context, float dpValue) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpValue,
                 context.getResources().getDisplayMetrics());
-    }
-
-    public static int getDefaultTargetDistance(Context context) {
-        return dp2px(context, DEFAULT_TARGET_DISTANCE);
     }
 }

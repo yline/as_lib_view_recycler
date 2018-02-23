@@ -12,6 +12,7 @@ import android.view.animation.Transformation;
 import android.widget.RelativeLayout;
 
 import com.yline.view.recycler.R;
+import com.yline.view.recycler.refresh.SuperSwipeRefreshLayout;
 
 /**
  * 刷新，下拉刷新，容器
@@ -25,6 +26,9 @@ public class HeadViewContainer extends RelativeLayout {
     private static final int ANIMATE_TO_START_DURATION = 200;
     private static final float DECELERATE_INTERPOLATION_FACTOR = 2f;
 
+    private final int mDefaultTargetDistance;
+    private static final int DEFAULT_TARGET_DISTANCE = 64; // 默认偏移距离
+
     private OnHeadAnimationCallback mAnimationListener;
     private RelativeLayout mContainer;
 
@@ -36,7 +40,6 @@ public class HeadViewContainer extends RelativeLayout {
     private Animation mScaleUpAnimation;
     private Animation mScaleDownAnimation;
 
-    private OnApplyAnimationCallback mTargetAnimationCallback;
     private Animation mOffsetTargetAnimation; // 滚动到指定位置
     private OnApplyAnimationCallback mStartAnimationCallback;
     private Animation mOffsetStartAnimation; // 滚动到开始位置
@@ -49,16 +52,22 @@ public class HeadViewContainer extends RelativeLayout {
 
     public HeadViewContainer(Context context) {
         super(context);
+
+        mDefaultTargetDistance = SuperSwipeRefreshLayout.dp2px(context, DEFAULT_TARGET_DISTANCE);
         initView();
     }
 
     public HeadViewContainer(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        mDefaultTargetDistance = SuperSwipeRefreshLayout.dp2px(context, DEFAULT_TARGET_DISTANCE);
         initView();
     }
 
     public HeadViewContainer(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+
+        mDefaultTargetDistance = SuperSwipeRefreshLayout.dp2px(context, DEFAULT_TARGET_DISTANCE);
         initView();
     }
 
@@ -134,14 +143,24 @@ public class HeadViewContainer extends RelativeLayout {
         attachAnimation(scaleAnimation, listener);
     }
 
-    public void startTargetAnimation(OnApplyAnimationCallback callback, HeadViewContainer.OnHeadAnimationCallback listener) {
-        mTargetAnimationCallback = callback;
-        Animation animation = getOffsetTargetAnimation();
-        animation.reset();
-        animation.setDuration(ANIMATE_TO_TRIGGER_DURATION);
-        animation.setInterpolator(new DecelerateInterpolator(DECELERATE_INTERPOLATION_FACTOR));
+    public void startTargetAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
+        if (null == mOffsetTargetAnimation) {
+            mOffsetTargetAnimation = new Animation() {
+                @Override
+                protected void applyTransformation(float interpolatedTime, Transformation t) {
+                    super.applyTransformation(interpolatedTime, t);
 
-        attachAnimation(animation, listener);
+                    int endTarget = mDefaultTargetDistance - Math.abs(mOriginalOffset);
+                    int offset = mCurrentTargetOffset + (int) ((endTarget - mCurrentTargetOffset) * interpolatedTime) - getTop();
+                    setTargetOffsetTopAndBottom(offset);
+                }
+            };
+        }
+        mOffsetTargetAnimation.reset();
+        mOffsetTargetAnimation.setDuration(ANIMATE_TO_TRIGGER_DURATION);
+        mOffsetTargetAnimation.setInterpolator(new DecelerateInterpolator(DECELERATE_INTERPOLATION_FACTOR));
+
+        attachAnimation(mOffsetTargetAnimation, listener);
     }
 
     public void startStartAnimation(OnApplyAnimationCallback callback, HeadViewContainer.OnHeadAnimationCallback listener) {
@@ -193,20 +212,6 @@ public class HeadViewContainer extends RelativeLayout {
         return mScaleDownAnimation;
     }
 
-    private Animation getOffsetTargetAnimation() {
-        if (null == mOffsetTargetAnimation) {
-            mOffsetTargetAnimation = new Animation() {
-                @Override
-                protected void applyTransformation(float interpolatedTime, Transformation t) {
-                    super.applyTransformation(interpolatedTime, t);
-                    if (null != mTargetAnimationCallback) {
-                        mTargetAnimationCallback.onApply(interpolatedTime);
-                    }
-                }
-            };
-        }
-        return mOffsetTargetAnimation;
-    }
 
     private Animation getOffsetStartAnimation() {
         if (null == mOffsetStartAnimation) {
@@ -249,6 +254,10 @@ public class HeadViewContainer extends RelativeLayout {
 
     public boolean isRefreshing() {
         return mIsRefreshing;
+    }
+
+    public int getDefaultTargetDistance() {
+        return mDefaultTargetDistance;
     }
 
     public interface OnApplyAnimationCallback {
