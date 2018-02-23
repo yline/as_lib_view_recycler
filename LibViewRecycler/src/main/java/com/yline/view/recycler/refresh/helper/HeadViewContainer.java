@@ -28,6 +28,10 @@ public class HeadViewContainer extends RelativeLayout {
     private OnHeadAnimationCallback mAnimationListener;
     private RelativeLayout mContainer;
 
+    private boolean mIsOffsetInit; // 顶部初始化距离是否计算过了
+    private int mOriginalOffset; // 顶部的初始距离，等于，负的头部高度
+    private int mCurrentTargetOffset; // 距离顶部的实时偏移量
+
     private Animation mScaleUpAnimation;
     private Animation mScaleDownAnimation;
 
@@ -60,6 +64,8 @@ public class HeadViewContainer extends RelativeLayout {
     private void initView() {
         LayoutInflater.from(getContext()).inflate(R.layout.view_recycler_head_refresh_container, this, true);
         mContainer = findViewById(R.id.view_recycler_head_refresh_container);
+
+        mIsOffsetInit = false;
     }
 
     @Override
@@ -208,6 +214,26 @@ public class HeadViewContainer extends RelativeLayout {
             };
         }
         return mOffsetStartAnimation;
+    }
+
+    public void initOffset(int originalOffset) {
+        if (!mIsOffsetInit) {
+            this.mIsOffsetInit = true;
+            this.mOriginalOffset = originalOffset;
+            this.mCurrentTargetOffset = originalOffset;
+        }
+    }
+
+    public int getOriginalOffset() {
+        return mOriginalOffset;
+    }
+
+    public int getCurrentTargetOffset() {
+        return mCurrentTargetOffset;
+    }
+
+    public void setCurrentTargetOffset(int targetOffset) {
+        this.mCurrentTargetOffset = targetOffset;
     }
 
     public interface OnApplyAnimationCallback {
