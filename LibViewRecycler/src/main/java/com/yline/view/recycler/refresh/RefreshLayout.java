@@ -176,9 +176,6 @@ class RefreshLayout extends ViewGroup {
 
             int offset = mHeadViewContainer.getDefaultTargetDistance() + mHeadViewContainer.getOriginalOffset() - mHeadViewContainer.getCurrentTargetOffset();
             mHeadViewContainer.setTargetOffsetTopAndBottom(offset);
-            if (Build.VERSION.SDK_INT < 11) {
-                invalidate();
-            }
 
             mHeadViewContainer.setVisibility(View.VISIBLE);
             mHeadViewContainer.startScaleUpAnimation(mRefreshListener);
@@ -196,7 +193,8 @@ class RefreshLayout extends ViewGroup {
             if (refreshing) {
                 mHeadViewContainer.startTargetAnimation(mRefreshListener);
             } else {
-                animateOffsetToStartPosition(mRefreshListener);
+                mHeadViewContainer.startStartAnimation(mRefreshListener);
+                resetTargetLayoutDelay(ANIMATE_TO_START_DURATION);
             }
         }
     }
@@ -224,27 +222,10 @@ class RefreshLayout extends ViewGroup {
             } else {
                 mHeadViewContainer.setVisibility(View.GONE);
                 mHeadViewContainer.setTargetOffsetTopAndBottom(mHeadViewContainer.getOriginalOffset() - mHeadViewContainer.getCurrentTargetOffset());
-                if (Build.VERSION.SDK_INT < 11) {
-                    invalidate();
-                }
             }
             mHeadViewContainer.setCurrentTargetOffset(mHeadViewContainer.getTop());
         }
     };
-
-
-    private void animateOffsetToStartPosition(HeadViewContainer.OnHeadAnimationCallback listener) {
-        final int startFrom = mHeadViewContainer.getCurrentTargetOffset();
-        mHeadViewContainer.startStartAnimation(new HeadViewContainer.OnApplyAnimationCallback() {
-            @Override
-            public void onApply(float interpolatedTime) {
-                int targetTop = (startFrom + (int) ((mHeadViewContainer.getOriginalOffset() - startFrom) * interpolatedTime));
-                int offset = targetTop - mHeadViewContainer.getTop();
-                mHeadViewContainer.setTargetOffsetTopAndBottom(offset);
-            }
-        }, listener);
-        resetTargetLayoutDelay(ANIMATE_TO_START_DURATION);
-    }
 
     /**
      * 重置Target位置
@@ -347,9 +328,6 @@ class RefreshLayout extends ViewGroup {
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mHeadViewContainer.setTargetOffsetTopAndBottom(mHeadViewContainer.getOriginalOffset() - mHeadViewContainer.getTop());
-                if (Build.VERSION.SDK_INT < 11) {
-                    invalidate();
-                }
                 mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
                 mIsBeingDragged = false;
                 final float initialMotionY = getMotionEventY(ev, mActivePointerId);
@@ -475,9 +453,6 @@ class RefreshLayout extends ViewGroup {
                         mHeadRefreshAdapter.onCreating(overScrollTop, mHeadViewContainer.getDefaultTargetDistance());
                     }
                     mHeadViewContainer.setTargetOffsetTopAndBottom(targetY - mHeadViewContainer.getCurrentTargetOffset());
-                    if (Build.VERSION.SDK_INT < 11) {
-                        invalidate();
-                    }
                 }
                 break;
             }
@@ -506,14 +481,14 @@ class RefreshLayout extends ViewGroup {
                     setRefreshing(true, true /* notify */);
                 } else {
                     mHeadViewContainer.setRefreshing(false);
-                    animateOffsetToStartPosition(new HeadViewContainer.OnHeadAnimationCallback() {
+                    mHeadViewContainer.startStartAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
                         @Override
                         public void onAnimationStart(Animation animation) {
-
                         }
 
                         @Override
                         public void onAnimationEnd(Animation animation) {
+                            resetTargetLayout();
                             mHeadViewContainer.startScaleDownAnimation(null);
                         }
                     });
@@ -584,15 +559,7 @@ class RefreshLayout extends ViewGroup {
                 } else {// 下拉到mFooterViewHeight
                     pushDistance = mFootViewHeight;
                 }
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-                    updateFooterViewPosition();
-                    if (pushDistance == mFootViewHeight && mFootLoadAdapter != null) {
-                        isFootLoading = true;
-                        mFootLoadAdapter.animate();
-                    }
-                } else {
-                    animatorFooterToBottom((int) overScrollBottom, pushDistance);
-                }
+                animatorFooterToBottom((int) overScrollBottom, pushDistance);
                 return false;
             }
             default:
@@ -644,13 +611,7 @@ class RefreshLayout extends ViewGroup {
      */
     public void setLoadMore(boolean loadMore) {
         if (!loadMore && isFootLoading) {// 停止加载
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-                isFootLoading = false;
-                pushDistance = 0;
-                updateFooterViewPosition();
-            } else {
-                animatorFooterToBottom(mFootViewHeight, 0);
-            }
+            animatorFooterToBottom(mFootViewHeight, 0);
         }
     }
 

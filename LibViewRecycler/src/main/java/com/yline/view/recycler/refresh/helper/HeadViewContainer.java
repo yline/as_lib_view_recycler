@@ -163,14 +163,38 @@ public class HeadViewContainer extends RelativeLayout {
         attachAnimation(mOffsetTargetAnimation, listener);
     }
 
-    public void startStartAnimation(OnApplyAnimationCallback callback, HeadViewContainer.OnHeadAnimationCallback listener) {
-        mStartAnimationCallback = callback;
-        Animation animation = getOffsetStartAnimation();
-        animation.reset();
-        animation.setDuration(ANIMATE_TO_START_DURATION);
-        animation.setInterpolator(new DecelerateInterpolator(DECELERATE_INTERPOLATION_FACTOR));
+    public void startStartAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
+        if (null == mOffsetStartAnimation) {
+            mOffsetStartAnimation = new Animation() {
+                @Override
+                protected void applyTransformation(float interpolatedTime, Transformation t) {
+                    super.applyTransformation(interpolatedTime, t);
 
-        attachAnimation(animation, listener);
+                    int offset = mCurrentTargetOffset + (int) ((mOriginalOffset - mCurrentTargetOffset) * interpolatedTime) - getTop();
+                    setTargetOffsetTopAndBottom(offset);
+                }
+            };
+        }
+        mOffsetStartAnimation.reset();
+        mOffsetStartAnimation.setDuration(ANIMATE_TO_START_DURATION);
+        mOffsetStartAnimation.setInterpolator(new DecelerateInterpolator(DECELERATE_INTERPOLATION_FACTOR));
+
+        attachAnimation(mOffsetStartAnimation, listener);
+    }
+
+    private Animation getOffsetStartAnimation() {
+        if (null == mOffsetStartAnimation) {
+            mOffsetStartAnimation = new Animation() {
+                @Override
+                protected void applyTransformation(float interpolatedTime, Transformation t) {
+                    super.applyTransformation(interpolatedTime, t);
+                    if (null != mStartAnimationCallback) {
+                        mStartAnimationCallback.onApply(interpolatedTime);
+                    }
+                }
+            };
+        }
+        return mOffsetStartAnimation;
     }
 
     /**
@@ -210,22 +234,6 @@ public class HeadViewContainer extends RelativeLayout {
             mScaleDownAnimation.setDuration(SCALE_DOWN_DURATION);
         }
         return mScaleDownAnimation;
-    }
-
-
-    private Animation getOffsetStartAnimation() {
-        if (null == mOffsetStartAnimation) {
-            mOffsetStartAnimation = new Animation() {
-                @Override
-                protected void applyTransformation(float interpolatedTime, Transformation t) {
-                    super.applyTransformation(interpolatedTime, t);
-                    if (null != mStartAnimationCallback) {
-                        mStartAnimationCallback.onApply(interpolatedTime);
-                    }
-                }
-            };
-        }
-        return mOffsetStartAnimation;
     }
 
     public void initOffset(int originalOffset) {
