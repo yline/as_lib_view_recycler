@@ -1,8 +1,6 @@
 package com.yline.view.recycler.refresh.helper;
 
-import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -69,23 +67,20 @@ public class RefreshChildHelper {
     }
 
     /**
+     * 经测试isChildInTop、isChildInBottom计算的结果如下
+     * 在顶部：true、false
+     * 顶部滑到中间：true、false
+     * 中间：false、false
+     * 在底部：false、true
+     * 底部滑到中间：false、true
+     * 结论：需要适配顶部或底部滑动到中间的情况
+     * 适配方案：通过移动偏移量，排除情况
      * 判断目标View是否滑动到顶部-还能否继续滑动
      *
      * @return true 在顶部
      */
-    public boolean isChildScrollToTop() {
-        if (Build.VERSION.SDK_INT < 14) {
-            if (mChildTarget instanceof AbsListView) {
-                final AbsListView absListView = (AbsListView) mChildTarget;
-                return !(absListView.getChildCount() > 0 && (absListView
-                        .getFirstVisiblePosition() > 0 || absListView
-                        .getChildAt(0).getTop() < absListView.getPaddingTop()));
-            } else {
-                return !(mChildTarget.getScrollY() > 0);
-            }
-        } else {
-            return !ViewCompat.canScrollVertically(mChildTarget, -1);
-        }
+    public boolean isChildInTop() {
+        return !mChildTarget.canScrollVertically(-1);
     }
 
     /**
@@ -93,8 +88,8 @@ public class RefreshChildHelper {
      *
      * @return true 在底部
      */
-    public boolean isChildScrollToBottom() {
-        if (isChildScrollToTop()) {
+    public boolean isChildInBottom() {
+        if (isChildInTop()) {
             return false;
         }
 

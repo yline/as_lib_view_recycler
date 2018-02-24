@@ -249,11 +249,6 @@ class RefreshLayout extends ViewGroup {
         return (null != mFootLoadAdapter && !mFootLoadAdapter.isTargetScroll());
     }
 
-    /**
-     * 主要判断是否应该拦截子View的事件<br>
-     * 如果拦截，则交给自己的OnTouchEvent处理<br>
-     * 否者，交给子View处理<br>
-     */
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         boolean isChildExist = mChildHelper.checkChild(this, mHeadViewContainer, mFootViewContainer);
@@ -261,65 +256,68 @@ class RefreshLayout extends ViewGroup {
             return false;
         }
 
-        final int action = MotionEventCompat.getActionMasked(ev);
-        boolean isChildScrollToBottom = mChildHelper.isChildScrollToBottom();
-        if (!isEnabled() || mHeadViewContainer.isRefreshing() || isFootLoading || (!mChildHelper.isChildScrollToTop() && !isChildScrollToBottom)) {
-            // 如果子View可以滑动，不拦截事件，交给子View处理-下拉刷新
-            // 或者子View没有滑动到底部不拦截事件-上拉加载更多
-            return false;
+        boolean isRefresh = mHeadViewContainer.isRefreshing() || isFootLoading;
+        // 控件可点击并且处于未刷新状态
+        if (isEnabled() && !isRefresh) {
+            boolean isChildInTop = mChildHelper.isChildInTop();
+            boolean isChildInBottom = mChildHelper.isChildInBottom();
+
+            // 子控件在顶部或者在底部时
+            if (isChildInTop || isChildInBottom) {
+                final int action = MotionEventCompat.getActionMasked(ev);
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                        mHeadViewContainer.setTargetOffsetTopAndBottom(mHeadViewContainer.getOriginalOffset() - mHeadViewContainer.getTop());
+                        mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
+                        mIsBeingDragged = false;
+                        final float initialMotionY = getMotionEventY(ev, mActivePointerId);
+                        if (initialMotionY == -1) {
+                            return false;
+                        }
+                        mInitialMotionY = initialMotionY;// 记录按下的位置
+                    case MotionEvent.ACTION_MOVE:
+                        if (mActivePointerId == INVALID_POINTER) {
+                            v("onInterceptTouchEvent", "mActivePointerId = " + mActivePointerId);
+                            return false;
+                        }
+
+                        final float y = getMotionEventY(ev, mActivePointerId);
+                        if (y == -1) {
+                            return false;
+                        }
+
+                        float yDiff = 0;
+                        if (isChildInBottom) {
+                            yDiff = mInitialMotionY - y;// 计算上拉距离
+                            if (yDiff > touchSlop && !mIsBeingDragged) {// 判断是否下拉的距离足够
+                                mIsBeingDragged = true;// 正在上拉
+                            }
+                        } else {
+                            yDiff = y - mInitialMotionY;// 计算下拉距离
+                            if (yDiff > touchSlop && !mIsBeingDragged) {// 判断是否下拉的距离足够
+                                mIsBeingDragged = true;// 正在下拉
+                            }
+                        }
+                        break;
+
+                    case MotionEventCompat.ACTION_POINTER_UP:
+                        onSecondaryPointerUp(ev);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        mIsBeingDragged = false;
+                        mActivePointerId = INVALID_POINTER;
+                        break;
+                    default:
+                        break;
+                }
+
+                return mIsBeingDragged;// 如果正在拖动，则拦截子View的事件
+            }
         }
 
-        // 下拉刷新判断
-        switch (action) {
-            case MotionEvent.ACTION_DOWN:
-                mHeadViewContainer.setTargetOffsetTopAndBottom(mHeadViewContainer.getOriginalOffset() - mHeadViewContainer.getTop());
-                mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
-                mIsBeingDragged = false;
-                final float initialMotionY = getMotionEventY(ev, mActivePointerId);
-                if (initialMotionY == -1) {
-                    return false;
-                }
-                mInitialMotionY = initialMotionY;// 记录按下的位置
-
-            case MotionEvent.ACTION_MOVE:
-                if (mActivePointerId == INVALID_POINTER) {
-                    v("onInterceptTouchEvent", "mActivePointerId = " + mActivePointerId);
-                    return false;
-                }
-
-                final float y = getMotionEventY(ev, mActivePointerId);
-                if (y == -1) {
-                    return false;
-                }
-
-                float yDiff = 0;
-                if (isChildScrollToBottom) {
-                    yDiff = mInitialMotionY - y;// 计算上拉距离
-                    if (yDiff > touchSlop && !mIsBeingDragged) {// 判断是否下拉的距离足够
-                        mIsBeingDragged = true;// 正在上拉
-                    }
-                } else {
-                    yDiff = y - mInitialMotionY;// 计算下拉距离
-                    if (yDiff > touchSlop && !mIsBeingDragged) {// 判断是否下拉的距离足够
-                        mIsBeingDragged = true;// 正在下拉
-                    }
-                }
-                break;
-
-            case MotionEventCompat.ACTION_POINTER_UP:
-                onSecondaryPointerUp(ev);
-                break;
-
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                mIsBeingDragged = false;
-                mActivePointerId = INVALID_POINTER;
-                break;
-            default:
-                break;
-        }
-
-        return mIsBeingDragged;// 如果正在拖动，则拦截子View的事件
+        return false;
     }
 
     private float getMotionEventY(MotionEvent ev, int activePointerId) {
@@ -334,17 +332,24 @@ class RefreshLayout extends ViewGroup {
     public boolean onTouchEvent(MotionEvent ev) {
         final int action = MotionEventCompat.getActionMasked(ev);
 
-        boolean isChildScrollToBottom = mChildHelper.isChildScrollToBottom();
-        if (!isEnabled() || (!mChildHelper.isChildScrollToTop() && !isChildScrollToBottom)) {
-            // 如果子View可以滑动，不拦截事件，交给子View处理
-            return false;
+        boolean isChildInTop = mChildHelper.isChildInTop();
+        boolean isChildInBottom = mChildHelper.isChildInBottom();
+        v("onTouchEvent", "isChildInTop = " + isChildInTop + ", isChildInBottom = " + isChildInBottom);
+
+        // 该控件处于可处理点击事件状态
+        if (isEnabled()) {
+            // 处于底部，处理上拉加载逻辑
+            if (isChildInBottom){
+                return handlerFootLoadTouchEvent(ev, action);
+            }
+
+            // 处于顶部，处理下拉刷新逻辑
+            if (isChildInTop){
+                return handlerHeadRefreshTouchEvent(ev, action);
+            }
         }
 
-        if (isChildScrollToBottom) {// 上拉加载更多
-            return handlerFootLoadTouchEvent(ev, action);
-        } else {// 下拉刷新
-            return handlerHeadRefreshTouchEvent(ev, action);
-        }
+        return false;
     }
 
     private boolean handlerHeadRefreshTouchEvent(MotionEvent ev, int action) {
