@@ -9,7 +9,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
-import android.os.Handler;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
@@ -178,9 +177,21 @@ class RefreshLayout extends ViewGroup {
             mHeadViewContainer.setTargetOffsetTopAndBottom(offset);
 
             mHeadViewContainer.setVisibility(View.VISIBLE);
-            mHeadViewContainer.startScaleUpAnimation(mRefreshListener);
+            mHeadViewContainer.startScaleUpAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    if (mNotify && null != mHeadRefreshAdapter) {
+                        mHeadRefreshAdapter.animate();
+                    }
+                    mHeadViewContainer.setCurrentTargetOffset(mHeadViewContainer.getTop());
+                }
+            });
         } else {
-            setRefreshing(false, false /* notify */);
+            setRefreshing(false, false);
         }
     }
 
@@ -191,55 +202,38 @@ class RefreshLayout extends ViewGroup {
 
             mChildHelper.checkChild(this, mHeadViewContainer, mFootViewContainer);
             if (refreshing) {
-                mHeadViewContainer.startTargetAnimation(mRefreshListener);
-            } else {
-                mHeadViewContainer.startStartAnimation(mRefreshListener);
-                resetTargetLayoutDelay(ANIMATE_TO_START_DURATION);
-            }
-        }
-    }
-
-    /**
-     * 重置Target位置
-     *
-     * @param delay
-     */
-    public void resetTargetLayoutDelay(int delay) {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                resetTargetLayout();
-            }
-        }, delay);
-    }
-
-    /**
-     * 下拉时，超过距离之后，弹回来的动画监听器
-     */
-    /**
-     * 下拉时，没有到有之间的平移动画
-     */
-    private HeadViewContainer.OnHeadAnimationCallback mRefreshListener = new HeadViewContainer.OnHeadAnimationCallback() {
-        @Override
-        public void onAnimationStart(Animation animation) {
-        }
-
-        @Override
-        public void onAnimationEnd(Animation animation) {
-            v("mRefreshListener onAnimationEnd", "isRefreshing = " + mHeadViewContainer.isRefreshing() + ", mNotify = " + mNotify);
-            if (mHeadViewContainer.isRefreshing()) {
-                if (mNotify) {
-                    if (mHeadRefreshAdapter != null) {
-                        mHeadRefreshAdapter.animate();
+                mHeadViewContainer.startTargetAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
                     }
-                }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        if (mNotify && null != mHeadRefreshAdapter) {
+                            mHeadRefreshAdapter.animate();
+                        }
+                        mHeadViewContainer.setCurrentTargetOffset(mHeadViewContainer.getTop());
+                    }
+                });
             } else {
-                mHeadViewContainer.setVisibility(View.GONE);
-                mHeadViewContainer.setTargetOffsetTopAndBottom(mHeadViewContainer.getOriginalOffset() - mHeadViewContainer.getCurrentTargetOffset());
+                mHeadViewContainer.startStartAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        mHeadViewContainer.setVisibility(View.GONE);
+                        mHeadViewContainer.setTargetOffsetTopAndBottom(mHeadViewContainer.getOriginalOffset() - mHeadViewContainer.getCurrentTargetOffset());
+                        mHeadViewContainer.setCurrentTargetOffset(mHeadViewContainer.getTop());
+
+                        resetTargetLayout();
+                    }
+                });
             }
-            mHeadViewContainer.setCurrentTargetOffset(mHeadViewContainer.getTop());
         }
-    };
+    }
 
     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
