@@ -21,7 +21,6 @@ import com.yline.view.recycler.refresh.SuperSwipeRefreshLayout;
  * @version 1.0.0
  */
 public class HeadViewContainer extends RelativeLayout {
-    private static final int SCALE_DOWN_DURATION = 150;
     private static final int ANIMATE_TO_TRIGGER_DURATION = 200;
     private static final int ANIMATE_TO_START_DURATION = 200;
     private static final float DECELERATE_INTERPOLATION_FACTOR = 2f;
@@ -32,13 +31,13 @@ public class HeadViewContainer extends RelativeLayout {
     private OnHeadAnimationCallback mAnimationListener;
     private RelativeLayout mContainer;
 
-    private boolean mIsRefreshing;
+    private boolean mIsNotify; // 标记量：是否通知用户正在刷新状态
+    private boolean mIsRefreshing; // 标记量：是否在刷新
     private boolean mIsOffsetInit; // 顶部初始化距离是否计算过了
     private int mOriginalOffset; // 顶部的初始距离，等于，负的头部高度
     private int mCurrentTargetOffset; // 距离顶部的实时偏移量
 
     private Animation mScaleUpAnimation;
-    private Animation mScaleDownAnimation;
 
     private Animation mMoveTargetAnimation; // 滚动到指定位置
     private Animation mMoveDownAnimation; // 滚动到开始位置
@@ -78,14 +77,6 @@ public class HeadViewContainer extends RelativeLayout {
     }
 
     @Override
-    protected void onAnimationStart() {
-        super.onAnimationStart();
-        if (null != mAnimationListener) {
-            mAnimationListener.onAnimationStart(getAnimation());
-        }
-    }
-
-    @Override
     protected void onAnimationEnd() {
         super.onAnimationEnd();
         if (null != mAnimationListener) {
@@ -118,9 +109,81 @@ public class HeadViewContainer extends RelativeLayout {
     /**
      * 非用户下拉时，实现放大动画背景，再加载动画效果
      *
-     * @param listener 放大动画的回调
+     * @param callback 放大动画的回调
      */
-    public void scaleUpAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
+    public void scaleUpRefresh(@NonNull final OnHeadAnimationCallback callback) {
+        if (!mIsRefreshing) {
+            mIsRefreshing = true;
+            mIsNotify = true;
+
+            scaleUpAnimation(new OnHeadAnimationCallback() {
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    mCurrentTargetOffset = getTop();
+                    if (mIsNotify) {
+                        callback.onAnimationEnd(animation);
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * 用户手指滑动，移动到指定位置，开始刷新动画
+     *
+     * @param callback 移动到指定位置的动画回调
+     */
+    public void moveTargetRefresh(@NonNull final OnHeadAnimationCallback callback) {
+        if (!mIsRefreshing) {
+            mIsRefreshing = true;
+            mIsNotify = true;
+
+            moveTargetAnimation(new OnHeadAnimationCallback() {
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    mCurrentTargetOffset = getTop();
+                    if (mIsNotify) {
+                        callback.onAnimationEnd(animation);
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * 用户手指滑动，未滑动超过指定位置，取消刷新，自动回滚到消失位置
+     *
+     * @param callback 取消刷新操作的动画回调
+     */
+    public void moveDownRefreshCancel(OnHeadAnimationCallback callback) {
+        mIsRefreshing = false;
+        moveDownAnimation(callback);
+    }
+
+    /**
+     * 用户手指滑动，超过指定位置，刷新结束，回滚到消失位置
+     *
+     * @param callback 指定位置移动消失的动画回调
+     */
+    public void moveDownRefresh(@NonNull final OnHeadAnimationCallback callback) {
+        if (mIsRefreshing) {
+            mIsRefreshing = false;
+            mIsNotify = false;
+
+            moveDownAnimation(new OnHeadAnimationCallback() {
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    setVisibility(GONE);
+                    setTargetOffsetTopAndBottom(mOriginalOffset - mCurrentTargetOffset);
+                    mCurrentTargetOffset = getTop();
+
+                    callback.onAnimationEnd(animation);
+                }
+            });
+        }
+    }
+
+    private void scaleUpAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
         // 动画
         if (null == mScaleUpAnimation) {
             mScaleUpAnimation = new Animation() {
@@ -146,28 +209,7 @@ public class HeadViewContainer extends RelativeLayout {
         attachAnimation(mScaleUpAnimation, listener);
     }
 
-    public void scaleDownAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
-        if (null == mScaleDownAnimation) {
-            mScaleDownAnimation = new Animation() {
-                @Override
-                protected void applyTransformation(float interpolatedTime, Transformation t) {
-                    super.applyTransformation(interpolatedTime, t);
-
-                    setScaleX(1 - interpolatedTime);
-                    setScaleY(1 - interpolatedTime);
-                }
-            };
-            mScaleDownAnimation.setDuration(SCALE_DOWN_DURATION);
-        }
-        attachAnimation(mScaleDownAnimation, listener);
-    }
-
-    /**
-     * 用户手指滑动，移动到指定位置，开始刷新动画
-     *
-     * @param listener 移动到指定位置的动画回调
-     */
-    public void moveTargetAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
+    private void moveTargetAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
         if (null == mMoveTargetAnimation) {
             mMoveTargetAnimation = new Animation() {
                 @Override
@@ -187,12 +229,7 @@ public class HeadViewContainer extends RelativeLayout {
         attachAnimation(mMoveTargetAnimation, listener);
     }
 
-    /**
-     * 快速移动到消失位置，消失后，停止刷新动画
-     *
-     * @param listener 指定位置移动消失的动画回调
-     */
-    public void moveDownAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
+    private void moveDownAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
         if (null == mMoveDownAnimation) {
             mMoveDownAnimation = new Animation() {
                 @Override
@@ -217,7 +254,7 @@ public class HeadViewContainer extends RelativeLayout {
      * @param animation 动画
      * @param listener  回调
      */
-    public void attachAnimation(Animation animation, OnHeadAnimationCallback listener) {
+    private void attachAnimation(Animation animation, OnHeadAnimationCallback listener) {
         this.mAnimationListener = listener;
         clearAnimation();
         startAnimation(animation);
@@ -231,7 +268,7 @@ public class HeadViewContainer extends RelativeLayout {
     public void setTargetOffsetTopAndBottom(int offset) {
         bringToFront();
         offsetTopAndBottom(offset);
-        setCurrentTargetOffset(getTop());
+        mCurrentTargetOffset = getTop();
     }
 
     public void initOffset(int originalOffset) {
@@ -250,14 +287,6 @@ public class HeadViewContainer extends RelativeLayout {
         return mCurrentTargetOffset;
     }
 
-    public void setCurrentTargetOffset(int targetOffset) {
-        this.mCurrentTargetOffset = targetOffset;
-    }
-
-    public void setRefreshing(boolean isRefreshing) {
-        this.mIsRefreshing = isRefreshing;
-    }
-
     public boolean isRefreshing() {
         return mIsRefreshing;
     }
@@ -267,13 +296,6 @@ public class HeadViewContainer extends RelativeLayout {
     }
 
     public interface OnHeadAnimationCallback {
-        /**
-         * 动画开始
-         *
-         * @param animation 动画
-         */
-        void onAnimationStart(Animation animation);
-
         /**
          * 动画结束
          *

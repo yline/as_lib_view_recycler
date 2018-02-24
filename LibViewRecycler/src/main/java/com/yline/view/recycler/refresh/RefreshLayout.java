@@ -65,7 +65,6 @@ class RefreshLayout extends ViewGroup {
     private float mInitialMotionY;
     private boolean mIsBeingDragged;
     private int mActivePointerId = INVALID_POINTER;
-    private boolean mNotify;
     private int pushDistance = 0;
 
     /* ---------------------------------- 常量 ---------------------------------- */
@@ -162,80 +161,25 @@ class RefreshLayout extends ViewGroup {
     }
 
     /**
-     * Notify the widget that refresh state has changed. Do not call this when
-     * refresh is triggered by a swipe gesture.
+     * 用户直接指定是否刷新
      *
-     * @param refreshing Whether or not the view should show refresh progress.
+     * @param refreshing true{立即刷新，从小变大动画}，false{刷新动画消失}
      */
     public void setRefreshing(boolean refreshing) {
         if (refreshing) {
-            scaleUpRefresh();
+            mHeadViewContainer.scaleUpRefresh(new HeadViewContainer.OnHeadAnimationCallback() {
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    if (null != mHeadRefreshAdapter) {
+                        mHeadRefreshAdapter.animate();
+                    }
+                }
+            });
         } else {
-            stopRefresh();
-        }
-    }
-
-    private void scaleUpRefresh() {
-        if (!mHeadViewContainer.isRefreshing()) {
-            mHeadViewContainer.setRefreshing(true);
-            mNotify = true;
-
-            mHeadViewContainer.scaleUpAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    if (mNotify && null != mHeadRefreshAdapter) {
-                        mHeadRefreshAdapter.animate();
-                    }
-                    mHeadViewContainer.setCurrentTargetOffset(mHeadViewContainer.getTop());
-                }
-            });
-        }
-    }
-
-    private void startRefresh() {
-        if (!mHeadViewContainer.isRefreshing()) {
-            mHeadViewContainer.setRefreshing(true);
-            mNotify = true;
-
             mChildHelper.checkChild(this, mHeadViewContainer, mFootViewContainer);
-            mHeadViewContainer.moveTargetAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                }
-
+            mHeadViewContainer.moveDownRefresh(new HeadViewContainer.OnHeadAnimationCallback() {
                 @Override
                 public void onAnimationEnd(Animation animation) {
-                    if (mNotify && null != mHeadRefreshAdapter) {
-                        mHeadRefreshAdapter.animate();
-                    }
-                    mHeadViewContainer.setCurrentTargetOffset(mHeadViewContainer.getTop());
-                }
-            });
-        }
-    }
-
-    private void stopRefresh() {
-        if (mHeadViewContainer.isRefreshing()) {
-            mHeadViewContainer.setRefreshing(false);
-            mNotify = false;
-
-            mChildHelper.checkChild(this, mHeadViewContainer, mFootViewContainer);
-            mHeadViewContainer.moveDownAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    mHeadViewContainer.setVisibility(View.GONE);
-                    mHeadViewContainer.setTargetOffsetTopAndBottom(mHeadViewContainer.getOriginalOffset() - mHeadViewContainer.getCurrentTargetOffset());
-                    mHeadViewContainer.setCurrentTargetOffset(mHeadViewContainer.getTop());
-
                     resetTargetLayout();
                 }
             });
@@ -407,11 +351,6 @@ class RefreshLayout extends ViewGroup {
         }
     }
 
-    @Override
-    public boolean onInterceptHoverEvent(MotionEvent event) {
-        return super.onInterceptHoverEvent(event);
-    }
-
     private boolean handlerHeadRefreshTouchEvent(MotionEvent ev, int action) {
         switch (action) {
             case MotionEvent.ACTION_DOWN:
@@ -479,18 +418,20 @@ class RefreshLayout extends ViewGroup {
                 final float overScrollTop = (y - mInitialMotionY) * DRAG_RATE;
                 mIsBeingDragged = false;
                 if (overScrollTop > mHeadViewContainer.getDefaultTargetDistance()) {
-                    startRefresh();
-                } else {
-                    mHeadViewContainer.setRefreshing(false);
-                    mHeadViewContainer.moveDownAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
+                    mChildHelper.checkChild(this, mHeadViewContainer, mFootViewContainer);
+                    mHeadViewContainer.moveTargetRefresh(new HeadViewContainer.OnHeadAnimationCallback() {
                         @Override
-                        public void onAnimationStart(Animation animation) {
+                        public void onAnimationEnd(Animation animation) {
+                            if (null != mHeadRefreshAdapter) {
+                                mHeadRefreshAdapter.animate();
+                            }
                         }
-
+                    });
+                } else {
+                    mHeadViewContainer.moveDownRefreshCancel(new HeadViewContainer.OnHeadAnimationCallback() {
                         @Override
                         public void onAnimationEnd(Animation animation) {
                             resetTargetLayout();
-                            mHeadViewContainer.scaleDownAnimation(null);
                         }
                     });
                 }
