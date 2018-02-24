@@ -37,7 +37,7 @@ public class SimpleRefreshActivity extends BaseAppCompatActivity {
 
         swipeRefreshLayout.setOnRefreshListener(new AbstractRefreshAdapter.OnSwipeListener() {
             @Override
-            public void onAnimate() {
+            public void onRefresh() {
                 SDKManager.getHandler().postDelayed(new Runnable() {
 
                     @Override
@@ -52,7 +52,7 @@ public class SimpleRefreshActivity extends BaseAppCompatActivity {
         });
         swipeRefreshLayout.setOnLoadListener(new AbstractRefreshAdapter.OnSwipeListener() {
             @Override
-            public void onAnimate() {
+            public void onRefresh() {
                 SDKManager.getHandler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -72,16 +72,16 @@ public class SimpleRefreshActivity extends BaseAppCompatActivity {
             @Override
             public void onClick(View v) {
                 swipeRefreshLayout.setRefreshing(true);
-                SDKManager.getHandler().postDelayed(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        swipeRefreshLayout.setRefreshing(false);
-                        // 更新recyclerView
-                        recyclerAdapter.add(0, "Refresh Item + " + new Random().nextInt(300), true);
-                        recyclerView.scrollToPosition(0);
-                    }
-                }, 4000);
+//                SDKManager.getHandler().postDelayed(new Runnable() {
+//
+//                    @Override
+//                    public void run() {
+//                        swipeRefreshLayout.setRefreshing(false);
+//                        // 更新recyclerView
+//                        recyclerAdapter.add(0, "Refresh Item + " + new Random().nextInt(300), true);
+//                        recyclerView.scrollToPosition(0);
+//                    }
+//                }, 4000);
             }
         });
     }

@@ -38,7 +38,9 @@ import com.yline.view.recycler.refresh.helper.RefreshChildHelper;
  */
 @SuppressLint("ClickableViewAccessibility")
 class RefreshLayout extends ViewGroup {
-    private static final String LOG_TAG = "CustomSwipe";
+    public static void v(String tag, String msg) {
+        Log.v("xxx-", tag + " : " + msg);
+    }
 
     // 数据
     private final int mHeadViewHeight;
@@ -170,7 +172,7 @@ class RefreshLayout extends ViewGroup {
     public void setRefreshing(boolean refreshing) {
         if (refreshing && !mHeadViewContainer.isRefreshing()) {
             mHeadViewContainer.setRefreshing(true);
-            mNotify = false;
+            mNotify = true;
 
             int offset = mHeadViewContainer.getDefaultTargetDistance() + mHeadViewContainer.getOriginalOffset() - mHeadViewContainer.getCurrentTargetOffset();
             mHeadViewContainer.setTargetOffsetTopAndBottom(offset);
@@ -194,13 +196,16 @@ class RefreshLayout extends ViewGroup {
             if (refreshing) {
                 mHeadViewContainer.startTargetAnimation(mRefreshListener);
             } else {
-                animateOffsetToStartPosition(mHeadViewContainer.getCurrentTargetOffset(), mRefreshListener);
+                animateOffsetToStartPosition(mRefreshListener);
             }
         }
     }
 
     /**
      * 下拉时，超过距离之后，弹回来的动画监听器
+     */
+    /**
+     * 下拉时，没有到有之间的平移动画
      */
     private HeadViewContainer.OnHeadAnimationCallback mRefreshListener = new HeadViewContainer.OnHeadAnimationCallback() {
         @Override
@@ -209,6 +214,7 @@ class RefreshLayout extends ViewGroup {
 
         @Override
         public void onAnimationEnd(Animation animation) {
+            v("mRefreshListener onAnimationEnd", "isRefreshing = " + mHeadViewContainer.isRefreshing() + ", mNotify = " + mNotify);
             if (mHeadViewContainer.isRefreshing()) {
                 if (mNotify) {
                     if (mHeadRefreshAdapter != null) {
@@ -227,8 +233,8 @@ class RefreshLayout extends ViewGroup {
     };
 
 
-    private void animateOffsetToStartPosition(int from, HeadViewContainer.OnHeadAnimationCallback listener) {
-        final int startFrom = from;
+    private void animateOffsetToStartPosition(HeadViewContainer.OnHeadAnimationCallback listener) {
+        final int startFrom = mHeadViewContainer.getCurrentTargetOffset();
         mHeadViewContainer.startStartAnimation(new HeadViewContainer.OnApplyAnimationCallback() {
             @Override
             public void onApply(float interpolatedTime) {
@@ -354,7 +360,7 @@ class RefreshLayout extends ViewGroup {
 
             case MotionEvent.ACTION_MOVE:
                 if (mActivePointerId == INVALID_POINTER) {
-                    Log.e(LOG_TAG, "Got ACTION_MOVE event but don't have an active pointer id.");
+                    v("onInterceptTouchEvent", "mActivePointerId = " + mActivePointerId);
                     return false;
                 }
 
@@ -437,7 +443,7 @@ class RefreshLayout extends ViewGroup {
             case MotionEvent.ACTION_MOVE: {
                 final int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
                 if (pointerIndex < 0) {
-                    Log.e(LOG_TAG, "Got ACTION_MOVE event but have an invalid active pointer id.");
+                    v("handlerHeadRefreshTouchEvent", "pointerIndex = " + pointerIndex);
                     return false;
                 }
 
@@ -488,9 +494,7 @@ class RefreshLayout extends ViewGroup {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL: {
                 if (mActivePointerId == INVALID_POINTER) {
-                    if (action == MotionEvent.ACTION_UP) {
-                        Log.e(LOG_TAG, "Got ACTION_UP event but don't have an active pointer id.");
-                    }
+                    v("handlerHeadRefreshTouchEvent", "mActivePointerId = " + mActivePointerId);
                     return false;
                 }
                 final int pointerIndex = MotionEventCompat.findPointerIndex(ev,
@@ -502,7 +506,7 @@ class RefreshLayout extends ViewGroup {
                     setRefreshing(true, true /* notify */);
                 } else {
                     mHeadViewContainer.setRefreshing(false);
-                    animateOffsetToStartPosition(mHeadViewContainer.getCurrentTargetOffset(), new HeadViewContainer.OnHeadAnimationCallback() {
+                    animateOffsetToStartPosition(new HeadViewContainer.OnHeadAnimationCallback() {
                         @Override
                         public void onAnimationStart(Animation animation) {
 
@@ -541,7 +545,7 @@ class RefreshLayout extends ViewGroup {
                 final int pointerIndex = MotionEventCompat.findPointerIndex(ev,
                         mActivePointerId);
                 if (pointerIndex < 0) {
-                    Log.e(LOG_TAG, "Got ACTION_MOVE event but have an invalid active pointer id.");
+                    v("handlerFootLoadTouchEvent", "pointerIndex = " + pointerIndex);
                     return false;
                 }
                 final float y = MotionEventCompat.getY(ev, pointerIndex);
@@ -567,9 +571,7 @@ class RefreshLayout extends ViewGroup {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL: {
                 if (mActivePointerId == INVALID_POINTER) {
-                    if (action == MotionEvent.ACTION_UP) {
-                        Log.e(LOG_TAG, "Got ACTION_UP event but don't have an active pointer id.");
-                    }
+                    v("handlerFootLoadTouchEvent", "mActivePointerId = " + mActivePointerId);
                     return false;
                 }
                 final int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);

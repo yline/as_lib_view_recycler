@@ -83,7 +83,7 @@ public class CustomRefreshActivity extends BaseAppCompatActivity {
         /*swipeRefreshLayout.setOnLoadListener(new ViewSwipeRefreshLayout.OnSwipeListener()
         {
 			@Override
-			public void onAnimate()
+			public void onRefresh()
 			{
 				new Handler().postDelayed(new Runnable()
 				{

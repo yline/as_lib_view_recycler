@@ -66,7 +66,7 @@ public abstract class AbstractRefreshAdapter {
     public void animate() {
         onAnimate();
         if (null != mOnRefreshListener) {
-            mOnRefreshListener.onAnimate();
+            mOnRefreshListener.onRefresh();
         }
     }
 
@@ -75,8 +75,8 @@ public abstract class AbstractRefreshAdapter {
      */
     public interface OnSwipeListener {
         /**
-         * 动画中
+         * 正在执行动画，等待用户手动调用结束
          */
-        void onAnimate();
+        void onRefresh();
     }
 }
