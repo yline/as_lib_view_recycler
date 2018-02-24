@@ -118,6 +118,7 @@ public class HeadViewContainer extends RelativeLayout {
 
     /**
      * 开启动画
+     * 
      *
      * @param listener 回调
      */
@@ -139,8 +140,19 @@ public class HeadViewContainer extends RelativeLayout {
     }
 
     public void startScaleDownAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
-        Animation scaleAnimation = getScaleDownAnimation();
-        attachAnimation(scaleAnimation, listener);
+        if (null == mScaleDownAnimation) {
+            mScaleDownAnimation = new Animation() {
+                @Override
+                protected void applyTransformation(float interpolatedTime, Transformation t) {
+                    super.applyTransformation(interpolatedTime, t);
+
+                    setScaleX(1 - interpolatedTime);
+                    setScaleY(1 - interpolatedTime);
+                }
+            };
+            mScaleDownAnimation.setDuration(SCALE_DOWN_DURATION);
+        }
+        attachAnimation(mScaleDownAnimation, listener);
     }
 
     public void startTargetAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
@@ -203,22 +215,6 @@ public class HeadViewContainer extends RelativeLayout {
         bringToFront();
         offsetTopAndBottom(offset);
         setCurrentTargetOffset(getTop());
-    }
-
-    private Animation getScaleDownAnimation() {
-        if (null == mScaleDownAnimation) {
-            mScaleDownAnimation = new Animation() {
-                @Override
-                protected void applyTransformation(float interpolatedTime, Transformation t) {
-                    super.applyTransformation(interpolatedTime, t);
-
-                    setScaleX(1 - interpolatedTime);
-                    setScaleY(1 - interpolatedTime);
-                }
-            };
-            mScaleDownAnimation.setDuration(SCALE_DOWN_DURATION);
-        }
-        return mScaleDownAnimation;
     }
 
     public void initOffset(int originalOffset) {

@@ -191,47 +191,53 @@ class RefreshLayout extends ViewGroup {
                 }
             });
         } else {
-            setRefreshing(false, false);
+            stopRefresh();
         }
     }
 
-    private void setRefreshing(boolean refreshing, final boolean notify) {
-        if (mHeadViewContainer.isRefreshing() != refreshing) {
-            mHeadViewContainer.setRefreshing(refreshing);
-            mNotify = notify;
+    private void startRefresh() {
+        if (!mHeadViewContainer.isRefreshing()) {
+            mHeadViewContainer.setRefreshing(true);
+            mNotify = true;
 
             mChildHelper.checkChild(this, mHeadViewContainer, mFootViewContainer);
-            if (refreshing) {
-                mHeadViewContainer.startTargetAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-                    }
+            mHeadViewContainer.startTargetAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+                }
 
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        if (mNotify && null != mHeadRefreshAdapter) {
-                            mHeadRefreshAdapter.animate();
-                        }
-                        mHeadViewContainer.setCurrentTargetOffset(mHeadViewContainer.getTop());
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    if (mNotify && null != mHeadRefreshAdapter) {
+                        mHeadRefreshAdapter.animate();
                     }
-                });
-            } else {
-                mHeadViewContainer.startStartAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
+                    mHeadViewContainer.setCurrentTargetOffset(mHeadViewContainer.getTop());
+                }
+            });
+        }
+    }
 
-                    }
+    private void stopRefresh() {
+        if (mHeadViewContainer.isRefreshing()) {
+            mHeadViewContainer.setRefreshing(false);
+            mNotify = false;
 
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        mHeadViewContainer.setVisibility(View.GONE);
-                        mHeadViewContainer.setTargetOffsetTopAndBottom(mHeadViewContainer.getOriginalOffset() - mHeadViewContainer.getCurrentTargetOffset());
-                        mHeadViewContainer.setCurrentTargetOffset(mHeadViewContainer.getTop());
+            mChildHelper.checkChild(this, mHeadViewContainer, mFootViewContainer);
+            mHeadViewContainer.startStartAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
+                @Override
+                public void onAnimationStart(Animation animation) {
 
-                        resetTargetLayout();
-                    }
-                });
-            }
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    mHeadViewContainer.setVisibility(View.GONE);
+                    mHeadViewContainer.setTargetOffsetTopAndBottom(mHeadViewContainer.getOriginalOffset() - mHeadViewContainer.getCurrentTargetOffset());
+                    mHeadViewContainer.setCurrentTargetOffset(mHeadViewContainer.getTop());
+
+                    resetTargetLayout();
+                }
+            });
         }
     }
 
@@ -472,7 +478,7 @@ class RefreshLayout extends ViewGroup {
                 final float overScrollTop = (y - mInitialMotionY) * DRAG_RATE;
                 mIsBeingDragged = false;
                 if (overScrollTop > mHeadViewContainer.getDefaultTargetDistance()) {
-                    setRefreshing(true, true /* notify */);
+                    startRefresh();
                 } else {
                     mHeadViewContainer.setRefreshing(false);
                     mHeadViewContainer.startStartAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
