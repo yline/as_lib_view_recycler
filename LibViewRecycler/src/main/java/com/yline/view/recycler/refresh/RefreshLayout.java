@@ -9,7 +9,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
-import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -264,11 +263,11 @@ class RefreshLayout extends ViewGroup {
 
             // 子控件在顶部或者在底部时
             if (isChildInTop || isChildInBottom) {
-                final int action = MotionEventCompat.getActionMasked(ev);
+                final int action = ev.getActionMasked();
                 switch (action) {
                     case MotionEvent.ACTION_DOWN:
                         mHeadViewContainer.setTargetOffsetTopAndBottom(mHeadViewContainer.getOriginalOffset() - mHeadViewContainer.getTop());
-                        mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
+                        mActivePointerId = ev.getPointerId(0);
                         mIsBeingDragged = false;
                         final float initialMotionY = getMotionEventY(ev, mActivePointerId);
                         if (initialMotionY == -1) {
@@ -286,7 +285,7 @@ class RefreshLayout extends ViewGroup {
                             return false;
                         }
 
-                        float yDiff = 0;
+                        float yDiff;
                         if (isChildInBottom) {
                             yDiff = mInitialMotionY - y;// 计算上拉距离
                             if (yDiff > touchSlop && !mIsBeingDragged) {// 判断是否下拉的距离足够
@@ -299,11 +298,9 @@ class RefreshLayout extends ViewGroup {
                             }
                         }
                         break;
-
-                    case MotionEventCompat.ACTION_POINTER_UP:
+                    case MotionEvent.ACTION_POINTER_UP:
                         onSecondaryPointerUp(ev);
                         break;
-
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
                         mIsBeingDragged = false;
@@ -321,16 +318,16 @@ class RefreshLayout extends ViewGroup {
     }
 
     private float getMotionEventY(MotionEvent ev, int activePointerId) {
-        final int index = MotionEventCompat.findPointerIndex(ev, activePointerId);
+        final int index = ev.findPointerIndex(activePointerId);
         if (index < 0) {
             return -1;
         }
-        return MotionEventCompat.getY(ev, index);
+        return ev.getY(index);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        final int action = MotionEventCompat.getActionMasked(ev);
+        final int action = ev.getActionMasked();
 
         boolean isChildInTop = mChildHelper.isChildInTop();
         boolean isChildInBottom = mChildHelper.isChildInBottom();
@@ -339,12 +336,12 @@ class RefreshLayout extends ViewGroup {
         // 该控件处于可处理点击事件状态
         if (isEnabled()) {
             // 处于底部，处理上拉加载逻辑
-            if (isChildInBottom){
+            if (isChildInBottom) {
                 return handlerFootLoadTouchEvent(ev, action);
             }
 
             // 处于顶部，处理下拉刷新逻辑
-            if (isChildInTop){
+            if (isChildInTop) {
                 return handlerHeadRefreshTouchEvent(ev, action);
             }
         }
@@ -355,18 +352,17 @@ class RefreshLayout extends ViewGroup {
     private boolean handlerHeadRefreshTouchEvent(MotionEvent ev, int action) {
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
+                mActivePointerId = ev.getPointerId(0);
                 mIsBeingDragged = false;
                 break;
-
             case MotionEvent.ACTION_MOVE: {
-                final int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
+                final int pointerIndex = ev.findPointerIndex(mActivePointerId);
                 if (pointerIndex < 0) {
                     v("handlerHeadRefreshTouchEvent", "pointerIndex = " + pointerIndex);
                     return false;
                 }
 
-                final float y = MotionEventCompat.getY(ev, pointerIndex);
+                final float y = ev.getY(pointerIndex);
                 final float overScrollTop = (y - mInitialMotionY) * DRAG_RATE;
                 if (mIsBeingDragged) {
                     float originalDragPercent = overScrollTop / mHeadViewContainer.getDefaultTargetDistance();
@@ -387,8 +383,8 @@ class RefreshLayout extends ViewGroup {
                         mHeadViewContainer.setVisibility(View.VISIBLE);
                     }
 
-                    ViewCompat.setScaleX(mHeadViewContainer, 1f);
-                    ViewCompat.setScaleY(mHeadViewContainer, 1f);
+                    mHeadViewContainer.setScaleX(1f);
+                    mHeadViewContainer.setScaleY(1f);
 
                     if (null != mHeadRefreshAdapter) {
                         mHeadRefreshAdapter.onCreating(overScrollTop, mHeadViewContainer.getDefaultTargetDistance());
@@ -397,24 +393,22 @@ class RefreshLayout extends ViewGroup {
                 }
                 break;
             }
-            case MotionEventCompat.ACTION_POINTER_DOWN: {
-                final int index = MotionEventCompat.getActionIndex(ev);
-                mActivePointerId = MotionEventCompat.getPointerId(ev, index);
+            case MotionEvent.ACTION_POINTER_DOWN: {
+                final int index = ev.getActionIndex();
+                mActivePointerId = ev.getPointerId(index);
                 break;
             }
-
-            case MotionEventCompat.ACTION_POINTER_UP:
+            case MotionEvent.ACTION_POINTER_UP:
                 onSecondaryPointerUp(ev);
                 break;
-
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL: {
                 if (mActivePointerId == INVALID_POINTER) {
                     v("handlerHeadRefreshTouchEvent", "mActivePointerId = " + mActivePointerId);
                     return false;
                 }
-                final int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
-                final float y = MotionEventCompat.getY(ev, pointerIndex);
+                final int pointerIndex = ev.findPointerIndex(mActivePointerId);
+                final float y = ev.getY(pointerIndex);
                 final float overScrollTop = (y - mInitialMotionY) * DRAG_RATE;
                 mIsBeingDragged = false;
                 if (overScrollTop > mHeadViewContainer.getDefaultTargetDistance()) {
@@ -447,25 +441,20 @@ class RefreshLayout extends ViewGroup {
 
     /**
      * 处理上拉加载更多的Touch事件
-     *
-     * @param ev
-     * @param action
-     * @return
      */
     private boolean handlerFootLoadTouchEvent(MotionEvent ev, int action) {
         switch (action) {
             case MotionEvent.ACTION_DOWN:
-                mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
+                mActivePointerId = ev.getPointerId(0);
                 mIsBeingDragged = false;
                 break;
             case MotionEvent.ACTION_MOVE: {
-                final int pointerIndex = MotionEventCompat.findPointerIndex(ev,
-                        mActivePointerId);
+                final int pointerIndex = ev.findPointerIndex(mActivePointerId);
                 if (pointerIndex < 0) {
                     v("handlerFootLoadTouchEvent", "pointerIndex = " + pointerIndex);
                     return false;
                 }
-                final float y = MotionEventCompat.getY(ev, pointerIndex);
+                final float y = ev.getY(pointerIndex);
                 final float overScrollBottom = (mInitialMotionY - y) * DRAG_RATE;
                 if (mIsBeingDragged) {
                     pushDistance = (int) overScrollBottom;
@@ -476,23 +465,22 @@ class RefreshLayout extends ViewGroup {
                 }
                 break;
             }
-            case MotionEventCompat.ACTION_POINTER_DOWN: {
-                final int index = MotionEventCompat.getActionIndex(ev);
-                mActivePointerId = MotionEventCompat.getPointerId(ev, index);
+            case MotionEvent.ACTION_POINTER_DOWN: {
+                final int index = ev.getActionIndex();
+                mActivePointerId = ev.getPointerId(index);
                 break;
             }
-            case MotionEventCompat.ACTION_POINTER_UP:
+            case MotionEvent.ACTION_POINTER_UP:
                 onSecondaryPointerUp(ev);
                 break;
-
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL: {
                 if (mActivePointerId == INVALID_POINTER) {
                     v("handlerFootLoadTouchEvent", "mActivePointerId = " + mActivePointerId);
                     return false;
                 }
-                final int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
-                final float y = MotionEventCompat.getY(ev, pointerIndex);
+                final int pointerIndex = ev.findPointerIndex(mActivePointerId);
+                final float y = ev.getY(pointerIndex);
                 final float overScrollBottom = (mInitialMotionY - y) * DRAG_RATE;// 松手是下拉的距离
                 mIsBeingDragged = false;
                 mActivePointerId = INVALID_POINTER;
@@ -512,9 +500,6 @@ class RefreshLayout extends ViewGroup {
 
     /**
      * 松手之后，使用动画将Footer从距离start变化到end
-     *
-     * @param start
-     * @param end
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void animatorFooterToBottom(int start, final int end) {
@@ -548,8 +533,6 @@ class RefreshLayout extends ViewGroup {
 
     /**
      * 设置停止加载
-     *
-     * @param loadMore
      */
     public void setLoadMore(boolean loadMore) {
         if (!loadMore && isFootLoading) {// 停止加载
@@ -571,11 +554,11 @@ class RefreshLayout extends ViewGroup {
     }
 
     private void onSecondaryPointerUp(MotionEvent ev) {
-        final int pointerIndex = MotionEventCompat.getActionIndex(ev);
-        final int pointerId = MotionEventCompat.getPointerId(ev, pointerIndex);
+        final int pointerIndex = ev.getActionIndex();
+        final int pointerId = ev.getPointerId(pointerIndex);
         if (pointerId == mActivePointerId) {
             final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
-            mActivePointerId = MotionEventCompat.getPointerId(ev, newPointerIndex);
+            mActivePointerId = ev.getPointerId(newPointerIndex);
         }
     }
 
