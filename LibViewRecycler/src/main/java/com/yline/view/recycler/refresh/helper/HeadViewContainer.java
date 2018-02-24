@@ -182,21 +182,6 @@ public class HeadViewContainer extends RelativeLayout {
         attachAnimation(mOffsetStartAnimation, listener);
     }
 
-    private Animation getOffsetStartAnimation() {
-        if (null == mOffsetStartAnimation) {
-            mOffsetStartAnimation = new Animation() {
-                @Override
-                protected void applyTransformation(float interpolatedTime, Transformation t) {
-                    super.applyTransformation(interpolatedTime, t);
-                    if (null != mStartAnimationCallback) {
-                        mStartAnimationCallback.onApply(interpolatedTime);
-                    }
-                }
-            };
-        }
-        return mOffsetStartAnimation;
-    }
-
     /**
      * 给 头部容器，设置动画和回调
      *

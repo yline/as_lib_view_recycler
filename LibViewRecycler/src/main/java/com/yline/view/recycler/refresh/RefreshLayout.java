@@ -200,6 +200,20 @@ class RefreshLayout extends ViewGroup {
     }
 
     /**
+     * 重置Target位置
+     *
+     * @param delay
+     */
+    public void resetTargetLayoutDelay(int delay) {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                resetTargetLayout();
+            }
+        }, delay);
+    }
+
+    /**
      * 下拉时，超过距离之后，弹回来的动画监听器
      */
     /**
@@ -226,20 +240,6 @@ class RefreshLayout extends ViewGroup {
             mHeadViewContainer.setCurrentTargetOffset(mHeadViewContainer.getTop());
         }
     };
-
-    /**
-     * 重置Target位置
-     *
-     * @param delay
-     */
-    public void resetTargetLayoutDelay(int delay) {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                resetTargetLayout();
-            }
-        }, delay);
-    }
 
     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
