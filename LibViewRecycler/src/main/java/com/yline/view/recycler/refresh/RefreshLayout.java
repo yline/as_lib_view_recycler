@@ -59,7 +59,6 @@ class RefreshLayout extends ViewGroup {
 
     private static final int INVALID_POINTER = -1;
     private static final float DRAG_RATE = .5f;
-    private static final int ANIMATE_TO_START_DURATION = 200;
 
     /* 下拉刷新[有新建,就代表有默认值] */
     private boolean isFootLoading = false; // 是否正在上拉加载
@@ -169,15 +168,19 @@ class RefreshLayout extends ViewGroup {
      * @param refreshing Whether or not the view should show refresh progress.
      */
     public void setRefreshing(boolean refreshing) {
-        if (refreshing && !mHeadViewContainer.isRefreshing()) {
+        if (refreshing) {
+            scaleUpRefresh();
+        } else {
+            stopRefresh();
+        }
+    }
+
+    private void scaleUpRefresh() {
+        if (!mHeadViewContainer.isRefreshing()) {
             mHeadViewContainer.setRefreshing(true);
             mNotify = true;
 
-            int offset = mHeadViewContainer.getDefaultTargetDistance() + mHeadViewContainer.getOriginalOffset() - mHeadViewContainer.getCurrentTargetOffset();
-            mHeadViewContainer.setTargetOffsetTopAndBottom(offset);
-
-            mHeadViewContainer.setVisibility(View.VISIBLE);
-            mHeadViewContainer.startScaleUpAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
+            mHeadViewContainer.scaleUpAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
                 @Override
                 public void onAnimationStart(Animation animation) {
                 }
@@ -190,8 +193,6 @@ class RefreshLayout extends ViewGroup {
                     mHeadViewContainer.setCurrentTargetOffset(mHeadViewContainer.getTop());
                 }
             });
-        } else {
-            stopRefresh();
         }
     }
 
@@ -201,7 +202,7 @@ class RefreshLayout extends ViewGroup {
             mNotify = true;
 
             mChildHelper.checkChild(this, mHeadViewContainer, mFootViewContainer);
-            mHeadViewContainer.startTargetAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
+            mHeadViewContainer.moveTargetAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
                 @Override
                 public void onAnimationStart(Animation animation) {
                 }
@@ -223,7 +224,7 @@ class RefreshLayout extends ViewGroup {
             mNotify = false;
 
             mChildHelper.checkChild(this, mHeadViewContainer, mFootViewContainer);
-            mHeadViewContainer.startStartAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
+            mHeadViewContainer.moveDownAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
                 @Override
                 public void onAnimationStart(Animation animation) {
 
@@ -481,7 +482,7 @@ class RefreshLayout extends ViewGroup {
                     startRefresh();
                 } else {
                     mHeadViewContainer.setRefreshing(false);
-                    mHeadViewContainer.startStartAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
+                    mHeadViewContainer.moveDownAnimation(new HeadViewContainer.OnHeadAnimationCallback() {
                         @Override
                         public void onAnimationStart(Animation animation) {
                         }
@@ -489,7 +490,7 @@ class RefreshLayout extends ViewGroup {
                         @Override
                         public void onAnimationEnd(Animation animation) {
                             resetTargetLayout();
-                            mHeadViewContainer.startScaleDownAnimation(null);
+                            mHeadViewContainer.scaleDownAnimation(null);
                         }
                     });
                 }

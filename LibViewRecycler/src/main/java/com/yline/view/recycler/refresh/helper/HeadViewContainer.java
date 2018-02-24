@@ -40,9 +40,8 @@ public class HeadViewContainer extends RelativeLayout {
     private Animation mScaleUpAnimation;
     private Animation mScaleDownAnimation;
 
-    private Animation mOffsetTargetAnimation; // 滚动到指定位置
-    private OnApplyAnimationCallback mStartAnimationCallback;
-    private Animation mOffsetStartAnimation; // 滚动到开始位置
+    private Animation mMoveTargetAnimation; // 滚动到指定位置
+    private Animation mMoveDownAnimation; // 滚动到开始位置
 
     public static HeadViewContainer attachViewContainer(@NonNull ViewGroup viewGroup) {
         HeadViewContainer viewContainer = new HeadViewContainer(viewGroup.getContext());
@@ -117,12 +116,12 @@ public class HeadViewContainer extends RelativeLayout {
     }
 
     /**
-     * 开启动画
-     * 
+     * 非用户下拉时，实现放大动画背景，再加载动画效果
      *
-     * @param listener 回调
+     * @param listener 放大动画的回调
      */
-    public void startScaleUpAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
+    public void scaleUpAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
+        // 动画
         if (null == mScaleUpAnimation) {
             mScaleUpAnimation = new Animation() {
                 @Override
@@ -136,10 +135,18 @@ public class HeadViewContainer extends RelativeLayout {
             int duration = getResources().getInteger(android.R.integer.config_mediumAnimTime);
             mScaleUpAnimation.setDuration(duration);
         }
+
+        // 初始偏移量、设置成可见
+        int offset = mDefaultTargetDistance + mOriginalOffset - mCurrentTargetOffset;
+        setTargetOffsetTopAndBottom(offset);
+
+        setVisibility(VISIBLE);
+
+        // 设置动画
         attachAnimation(mScaleUpAnimation, listener);
     }
 
-    public void startScaleDownAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
+    public void scaleDownAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
         if (null == mScaleDownAnimation) {
             mScaleDownAnimation = new Animation() {
                 @Override
@@ -155,9 +162,14 @@ public class HeadViewContainer extends RelativeLayout {
         attachAnimation(mScaleDownAnimation, listener);
     }
 
-    public void startTargetAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
-        if (null == mOffsetTargetAnimation) {
-            mOffsetTargetAnimation = new Animation() {
+    /**
+     * 用户手指滑动，移动到指定位置，开始刷新动画
+     *
+     * @param listener 移动到指定位置的动画回调
+     */
+    public void moveTargetAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
+        if (null == mMoveTargetAnimation) {
+            mMoveTargetAnimation = new Animation() {
                 @Override
                 protected void applyTransformation(float interpolatedTime, Transformation t) {
                     super.applyTransformation(interpolatedTime, t);
@@ -168,16 +180,21 @@ public class HeadViewContainer extends RelativeLayout {
                 }
             };
         }
-        mOffsetTargetAnimation.reset();
-        mOffsetTargetAnimation.setDuration(ANIMATE_TO_TRIGGER_DURATION);
-        mOffsetTargetAnimation.setInterpolator(new DecelerateInterpolator(DECELERATE_INTERPOLATION_FACTOR));
+        mMoveTargetAnimation.reset();
+        mMoveTargetAnimation.setDuration(ANIMATE_TO_TRIGGER_DURATION);
+        mMoveTargetAnimation.setInterpolator(new DecelerateInterpolator(DECELERATE_INTERPOLATION_FACTOR));
 
-        attachAnimation(mOffsetTargetAnimation, listener);
+        attachAnimation(mMoveTargetAnimation, listener);
     }
 
-    public void startStartAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
-        if (null == mOffsetStartAnimation) {
-            mOffsetStartAnimation = new Animation() {
+    /**
+     * 快速移动到消失位置，消失后，停止刷新动画
+     *
+     * @param listener 指定位置移动消失的动画回调
+     */
+    public void moveDownAnimation(HeadViewContainer.OnHeadAnimationCallback listener) {
+        if (null == mMoveDownAnimation) {
+            mMoveDownAnimation = new Animation() {
                 @Override
                 protected void applyTransformation(float interpolatedTime, Transformation t) {
                     super.applyTransformation(interpolatedTime, t);
@@ -187,11 +204,11 @@ public class HeadViewContainer extends RelativeLayout {
                 }
             };
         }
-        mOffsetStartAnimation.reset();
-        mOffsetStartAnimation.setDuration(ANIMATE_TO_START_DURATION);
-        mOffsetStartAnimation.setInterpolator(new DecelerateInterpolator(DECELERATE_INTERPOLATION_FACTOR));
+        mMoveDownAnimation.reset();
+        mMoveDownAnimation.setDuration(ANIMATE_TO_START_DURATION);
+        mMoveDownAnimation.setInterpolator(new DecelerateInterpolator(DECELERATE_INTERPOLATION_FACTOR));
 
-        attachAnimation(mOffsetStartAnimation, listener);
+        attachAnimation(mMoveDownAnimation, listener);
     }
 
     /**
@@ -247,15 +264,6 @@ public class HeadViewContainer extends RelativeLayout {
 
     public int getDefaultTargetDistance() {
         return mDefaultTargetDistance;
-    }
-
-    public interface OnApplyAnimationCallback {
-        /**
-         * 修改动画偏移
-         *
-         * @param interpolatedTime 间隔时间，0-1
-         */
-        void onApply(float interpolatedTime);
     }
 
     public interface OnHeadAnimationCallback {
