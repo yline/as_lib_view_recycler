@@ -331,10 +331,6 @@ class RefreshLayout extends ViewGroup {
     }
 
     @Override
-    public void requestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-    }
-
-    @Override
     public boolean onTouchEvent(MotionEvent ev) {
         final int action = MotionEventCompat.getActionMasked(ev);
 
@@ -412,8 +408,7 @@ class RefreshLayout extends ViewGroup {
                     v("handlerHeadRefreshTouchEvent", "mActivePointerId = " + mActivePointerId);
                     return false;
                 }
-                final int pointerIndex = MotionEventCompat.findPointerIndex(ev,
-                        mActivePointerId);
+                final int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
                 final float y = MotionEventCompat.getY(ev, pointerIndex);
                 final float overScrollTop = (y - mInitialMotionY) * DRAG_RATE;
                 mIsBeingDragged = false;

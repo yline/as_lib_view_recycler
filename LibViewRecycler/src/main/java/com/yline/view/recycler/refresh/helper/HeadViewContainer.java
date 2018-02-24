@@ -10,6 +10,7 @@ import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Transformation;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 
 import com.yline.view.recycler.R;
 import com.yline.view.recycler.refresh.SuperSwipeRefreshLayout;
