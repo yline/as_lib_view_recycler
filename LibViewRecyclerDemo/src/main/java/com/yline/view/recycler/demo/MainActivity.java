@@ -21,10 +21,11 @@ import com.yline.view.recycler.demo.refresh.CircleProgressActivity;
 import com.yline.view.recycler.demo.refresh.CustomRefreshActivity;
 import com.yline.view.recycler.demo.refresh.SimpleRefreshActivity;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 public class MainActivity extends BaseTestActivity {
@@ -45,9 +46,19 @@ public class MainActivity extends BaseTestActivity {
         Set s;
         HashSet hs;
 
+        Integer i;
+        Byte bb;
+        Short sss;
+        Character c;
+
+        Long l;
+
         Boolean b;
         Float f;
+        Double d;
         String ss;
+        HashMap h;
+        Object o;
 
         addButton("test", new View.OnClickListener() {
             @Override
@@ -57,26 +68,9 @@ public class MainActivity extends BaseTestActivity {
                     dataList.add(String.valueOf(i));
                 }
 
-                for (String str : dataList) {
-                    int index = dataList.indexOf(str);
-                    dataList.set(index, "0" + str);
-                }
+                List<String> dataList2 = new ArrayList<>(dataList);
 
-                LogUtil.v("str = " + dataList);
-
-                String string = "01234567890123456789";
-                int code = string.hashCode();
-                int code2 = hashCode2(string);
-                LogUtil.v("code = " + code + ",code2 = " + code2 + ", same = " + (code == code2));
-
-
-                int i = 0x0001;
-
-                i = Integer.MAX_VALUE;
-                i = Integer.MIN_VALUE;
-
-                int max = 0x80000000 + 1;
-                LogUtil.v(String.format(Locale.CHINA, "-2 = %#x,-1 = %#x, 0 = %#x, 1 = %#x, 2 = %#x, max = %#x, min = %#x", -2, -1, 0, 1, 2, Integer.MAX_VALUE, Integer.MIN_VALUE));
+                LogUtil.v("one = " + dataList.hashCode() + ", two = " + dataList2.hashCode() + ", isSame = " + (dataList.hashCode() == dataList2.hashCode()));
             }
         });
     }

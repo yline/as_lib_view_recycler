@@ -12,6 +12,7 @@ import com.yline.application.SDKManager;
 import com.yline.base.BaseAppCompatActivity;
 import com.yline.test.StrConstant;
 import com.yline.view.recycler.demo.R;
+import com.yline.view.recycler.holder.RecyclerViewHolder;
 import com.yline.view.recycler.refresh.SuperSwipeRefreshLayout;
 import com.yline.view.recycler.refresh.adapter.AbstractRefreshAdapter;
 import com.yline.view.recycler.simple.SimpleHeadFootRecyclerAdapter;
@@ -30,7 +31,19 @@ public class SimpleRefreshActivity extends BaseAppCompatActivity {
 
         swipeRefreshLayout = (SuperSwipeRefreshLayout) findViewById(R.id.super_swipe_refresh);
         final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_super_swipe);
-        recyclerAdapter = new SimpleHeadFootRecyclerAdapter(this);
+        recyclerAdapter = new SimpleHeadFootRecyclerAdapter(this){
+            @Override
+            public void onBindViewHolder(RecyclerViewHolder holder, final int position) {
+                super.onBindViewHolder(holder, position);
+
+                holder.getItemView().setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        SDKManager.toast("getItemView + " + position);
+                    }
+                });
+            }
+        };
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(recyclerAdapter);

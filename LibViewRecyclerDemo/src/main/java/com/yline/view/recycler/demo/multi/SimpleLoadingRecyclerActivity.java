@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import com.yline.application.SDKManager;
 import com.yline.base.BaseAppCompatActivity;
@@ -48,7 +49,19 @@ public class SimpleLoadingRecyclerActivity extends BaseAppCompatActivity {
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mLoadingRecyclerAdapter = new SimpleLoadingRecyclerAdapter(this);
+        mLoadingRecyclerAdapter = new SimpleLoadingRecyclerAdapter(this){
+            @Override
+            public void onBindViewHolder(RecyclerViewHolder holder, final int position) {
+                super.onBindViewHolder(holder, position);
+
+                holder.getItemView().setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        SDKManager.toast("getItemView + " + position);
+                    }
+                });
+            }
+        };
         recyclerView.setAdapter(mLoadingRecyclerAdapter);
 
         mLoadingRecyclerAdapter.setDataList(StrConstant.getListRandom(25), true);
