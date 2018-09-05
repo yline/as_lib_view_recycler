@@ -5,7 +5,6 @@
 * ListView的公共Adapter，提供数据管理功能；暂时有16个数据管理的Api
 * RecyclerView的公共Adapter，提供数据管理功能；暂时有16个数据管理的Api
 * 提供处理Recycler添加头部和底部的情况
-* ItemDecoration，RecyclerView的分割线处理
 
 技术交流群：[644213963](https://jq.qq.com/?_wv=1027&k=4ETdgdJ)   
 个人邮箱：[957339173@qq.com](https://jq.qq.com/?_wv=1027&k=4B0yi1n)  
@@ -13,7 +12,7 @@
 
 ## 依赖
 * Gradle：
-```compile 'com.yline.lib:LibViewRecycler:1.0.2'```
+```compile 'com.yline.lib:LibViewRecycler:1.3.0'```
 * Maven:
 ```
     <dependency>
@@ -78,27 +77,8 @@
 	...
 	simpleAdapter.addFootView(footViewB);
 
-### ItemDecoration
-	recyclerView.addItemDecoration(new GridItemDecoration(this)
-	{
-		// 重写 间隔 的资源文件 
-		@Override
-		protected int getDivideResourceId()
-		{
-			return R.drawable.recycler_divider_black_normal;
-		}
-		
-		// left、top、right、bottom 四个方向最边上是否绘制间隔
-		@Override
-		protected boolean[] isSpanDraw()
-		{
-			return new boolean[]{false, false, false, false};
-		}
-	});
-
 ### ViewHolder
 新建
-
 	ViewHolder(View view)
 	ViewHolder(Activity activity)
 
@@ -121,11 +101,10 @@
 ![](https://github.com/yline/as_lib_view_recycler/blob/master/LibViewRecyclerDemo/src/main/assets/data.jpeg)
 
 ## 版本    
-### Version 1.0.3
+### Version 1.3.0
 > ViewHolder View控件操作   
 > 空数据时，RecyclerView显示   
-> RecyclwView添加头部和底部   
-> ItemDecoration 适配了Linear、Grid、StaggerGrid
+> RecyclwView添加头部和底部 
 
 
 
