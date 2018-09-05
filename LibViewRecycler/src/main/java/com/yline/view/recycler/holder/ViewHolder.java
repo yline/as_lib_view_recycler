@@ -13,81 +13,69 @@ import android.widget.TextView;
  * @author yline 2017/3/19 -- 3:03
  * @version 1.0.0
  */
-public class ViewHolder implements Callback.IViewHolderCallback
-{
+public class ViewHolder implements OnViewHolderCallback {
 	private SparseArrayCompat<View> sArray;
-
+	
 	private View sView;
-
-	public ViewHolder(View view)
-	{
+	
+	public ViewHolder(View view) {
 		this.sView = view;
 		sArray = new SparseArrayCompat<>();
 	}
-
-	public ViewHolder(Activity activity)
-	{
+	
+	public ViewHolder(Activity activity) {
 		this.sView = activity.getWindow().getDecorView();
 		this.sArray = new SparseArrayCompat<>();
 	}
-
+	
 	@Override
-	public <T extends View> T get(int viewId)
-	{
-		if (sArray.get(viewId) == null)
-		{
+	public <T extends View> T get(int viewId) {
+		if (sArray.get(viewId) == null) {
 			View view = sView.findViewById(viewId);
 			sArray.put(viewId, view);
 		}
 		return (T) sArray.get(viewId);
 	}
-
+	
 	@Override
-	public View getItemView()
-	{
+	public View getItemView() {
 		return this.sView;
 	}
-
+	
 	@Override
-	public String getText(int viewId)
-	{
+	public String getText(int viewId) {
 		TextView textView = this.get(viewId);
 		return textView.getText().toString();
 	}
-
+	
 	@Override
-	public TextView setText(int viewId, String content)
-	{
+	public TextView setText(int viewId, String content) {
 		TextView textView = this.get(viewId);
 		textView.setText(content);
 		return textView;
 	}
-
+	
 	@Override
-	public ImageView setImageBackgroundResource(int viewId, int resId)
-	{
+	public ImageView setImageBackgroundResource(int viewId, int resId) {
 		ImageView imageView = this.get(viewId);
 		imageView.setBackgroundResource(resId);
 		return imageView;
 	}
-
+	
 	@Override
-	public ImageView setImageResource(int viewId, int resId)
-	{
+	public ImageView setImageResource(int viewId, int resId) {
 		ImageView imageView = this.get(viewId);
 		imageView.setImageResource(resId);
 		return imageView;
 	}
-
+	
 	@Override
-	public void setOnClickListener(int viewId, View.OnClickListener listener)
-	{
+	public void setOnClickListener(int viewId, View.OnClickListener listener) {
 		this.get(viewId).setOnClickListener(listener);
 	}
-
+	
 	@Override
-	public ProgressBar setProgress(int viewId, int progress)
-	{
+	public ProgressBar setProgress(int viewId, int progress) {
 		ProgressBar progressBar = this.get(viewId);
 		progressBar.setProgress(progress);
 		return progressBar;

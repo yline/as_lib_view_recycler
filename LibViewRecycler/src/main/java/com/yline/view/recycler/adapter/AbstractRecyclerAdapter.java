@@ -7,7 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.yline.view.recycler.holder.Callback;
+import com.yline.view.recycler.holder.IDataAdapterCallback;
 import com.yline.view.recycler.holder.RecyclerViewHolder;
 import com.yline.view.recycler.manager.RecyclerDataManager;
 import com.yline.view.recycler.manager.RecyclerSpanManager;
@@ -23,7 +23,7 @@ import java.util.function.UnaryOperator;
  * @author yline 2017/5/23 -- 10:28
  * @version 1.0.0
  */
-public abstract class AbstractRecyclerAdapter<T> extends RecyclerView.Adapter<RecyclerViewHolder> implements Callback.IDataAdapterCallback<T> {
+public abstract class AbstractRecyclerAdapter<T> extends RecyclerView.Adapter<RecyclerViewHolder> implements IDataAdapterCallback<T> {
     private final RecyclerDataManager<T> mDataManager;
 
     public AbstractRecyclerAdapter() {

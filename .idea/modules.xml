@@ -4,7 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/LibViewRecycler/LibViewRecycler.iml" filepath="$PROJECT_DIR$/LibViewRecycler/LibViewRecycler.iml" />
       <module fileurl="file://$PROJECT_DIR$/LibViewRecyclerDemo/LibViewRecyclerDemo.iml" filepath="$PROJECT_DIR$/LibViewRecyclerDemo/LibViewRecyclerDemo.iml" />
-      <module fileurl="file://$PROJECT_DIR$/_LibViewRecycler.iml" filepath="$PROJECT_DIR$/_LibViewRecycler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/LibViewRecyclerRefresh/LibViewRecyclerRefresh.iml" filepath="$PROJECT_DIR$/LibViewRecyclerRefresh/LibViewRecyclerRefresh.iml" />
+      <module fileurl="file://$PROJECT_DIR$/as_lib_view_recycler.iml" filepath="$PROJECT_DIR$/as_lib_view_recycler.iml" />
     </modules>
   </component>
 </project>

@@ -10,6 +10,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/LibViewRecycler" />
             <option value="$PROJECT_DIR$/LibViewRecyclerDemo" />
+            <option value="$PROJECT_DIR$/LibViewRecyclerRefresh" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

@@ -22,8 +22,8 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':LibViewRecycler')
-    compile 'com.yline.lib:LibSDK:2.1.2'
+    compile 'com.yline.lib:LibSDK:2.3.2'
     compile 'com.android.support:design:26.1.0'
-    compile 'com.android.support.constraint:constraint-layout:1.1.0'
+    compile 'com.android.support.constraint:constraint-layout:1.1.3'
     compile 'com.google.code.gson:gson:2.8.2'
 }

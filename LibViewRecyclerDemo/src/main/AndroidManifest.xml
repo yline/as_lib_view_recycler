@@ -21,16 +21,13 @@
         <activity android:name=".adapter.SimpleRecyclerActivity" />
         <activity android:name=".adapter.SimpleHeadFootRecyclerActivity" />
         <!-- linear -->
-        <activity android:name=".linear.LinearRecyclerActivity" />
-        <activity android:name=".linear.LinearHeadFootRecyclerActivity" />
+        <activity android:name=".decoration.linear.LinearRecyclerActivity" />
+        <activity android:name=".decoration.linear.LinearHeadFootRecyclerActivity" />
         <!-- grid -->
-        <activity android:name=".grid.GridRecyclerActivity" />
-        <activity android:name=".grid.GridHeadFootRecyclerActivity" />
-        <activity android:name=".refresh.CircleProgressActivity" />
-        <activity android:name=".refresh.CustomRefreshActivity" />
-        <activity android:name=".refresh.SimpleRefreshActivity" />
+        <activity android:name=".decoration.grid.GridRecyclerActivity" />
+        <activity android:name=".decoration.grid.GridHeadFootRecyclerActivity" />
         <activity android:name=".multi.SimpleMultiRecyclerActivity" />
-        <activity android:name=".multi.SimpleLoadingRecyclerActivity" />
+        <activity android:name=".adapter.SimpleLoadingRecyclerActivity" />
     </application>
 
 </manifest>

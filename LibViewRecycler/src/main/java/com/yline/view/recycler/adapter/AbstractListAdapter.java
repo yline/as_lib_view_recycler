@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.yline.view.recycler.holder.Callback;
+import com.yline.view.recycler.holder.IDataAdapterCallback;
 import com.yline.view.recycler.holder.ViewHolder;
 import com.yline.view.recycler.manager.ListDataManager;
 
@@ -23,7 +23,7 @@ import java.util.function.UnaryOperator;
  * @author yline 2017/5/23 -- 10:27
  * @version 1.0.0
  */
-public abstract class AbstractListAdapter<T> extends BaseAdapter implements Callback.IDataAdapterCallback<T> {
+public abstract class AbstractListAdapter<T> extends BaseAdapter implements IDataAdapterCallback<T> {
     private final ListDataManager<T> mDataManager;
     private final Context mContext;
 

@@ -5,12 +5,12 @@ import android.support.design.widget.TabLayout;
 import com.yline.application.SDKManager;
 import com.yline.log.LogFileUtil;
 import com.yline.test.StrConstant;
-import com.yline.view.recycler.holder.Callback;
+import com.yline.view.recycler.holder.IDataAdapterCallback;
 
 import java.util.List;
 
 public class DataAdapterTest {
-    public DataAdapterTest(TabLayout tabLayout, final Callback.IDataAdapterCallback<String> adapter) {
+    public DataAdapterTest(TabLayout tabLayout, final IDataAdapterCallback<String> adapter) {
         tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
         tabLayout.addTab(tabLayout.newTab().setText("getDataList"));
         tabLayout.addTab(tabLayout.newTab().setText("getItem(0)"));

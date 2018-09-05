@@ -1,1 +1,1 @@
-include ':LibViewRecyclerDemo', ':LibViewRecycler'
+include ':LibViewRecyclerDemo', ':LibViewRecycler', ':LibViewRecyclerRefresh'

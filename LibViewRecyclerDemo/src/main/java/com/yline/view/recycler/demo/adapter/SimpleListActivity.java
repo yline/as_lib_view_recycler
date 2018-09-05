@@ -9,7 +9,7 @@ import android.widget.ListView;
 import com.yline.base.BaseActivity;
 import com.yline.view.recycler.demo.test.DataAdapterTest;
 import com.yline.view.recycler.demo.R;
-import com.yline.view.recycler.simple.SimpleListAdapter;
+import com.yline.view.recycler.test.SimpleListAdapter;
 
 public class SimpleListActivity extends BaseActivity {
     private ListView lvDemo;

@@ -14,7 +14,7 @@ import com.yline.base.BaseAppCompatActivity;
 import com.yline.utils.UIScreenUtil;
 import com.yline.view.recycler.demo.test.DataAdapterTest;
 import com.yline.view.recycler.demo.R;
-import com.yline.view.recycler.simple.SimpleHeadFootRecyclerAdapter;
+import com.yline.view.recycler.test.SimpleHeadFootRecyclerAdapter;
 
 public class SimpleHeadFootRecyclerActivity extends BaseAppCompatActivity {
     private SimpleHeadFootRecyclerAdapter simpleAdapter;

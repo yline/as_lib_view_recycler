@@ -1,0 +1,8 @@
+1，adapter: 直接校验Lib
+2，增加decoration校验Lib
+3，增加multi，多样式Item功能
+
+
+PS:
+由于decoration大部分由item替代，抽离处理，不放入库工程；demo做演示作用，可以参考
+由于multi使用场景少，抽离出来，不放入库工程；demo做演示作用，可以参考

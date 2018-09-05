@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.yline.view.recycler.R;
-import com.yline.view.recycler.holder.Callback;
+import com.yline.view.recycler.holder.IDataAdapterCallback;
 import com.yline.view.recycler.holder.RecyclerViewHolder;
 import com.yline.view.recycler.manager.HeadFootRecyclerDataManager;
 import com.yline.view.recycler.manager.RecyclerSpanManager;
@@ -27,7 +27,7 @@ import java.util.function.UnaryOperator;
  * @author yline 2017/5/23 -- 10:31
  * @version 1.0.0
  */
-public abstract class AbstractHeadFootRecyclerAdapter<T> extends RecyclerView.Adapter<RecyclerViewHolder> implements Callback.IDataAdapterCallback<T> {
+public abstract class AbstractHeadFootRecyclerAdapter<T> extends RecyclerView.Adapter<RecyclerViewHolder> implements IDataAdapterCallback<T> {
     public static final int HEAD_COUNT = 1; // 头部数量
     public static final int FOOT_COUNT = 1; // 底部数量
 
